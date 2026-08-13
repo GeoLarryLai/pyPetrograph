@@ -1,0 +1,16 @@
+.DS_Store
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.ipynb_checkpoints/
+.venv/
+models/
+labels/
+predictions/
+*.joblib
+*.mp4
+AMICS data/
+dataset/
+old codes/
