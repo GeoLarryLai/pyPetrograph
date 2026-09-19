@@ -1,5 +1,4 @@
-# One env for all three demos (includes SegmentEveryGrain).
-# Does not download SAM 2.1 weights.
+# Core env for the three demos. SegmentEveryGrain is optional — see README.
 # conda env create -f environment.yml
 # conda activate pypetrograph
 # pip install -e .
@@ -27,12 +26,3 @@ dependencies:
   - jupyterlab
   - ipykernel
   - pip
-  - pip:
-      - tensorflow>=2.16,<2.22
-      - keras>=3
-      - segmenteverygrain==0.5.0
-      # Optional SAM refine (libraries only). Weights (~860 MB) are NOT
-      # downloaded here. Uncomment only if you will set USE_SAM2 = True.
-      # - sam2>=1.0
-      # - torch>=2.2
-      # - torchvision

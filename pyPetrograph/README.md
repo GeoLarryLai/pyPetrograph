@@ -224,12 +224,12 @@ Declared in the repo-root [`environment.yml`](../environment.yml) and [`pyprojec
 | Extra | Packages | Used by |
 |-------|----------|---------|
 | *(core)* | numpy, pillow, matplotlib, scikit-learn, scipy, geopandas, shapely, rasterio, affine, joblib, pandas, lightgbm, scikit-image, **PyQt5** | RGB + mineral-map |
-| `[seg]` | TensorFlow, Keras, `segmenteverygrain` | multimodal **U-Net** subprocess (enough for the demo) |
+| `[seg]` | TensorFlow, Keras, `segmenteverygrain` | **optional** multimodal U-Net / GrainPlot / montage (finer grain boundaries) |
 | `[sam2]` | torch, torchvision, `sam2` | optional SAM shape refine — **do not** download the ~860 MB weights unless `USE_SAM2 = True` |
 | `[xgb]` | xgboost | optional RGB classifier |
 | `[all]` | seg + sam2 + xgb | only if you need SAM refine and xgboost |
 
-See the [root README](../README.md#install) for install steps.
+From PyPI: `pip install pypetrograph`. Alternatively, see the [root README](../README.md#install) conda path. After `conda activate pypetrograph`, optional SEG is `pip install segmenteverygrain` (into this env), not SEG’s separate conda env.
 
 ---
 
