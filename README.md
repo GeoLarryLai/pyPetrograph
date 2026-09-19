@@ -68,9 +68,15 @@ You already have a color mineral map (one flat color per mineral) and a legend. 
 
 [`pyPetrograph_multimodal_grains.ipynb`](pyPetrograph_multimodal_grains.ipynb)
 
-A boundary drawn from PPL alone can miss contacts that only show under crossed polars (XPL), or the other way around. This notebook lines up PPL and XPL of the same field, stacks them as one overlay, and refines grain outlines with a [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain) U-Net (Zoltan Sylvester), then optional GrainPlot QC. Left: watershed — a no-training first guess from brightness. Right: GrainPlot QC — the trained refine on that overlay, so touching grains split more cleanly. [SAM 2.1](https://github.com/facebookresearch/sam2) (~860 MB, off by default) is only if you need still finer shapes.
+A boundary drawn from PPL alone can miss contacts that only show under crossed polars (XPL), or the other way around. This notebook lines up PPL and XPL of the same field and stacks them as one overlay. Grain outlines go left to right in the same order as the work:
 
-![Watershed vs GrainPlot QC on an aligned PPL + XPL overlay](project%20images/Grain-mapping-mutiimage-overlay.png)
+1. **Watershed** — first guess from brightness, no training.
+2. **SEG mask** — optional [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain) U-Net (Zoltan Sylvester). This saved mask is the **train target**.
+3. **N-channel U-Net** (~25 MB, already in [`outputs/models/grain_unet_ppl-xpl.keras`](outputs/models/grain_unet_ppl-xpl.keras)) — trained on that PPL + XPL stack to copy the SEG mask. The notebook **loads** it and does not train again.
+
+GrainPlot QC is a further optional window. [SAM 2.1](https://github.com/facebookresearch/sam2) (~860 MB, off by default) is only if you need still finer shapes.
+
+![Watershed, SEG train target, and N-channel U-Net on an aligned PPL + XPL overlay](project%20images/Grain-mapping-mutiimage-overlay.png)
 
 ---
 ## License

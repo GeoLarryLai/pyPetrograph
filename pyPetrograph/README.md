@@ -2,7 +2,7 @@
 
 See the [root README](../README.md) for what the package does, the under-development warning, and the SegmentEveryGrain / SAM 2.1 note.
 
-v0.0.6: hand-label RGB features → LightGBM area %; mineral-map grain counts; multi-image overlay grain segmentation (PPL + XPL, SegmentEveryGrain U-Net).
+v0.0.6: hand-label RGB features → LightGBM area %; mineral-map grain counts; multi-image overlay grain segmentation (PPL + XPL; optional SEG U-Net; shipped N-channel U-Net `grain_unet_ppl-xpl.keras`).
 
 ```python
 from pyPetrograph import Session, launch_app, check_and_install_packages, build_channel_stack
@@ -16,7 +16,7 @@ from pyPetrograph import Session, launch_app, check_and_install_packages, build_
 |----------|----------------|
 | `pyPetrograph_rgb_porosity.ipynb` | Wand/polygon pore + grain labels → LightGBM → porosity % with uncertainty |
 | `pyPetrograph_mineralmap_count.ipynb` | Flat-color mineral maps (legend TIFF) → snap colors → absorb specks → split touching grains → per-class counts with uncertainty |
-| `pyPetrograph_multimodal_grains.ipynb` | PPL + XPL → physics channels → SEG **U-Net** outlines (SAM off by default) → object table → names → stats |
+| `pyPetrograph_multimodal_grains.ipynb` | PPL + XPL → physics channels → watershed, optional SEG, optional N-channel U-Net (SAM off) → object table → names → stats |
 
 Each multimodal stage starts with `LOAD_SAVED_* = True`. Kernel **never imports TensorFlow**. GrainPlot, the N-channel U-Net, and the montage run in subprocesses of conda `work`.
 
@@ -48,12 +48,12 @@ Edit only the Settings cell in `pyPetrograph_multimodal_grains.ipynb` (default: 
 
 1. Align (auto + tweak window; Axioscan 2% stack is already on one grid — skip auto)
 2. Physics channels (`build_channel_stack` → `channels/{stem}_channels.npz`)
-3. Outlines: watershed (no training) or SEG **U-Net** (~26 MB). Leave `USE_SAM2 = False`. SAM refine (~860 MB) is only for finer grain shapes.
+3. Outlines: watershed (no training), optional SEG **U-Net** (~26 MB), optional N-channel U-Net (~25 MB, `outputs/models/grain_unet_ppl-xpl.keras`). Leave `USE_SAM2 = False`. SAM refine (~860 MB) is only for finer grain shapes.
 4. Object table (grains + leftover pores/cement)
 5. k-means + SEG montage labeler
 6. LightGBM + overlay + stats
 
-`INIT_UNET` / `TRAIN_UNET` stay False until you have a GrainPlot mask you trust.
+`INIT_UNET` / `TRAIN_UNET` stay False. The notebook loads the shipped N-channel weights when `.trained.json` is present.
 
 ---
 
@@ -100,6 +100,7 @@ Original images stay put. Default: beside each image `labels/` + `predictions/` 
   models/sam2.1_hiera_large.pt
   models/grain_unet_{channel_set}.keras
   models/grain_unet_{channel_set}.keras.norm.json
+  models/grain_unet_{channel_set}.keras.trained.json  # skip retrain when present
   models/object_model_{channel_set}.joblib
 
 {image_folder}/
@@ -148,7 +149,7 @@ Adapts to the layers present; a missing layer is skipped, never faked. `channel_
 ## Outlines (stage 3)
 
 - **Watershed** — no training; edge map = z-scored Sobel per channel.
-- **N-channel U-Net** — copy SEG RGB weights; first conv gets primary RGB kernels; other channels start small-random. Train on GrainPlot 3-class masks. Subprocess; pyarrow blocked (TF 2.21 SIGSEGV).
+- **N-channel U-Net** — copy SEG RGB weights; first conv gets primary RGB kernels; other channels start small-random. Train on a SEG / GrainPlot mask. Demo ships `outputs/models/grain_unet_ppl-xpl.keras` (~25 MB); skip train when `.trained.json` exists. Subprocess; pyarrow blocked (TF 2.21 SIGSEGV).
 - **GrainPlot** — click add / D delete / M merge. Same files as the PPL tutorial: `labels/{stem}_grains.geojson` + `_grains_mask.png`.
 
 ---
@@ -186,7 +187,7 @@ Retrain: stratified k-fold CV (default 5), then fit on all labeled pixels. Predi
 | `run_watershed` / `init_grain_unet` / `train_grain_unet` / `predict_grain_unet` | Outlines |
 | `launch_grain_qc` / `load_grain_qc` / `load_grain_mask` | GrainPlot (`interactive=False` writes grains without a window) |
 | `ensure_seg_weights` | Download SEG U-Net (~26 MB). Pass `sam2=True` only if you want the ~860 MB SAM 2.1 weights |
-| `compare_outlines` | Watershed \| U-Net \| QC |
+| `compare_outlines` | Watershed \| SEG / QC \| N-channel U-Net (process order) |
 | `build_object_table_from_stack` | One row per object |
 | `cluster_objects` / `launch_montage_labeler` | Group and name |
 | `train_object_classifier` / `predict_object_classes` / `save_classes` | LightGBM names |

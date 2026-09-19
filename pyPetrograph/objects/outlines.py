@@ -330,15 +330,17 @@ def compare_outlines(
     Overlay grain outlines on PPL. Only panels with labels are drawn.
 
     ``greyscale=True`` (default) uses a grey background. Outlines are darker
-    red (watershed), green (U-Net), blue (GrainPlot QC).
+    red (watershed), blue (SEG / GrainPlot), green (N-channel U-Net).
+    Panels draw left to right in process order.
     """
     import matplotlib.pyplot as plt
 
-    titles = titles or ("watershed (no training)", "N-channel U-Net", "GrainPlot QC")
-    colors = ((180, 15, 15), (0, 130, 45), (15, 45, 190))
+    titles = titles or ("watershed (no training)", "SEG / GrainPlot", "N-channel U-Net")
+    # Process order: first guess → train target / QC → trained N-channel net.
+    colors = ((180, 15, 15), (15, 45, 190), (0, 130, 45))
     panels = [
         (lab, title, col)
-        for lab, title, col in zip((watershed_lab, unet_lab, qc_lab), titles, colors)
+        for lab, title, col in zip((watershed_lab, qc_lab, unet_lab), titles, colors)
         if lab is not None
     ]
     if not panels:
