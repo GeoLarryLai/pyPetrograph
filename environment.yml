@@ -1,5 +1,5 @@
-# Recommended env: porosity + mineral-map + multimodal U-Net.
-# Does not download SAM 2.1 weights. For a lighter env see environment-core.yml.
+# One env for all three demos (includes SegmentEveryGrain).
+# Does not download SAM 2.1 weights.
 # conda env create -f environment.yml
 # conda activate pypetrograph
 # pip install -e .

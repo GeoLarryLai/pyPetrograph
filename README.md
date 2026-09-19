@@ -14,21 +14,13 @@ The current version is primarily developed by **Larry Syu-Heng Lai**, based on e
 
 ## Install
 
-**Conda (all three demos, including SegmentEveryGrain):**
-
 ```bash
 conda env create -f environment.yml
 conda activate pypetrograph
 pip install -e .
 ```
 
-**Porosity and mineral-map only:**
-
-```bash
-conda env create -f environment-core.yml
-conda activate pypetrograph
-pip install -e .
-```
+To skip SegmentEveryGrain, comment out `tensorflow`, `keras`, and `segmenteverygrain` in `environment.yml` before you create the env.
 
 ## Demo notebooks
 

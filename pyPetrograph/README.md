@@ -229,7 +229,7 @@ Declared in the repo-root [`environment.yml`](../environment.yml) and [`pyprojec
 | `[xgb]` | xgboost | optional RGB classifier |
 | `[all]` | seg + sam2 + xgb | only if you need SAM refine and xgboost |
 
-See the [root README](../README.md#install) for install steps. Use `environment-core.yml` if you do not want SegmentEveryGrain.
+See the [root README](../README.md#install) for install steps.
 
 ---
 
