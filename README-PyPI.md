@@ -16,23 +16,15 @@ pyPetrograph is a machine-learning toolkit for thin-section petrography.
 
 **Segment grains from a multi-image overlay.** Line up several image types of the same field (plane-polarized light, crossed polars, or others) and refine grain outlines with a U-Net, so boundaries are not drawn from one lighting alone.
 
-For finer grain-boundary mapping there is optional support for [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain) (Zoltan Sylvester). [SAM 2.1](https://github.com/facebookresearch/sam2) weights (~860 MB) are a further opt-in on their page, not part of the default install.
-
 ## Install
 
 ```bash
 pip install pypetrograph
 ```
 
-```bash
-pip install segmenteverygrain
-```
-
-The second line is optional (SegmentEveryGrain’s existing-environment path).
-
 ## Demos
 
-Example notebooks, test images, and figures are in the [GitHub repository](https://github.com/GeoLarryLai/pyPetrograph).
+Example notebooks, test images, figures, and optional extras are in the [GitHub repository](https://github.com/GeoLarryLai/pyPetrograph).
 
 ## Credits
 

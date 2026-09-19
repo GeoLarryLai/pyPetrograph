@@ -40,6 +40,18 @@ def grain_unet_path(channel_set_id: str) -> Path:
     return project_models_dir() / f"{GRAIN_UNET_PREFIX}{channel_set_id}.keras"
 
 
+def grain_unet_trained_marker(channel_set_id: str) -> Path:
+    """Sidecar written after a finished train (init-only ``.keras`` is not trained)."""
+    return Path(str(grain_unet_path(channel_set_id)) + ".trained.json")
+
+
+def grain_unet_is_trained(channel_set_id: str) -> bool:
+    """True if weights exist and a train pass wrote the sidecar."""
+    return grain_unet_path(channel_set_id).exists() and grain_unet_trained_marker(
+        channel_set_id
+    ).exists()
+
+
 def _unet_worker() -> Path:
     return Path(__file__).resolve().parent / "unet_worker.py"
 
@@ -163,6 +175,20 @@ def train_grain_unet(
         print(f"grain U-Net train: {out_path.name}  epochs={epochs}")
         proc = _run_worker(cmd)
     ok = proc.returncode == 0 and out_path.exists()
+    if ok:
+        marker = grain_unet_trained_marker(cs.channel_set_id)
+        marker.write_text(
+            json.dumps(
+                {
+                    "ok": True,
+                    "channel_set_id": cs.channel_set_id,
+                    "epochs": int(epochs),
+                    "path": str(out_path),
+                },
+                indent=2,
+            )
+            + "\n"
+        )
     return {
         "ok": ok,
         "path": out_path,

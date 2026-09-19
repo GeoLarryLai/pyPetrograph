@@ -1,0 +1,7 @@
+{
+  "ok": true,
+  "channel_set_id": "ppl-xpl",
+  "epochs": 15,
+  "n_predict": 763,
+  "path": "outputs/models/grain_unet_ppl-xpl.keras"
+}

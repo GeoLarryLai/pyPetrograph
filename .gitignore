@@ -23,8 +23,12 @@ Modal_*.ipynb
 SegmentEveryGrain_*.ipynb
 Rich Kyle-BEG Aggregate Mapping Project/
 project images/*.svg
-outputs/models/
+outputs/models/*
+!outputs/models/grain_unet_ppl-xpl.keras
+!outputs/models/grain_unet_ppl-xpl.keras.norm.json
+!outputs/models/grain_unet_ppl-xpl.keras.trained.json
 outputs/**/*.npy
 *.npz
 *.keras
+!outputs/models/grain_unet_ppl-xpl.keras
 *.pt

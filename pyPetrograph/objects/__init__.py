@@ -15,7 +15,9 @@ from pyPetrograph.objects.cluster import (
 )
 from pyPetrograph.objects.outlines import (
     compare_outlines,
+    grain_unet_is_trained,
     grain_unet_path,
+    grain_unet_trained_marker,
     init_grain_unet,
     predict_grain_unet,
     run_outlines,
@@ -61,6 +63,8 @@ __all__ = [
     "train_grain_unet",
     "predict_grain_unet",
     "grain_unet_path",
+    "grain_unet_trained_marker",
+    "grain_unet_is_trained",
     "run_outlines",
     "compare_outlines",
     "launch_grain_qc",

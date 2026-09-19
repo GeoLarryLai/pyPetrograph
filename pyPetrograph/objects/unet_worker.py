@@ -19,6 +19,8 @@ import traceback
 from pathlib import Path
 from typing import List, Optional, Tuple
 
+import numpy as np
+
 _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
