@@ -43,6 +43,7 @@ from pyPetrograph.common.paths import (
     StemPaths,
     _subdir_rel,
     cleanup_legacy_outputs,
+    get_output_dir,
     project_models_dir,
     relpath_display,
     stem_paths,
@@ -182,8 +183,14 @@ class Session:
         return sorted({p.parent.resolve() for p in self.image_queue})
 
     def ensure_output_dirs(self) -> Tuple[Path, Path]:
-        """Create labels/ + predictions/ beside images; notebook-level models/."""
+        """Create labels/ + predictions/; models/ via ``project_models_dir``."""
         self.models_dir = project_models_dir()
+        out = get_output_dir()
+        if out is not None:
+            (out / LABELS_SUBDIR).mkdir(parents=True, exist_ok=True)
+            (out / PREDICTIONS_SUBDIR).mkdir(parents=True, exist_ok=True)
+            self.predictions_dir = out / PREDICTIONS_SUBDIR
+            return self.models_dir, self.predictions_dir
         bases: List[Path] = (
             self.queue_parent_dirs() if self.image_queue else [self.work_directory()]
         )

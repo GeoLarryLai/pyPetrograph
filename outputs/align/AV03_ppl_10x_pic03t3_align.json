@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "working_slot": "ppl",
+  "point_tolerance_px": 8.0,
+  "scale_range": [
+    0.5,
+    2.0
+  ],
+  "click_pairs": [],
+  "layers": [
+    {
+      "slot": "ppl",
+      "path": "Test images/AV03_ppl_10x_pic03t3.tif",
+      "transform": {
+        "scale": 1.0,
+        "rotation_deg": 0.0,
+        "tx": 0.0,
+        "ty": 0.0
+      }
+    },
+    {
+      "slot": "xpl",
+      "path": "Test images/AV03_xpl_10x_pic03t3.tif",
+      "transform": {
+        "scale": 1.0,
+        "rotation_deg": 0.0,
+        "tx": -3.4000000953674316,
+        "ty": 2.200000047683716
+      }
+    }
+  ]
+}

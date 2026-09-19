@@ -1,0 +1,38 @@
+# One env for all three demos (includes SegmentEveryGrain).
+# Does not download SAM 2.1 weights.
+# conda env create -f environment.yml
+# conda activate pypetrograph
+# pip install -e .
+
+name: pypetrograph
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy>=1.24
+  - pillow>=10
+  - matplotlib>=3.7
+  - scikit-learn>=1.3
+  - scipy>=1.10
+  - geopandas>=0.14
+  - shapely>=2
+  - rasterio>=1.3
+  - affine>=2.4
+  - joblib>=1.3
+  - pandas>=2
+  - lightgbm>=4
+  - scikit-image>=0.22
+  - pyqt>=5.15
+  - xgboost>=2
+  - jupyterlab
+  - ipykernel
+  - pip
+  - pip:
+      - tensorflow>=2.16,<2.22
+      - keras>=3
+      - segmenteverygrain==0.5.0
+      # Optional SAM refine (libraries only). Weights (~860 MB) are NOT
+      # downloaded here. Uncomment only if you will set USE_SAM2 = True.
+      # - sam2>=1.0
+      # - torch>=2.2
+      # - torchvision

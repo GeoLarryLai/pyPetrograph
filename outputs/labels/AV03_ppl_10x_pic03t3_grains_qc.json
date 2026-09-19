@@ -1,0 +1,6 @@
+{
+  "ok": true,
+  "n": 585,
+  "geojson": "/Users/larryslai/Library/CloudStorage/Dropbox/My Documents/University of Texas Austin/(Project) ML petrography/outputs/labels/AV03_ppl_10x_pic03t3_grains.geojson",
+  "mask": "/Users/larryslai/Library/CloudStorage/Dropbox/My Documents/University of Texas Austin/(Project) ML petrography/outputs/labels/AV03_ppl_10x_pic03t3_grains_mask.png"
+}

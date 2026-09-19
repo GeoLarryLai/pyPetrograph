@@ -1,0 +1,37 @@
+map_red,map_green,map_blue,pixels,closest_legend_color,distance_from_legend
+192,192,192,119538,Rutile,64.0
+250,128,114,22764,Carpholite,61.7
+150,150,150,3310,Garnet-Spessartine,92.5
+191,255,255,444,Rutile,103.8
+255,255,191,375,Rutile,64.1
+255,224,156,345,Rutile,56.9
+156,224,255,246,Rutile,116.3
+72,0,116,199,Biotite,78.4
+224,156,72,170,Carpholite,69.7
+116,0,72,165,Iron Oxides,73.0
+72,156,224,152,Tourmaline,51.5
+0,116,191,114,Tourmaline,74.2
+0,72,156,107,Tourmaline,100.4
+116,0,116,104,Topaz,100.2
+255,191,116,101,Rutile,87.0
+72,0,0,88,Iron Oxides,56.0
+116,191,255,53,Tourmaline,104.4
+72,72,156,51,Garnet-Spessartine,62.3
+156,72,0,35,Illite,68.9
+72,0,72,23,Biotite,73.2
+156,72,72,10,Carpholite,56.6
+116,72,72,9,Carpholite,93.4
+156,191,156,4,Rutile,109.6
+191,255,191,3,Rutile,90.6
+0,116,116,3,Ilmenite,117.1
+72,72,0,3,Ilmenite,77.3
+0,72,72,2,Biotite,73.2
+191,191,116,2,Carpholite,102.8
+116,116,116,2,Garnet-Spessartine,93.3
+0,72,116,1,Biotite,78.4
+224,191,116,1,Rutile,92.4
+224,255,224,1,Rutile,73.3
+116,116,72,1,Illite,93.1
+116,72,0,1,Iron Oxides,73.0
+72,156,191,1,Tourmaline,61.7
+116,156,156,1,Garnet-Spessartine,82.8

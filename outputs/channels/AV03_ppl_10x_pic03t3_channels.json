@@ -1,0 +1,45 @@
+{
+  "channel_set_id": "ppl-xpl",
+  "groups": [
+    "ppl",
+    "xpl"
+  ],
+  "primary_slot": "ppl",
+  "primary_kind": "ppl",
+  "slots": [
+    "ppl",
+    "xpl"
+  ],
+  "xpl_angles_deg": [],
+  "y_target": 128.0,
+  "shape_hw": [
+    1088,
+    1636
+  ],
+  "toggles": {
+    "primary_rgb": true,
+    "xpl": true,
+    "bse": true,
+    "extra_texture": false,
+    "extra_embed": false
+  },
+  "notes": [],
+  "names": [
+    "ppl_r",
+    "ppl_g",
+    "ppl_b",
+    "xpl_r",
+    "xpl_g",
+    "xpl_b"
+  ],
+  "kinds": [
+    "rgb255",
+    "rgb255",
+    "rgb255",
+    "rgb255",
+    "rgb255",
+    "rgb255"
+  ],
+  "saved": "2026-09-18T20:42:32",
+  "source_image": "Test images/AV03_ppl_10x_pic03t3.tif"
+}

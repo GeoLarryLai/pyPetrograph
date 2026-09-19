@@ -1,0 +1,3 @@
+class_id,name,count,area_pct,area_pct_low,area_pct_high,area_pct_plus,area_pct_minus,sure_threshold,model_used
+1,pores,42500,2.4,2.14,2.81,0.42,0.26,0.8,/Users/larryslai/Library/CloudStorage/Dropbox/My Documents/University of Texas Austin/(Project) ML petrography/outputs/models/universal_model.joblib
+2,grains,1728659,97.6,96.8,97.6,0.0,0.8,0.8,/Users/larryslai/Library/CloudStorage/Dropbox/My Documents/University of Texas Austin/(Project) ML petrography/outputs/models/universal_model.joblib

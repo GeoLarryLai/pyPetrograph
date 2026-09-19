@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyPetrograph"
+version = "0.0.5"
+description = "Thin-section petrography: RGB pixel labeling, multimodal grain objects, and mineral-map counts."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "AGPL-3.0-or-later" }
+authors = [{ name = "Larry Syu-Heng Lai" }]
+keywords = ["petrography", "thin-section", "mineralogy", "segmentation", "porosity"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
+dependencies = [
+    "numpy>=1.24",
+    "pillow>=10",
+    "matplotlib>=3.7",
+    "scikit-learn>=1.3",
+    "scipy>=1.10",
+    "geopandas>=0.14",
+    "shapely>=2",
+    "rasterio>=1.3",
+    "affine>=2.4",
+    "joblib>=1.3",
+    "pandas>=2",
+    "lightgbm>=4",
+    "scikit-image>=0.22",
+    "PyQt5>=5.15",
+]
+
+[project.optional-dependencies]
+seg = [
+    "tensorflow>=2.16,<2.22",
+    "keras>=3",
+    "segmenteverygrain==0.5.0",
+]
+sam2 = [
+    "torch>=2.2",
+    "torchvision",
+    "sam2>=1.0",
+]
+xgb = ["xgboost>=2"]
+all = ["pyPetrograph[seg,sam2,xgb]"]
+
+[project.urls]
+Homepage = "https://github.com/GeoLarryLai/pyPetrograph"
+Repository = "https://github.com/GeoLarryLai/pyPetrograph"
+
+[tool.setuptools.packages.find]
+include = ["pyPetrograph*"]

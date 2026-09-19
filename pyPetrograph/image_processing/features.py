@@ -9,12 +9,18 @@ from shapely.geometry import Polygon
 
 from pyPetrograph.common.constants import (
     DEFAULT_FEATURE_TOGGLES,
+    DEFAULT_GABOR_ANGLES_DEG,
+    DEFAULT_GABOR_FREQUENCY,
+    DEFAULT_HESSIAN_SIGMA,
     DEFAULT_LBP_P,
     DEFAULT_LBP_R,
     DEFAULT_PREVIEW_TARGET_MP,
     DEFAULT_SCREEN_VIEW_FILL,
     DEFAULT_TEXTURE_WINDOW,
     DEFAULT_Y_TARGET,
+    FEATURE_ENTROPY_WINDOWS,
+    FEATURE_LBP_RADII,
+    FEATURE_STD_WINDOWS,
     GLCM_PROP_NAMES,
 )
 from pyPetrograph.common.image_io import _to_rgb_uint8
@@ -165,6 +171,81 @@ def compute_lbp_map(
     return codes.astype(np.float32)
 
 
+def compute_gabor_maps(
+    gray: np.ndarray,
+    *,
+    frequency: float = DEFAULT_GABOR_FREQUENCY,
+    angles_deg: Sequence[float] = DEFAULT_GABOR_ANGLES_DEG,
+) -> Dict[str, np.ndarray]:
+    """
+    Gabor filter magnitudes — stripes at given angles (cleavage / twins).
+
+    Default angles 0°, 45°, 90°. Returns ``gabor_0``, ``gabor_45``, ``gabor_90``.
+    """
+    from skimage.filters import gabor
+
+    g = np.asarray(gray, dtype=np.float32)
+    g01 = g / 255.0 if float(np.nanmax(g)) > 1.5 else g
+    out: Dict[str, np.ndarray] = {}
+    for deg in angles_deg:
+        theta = float(deg) * np.pi / 180.0
+        real, imag = gabor(g01, frequency=float(frequency), theta=theta)
+        mag = np.sqrt(real.astype(np.float32) ** 2 + imag.astype(np.float32) ** 2)
+        out[f"gabor_{int(round(float(deg)))}"] = mag.astype(np.float32)
+    return out
+
+
+def compute_hessian_maps(
+    gray: np.ndarray,
+    *,
+    sigma: float = DEFAULT_HESSIAN_SIGMA,
+) -> Dict[str, np.ndarray]:
+    """
+    Hessian eigenvalue maps — “ridge vs blob?” (crack vs grain).
+
+    Returns:
+    - ``hessian_ridge`` — ridge strength (max |eigenvalue|)
+    - ``hessian_aniso`` — how directional (|l1−l2| / (|l1|+|l2|))
+    """
+    from skimage.feature import hessian_matrix, hessian_matrix_eigvals
+
+    g = np.asarray(gray, dtype=np.float32)
+    g01 = g / 255.0 if float(np.nanmax(g)) > 1.5 else g
+    H = hessian_matrix(g01, sigma=float(sigma), use_gaussian_derivatives=True)
+    l1, l2 = hessian_matrix_eigvals(H)
+    l1 = l1.astype(np.float32)
+    l2 = l2.astype(np.float32)
+    ridge = np.maximum(np.abs(l1), np.abs(l2))
+    denom = np.abs(l1) + np.abs(l2) + 1e-6
+    aniso = np.abs(l1 - l2) / denom
+    return {
+        "hessian_ridge": ridge.astype(np.float32),
+        "hessian_aniso": aniso.astype(np.float32),
+    }
+
+
+def compute_local_entropy(gray: np.ndarray, window: int = 21) -> np.ndarray:
+    """Local entropy of Y in an odd window (how mixed the grays are)."""
+    from skimage.filters.rank import entropy
+    from skimage.morphology import disk
+
+    g8 = np.clip(np.asarray(gray), 0, 255).astype(np.uint8)
+    w = int(window)
+    if w < 3:
+        w = 3
+    radius = max(1, w // 2)
+    return entropy(g8, disk(radius)).astype(np.float32)
+
+
+def compute_fft_power_spectrum(gray: np.ndarray) -> np.ndarray:
+    """Centered log power spectrum of a 2D image (whole-field fabric fingerprint)."""
+    g = np.asarray(gray, dtype=np.float32)
+    g = g - float(g.mean())
+    spec = np.fft.fftshift(np.fft.fft2(g))
+    power = np.log1p(np.abs(spec).astype(np.float32))
+    return power
+
+
 def _glcm_props_from_crop(gray_u8: np.ndarray) -> Dict[str, float]:
     from skimage.feature import graycomatrix, graycoprops
 
@@ -272,14 +353,36 @@ def build_feature_stack(
         channels.append(y)
         names.append("y")
     if toggles.get("local_std"):
-        channels.append(compute_local_std(y, window=texture_window))
-        names.append("local_std")
+        for win in FEATURE_STD_WINDOWS:
+            channels.append(compute_local_std(y, window=int(win)))
+            names.append(f"local_std_{int(win)}")
     if toggles.get("local_grad"):
         channels.append(compute_sobel_mag(y))
         names.append("local_grad")
     if toggles.get("lbp"):
-        channels.append(compute_lbp_map(y, p=lbp_p, r=lbp_r))
-        names.append("lbp")
+        for rad in FEATURE_LBP_RADII:
+            tag = int(rad) if float(rad) == int(rad) else rad
+            channels.append(compute_lbp_map(y, p=lbp_p, r=float(rad)))
+            names.append(f"lbp_r{tag}")
+    if toggles.get("gabor"):
+        for name, arr in compute_gabor_maps(y).items():
+            channels.append(arr)
+            names.append(name)
+    if toggles.get("hessian"):
+        hmaps = compute_hessian_maps(y)
+        channels.append(hmaps["hessian_ridge"])
+        names.append("hessian_ridge")
+        if toggles.get("hessian_aniso"):
+            channels.append(hmaps["hessian_aniso"])
+            names.append("hessian_aniso")
+    elif toggles.get("hessian_aniso"):
+        hmaps = compute_hessian_maps(y)
+        channels.append(hmaps["hessian_aniso"])
+        names.append("hessian_aniso")
+    if toggles.get("entropy"):
+        for win in FEATURE_ENTROPY_WINDOWS:
+            channels.append(compute_local_entropy(y, window=int(win)))
+            names.append(f"entropy_{int(win)}")
     if toggles.get("glcm"):
         gmaps = glcm_feature_maps(y, polygons or [], shape_hw=y.shape[:2])
         for prop in GLCM_PROP_NAMES:
