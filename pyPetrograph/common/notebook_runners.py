@@ -9,11 +9,14 @@ import numpy as np
 from PIL import Image
 
 from pyPetrograph.common.constants import (
-    DEFAULT_FIGURE_DPI,
+    DEFAULT_EMBED_FEATURE_TOGGLES,
     DEFAULT_POLY_FILL_ALPHA,
     DEFAULT_PREVIEW_DPI,
     DEFAULT_SURE_PROBA,
+    clip_figure_dpi,
+    FEATURE_DISPLAY_TITLES,
     FEATURE_PREVIEW_CMAPS,
+    FEATURE_PREVIEW_ROWS,
     LABELS_SUBDIR,
     LEGEND_FONTSIZE,
     PathLike,
@@ -25,6 +28,7 @@ from pyPetrograph.common.ui import _pick_files_native
 from pyPetrograph.image_processing.brightness import relative_luminance, to_display_uint8
 from pyPetrograph.image_processing.features import (
     build_feature_stack,
+    compute_fft_power_spectrum,
     downsample_to_approx_mp,
     resolve_feature_toggles,
     resolve_view_target_mp,
@@ -53,7 +57,7 @@ def print_label_summary(session: Session) -> None:
         session.reload_current_from_disk()
 
     n = len(session.image_queue)
-    dpi = int(session.figure_dpi) or DEFAULT_FIGURE_DPI
+    dpi = clip_figure_dpi(session.figure_dpi)
     print("Label summary")
     print("=" * 60)
     for i, path in enumerate(session.image_queue):
@@ -133,7 +137,7 @@ def _show_figure_inline(
     if save_path is not None:
         path = Path(save_path)
         path.parent.mkdir(parents=True, exist_ok=True)
-        save_dpi = int(dpi) if dpi is not None else int(fig.dpi)
+        save_dpi = clip_figure_dpi(dpi if dpi is not None else fig.dpi)
         fig.savefig(path, dpi=save_dpi, bbox_inches="tight", facecolor="white")
     try:
         from IPython.display import display
@@ -144,23 +148,127 @@ def _show_figure_inline(
         fig.show()
 
 
+def _feature_base_name(name: str) -> str:
+    if "_" in name:
+        prefix, rest = name.split("_", 1)
+        if prefix in ("ppl", "xpl", "bse"):
+            return rest
+    return name
+
+
+def feature_display_title(name: str) -> str:
+    base = _feature_base_name(name)
+    return FEATURE_DISPLAY_TITLES.get(base, FEATURE_DISPLAY_TITLES.get(name, name))
+
+
+def _group_feature_rows(names: Sequence[str]) -> List[List[Optional[int]]]:
+    """Rows of stack indices (None = empty cell). RGB and scale families share a row."""
+    index = {_feature_base_name(n): i for i, n in enumerate(names)}
+    used: set = set()
+    rows: List[List[Optional[int]]] = []
+    for group in FEATURE_PREVIEW_ROWS:
+        idxs: List[Optional[int]] = []
+        hit = False
+        for key in group:
+            if key in index:
+                idxs.append(index[key])
+                used.add(index[key])
+                hit = True
+            else:
+                idxs.append(None)
+        if hit:
+            rows.append(idxs)
+    leftovers = [i for i in range(len(names)) if i not in used]
+    for i in range(0, len(leftovers), 3):
+        chunk: List[Optional[int]] = list(leftovers[i : i + 3])
+        while len(chunk) < 3:
+            chunk.append(None)
+        rows.append(chunk)
+    return rows
+
+
+def _show_one_feature_column(
+    stack: np.ndarray,
+    names: Sequence[str],
+    *,
+    title: str,
+    dpi: int,
+    save_path: Optional[Path] = None,
+) -> None:
+    """3-column feature maps; RGB and matching scales share a row."""
+    import matplotlib.pyplot as plt
+
+    nfeat = len(names)
+    if nfeat == 0:
+        print(f"{title}: no features toggled on.")
+        return
+    rows = _group_feature_rows(names)
+    nrows = max(1, len(rows))
+    fig, axes = plt.subplots(nrows, 3, figsize=(4.5 * 3, 2.6 * nrows), dpi=dpi)
+    axes_arr = np.atleast_2d(axes)
+    print(f"{title} shape={stack.shape[:2]} | {list(names)}")
+    for r, row in enumerate(rows):
+        for c in range(3):
+            ax = axes_arr[r, c]
+            idx = row[c] if c < len(row) else None
+            if idx is None:
+                ax.axis("off")
+                continue
+            name = str(names[idx])
+            ch = stack[..., idx]
+            base = _feature_base_name(name)
+            cmap = FEATURE_PREVIEW_CMAPS.get(base, FEATURE_PREVIEW_CMAPS.get(name, "viridis"))
+            if base in ("r", "g", "b"):
+                ax.imshow(ch, cmap=cmap, vmin=0, vmax=255)
+            elif base == "y":
+                ax.imshow(ch, cmap="gray")
+            else:
+                ax.imshow(ch, cmap=cmap)
+            ax.set_title(feature_display_title(name), fontsize=10)
+            ax.axis("off")
+    fig.suptitle(title, fontsize=12)
+    fig.tight_layout()
+    _show_figure_inline(fig, save_path=save_path, dpi=dpi)
+    if save_path is not None:
+        print(f"  → {relpath_display(save_path)}")
+
+
+def _show_fft_figure(
+    gray: np.ndarray,
+    *,
+    title: str,
+    dpi: int,
+    save_path: Optional[Path] = None,
+) -> None:
+    import matplotlib.pyplot as plt
+
+    power = compute_fft_power_spectrum(gray)
+    fig, ax = plt.subplots(1, 1, figsize=(4.5, 4.5), dpi=dpi)
+    ax.imshow(power, cmap="magma")
+    ax.set_title("repeating pattern (FFT)")
+    ax.axis("off")
+    fig.suptitle(title, fontsize=12)
+    fig.tight_layout()
+    _show_figure_inline(fig, save_path=save_path, dpi=dpi)
+    if save_path is not None:
+        print(f"  → {relpath_display(save_path)}")
+
+
 def run_feature_preview(session: Session) -> None:
     """
-    Inline preview of toggled feature maps for every queued image (1 column).
+    Inline preview of toggled feature maps for every queued image (3-column grid).
 
     Uses rgb_cache when present. Training still uses full working resolution.
     """
-    import matplotlib.pyplot as plt
-
     if not session.image_queue:
         print("Select images first.")
         return
 
     toggles = resolve_feature_toggles(session.feature_toggles)
     view_mp = session.view_target_mp()
-    dpi = int(session.figure_dpi) or DEFAULT_FIGURE_DPI
+    dpi = clip_figure_dpi(session.preview_dpi)
     print("Feature preview (downsampled; train uses full res)")
-    print(f"view_mp≈{view_mp:.2f} | dpi={dpi} (figure_dpi)")
+    print(f"view_mp≈{view_mp:.2f} | dpi={dpi} (preview_dpi)")
     print("toggles:", {k: v for k, v in toggles.items() if v})
 
     for qi, path in enumerate(session.image_queue, 1):
@@ -168,8 +276,10 @@ def run_feature_preview(session: Session) -> None:
         small = downsample_to_approx_mp(img, view_mp)
         scale_y = small.shape[0] / img.shape[0]
         scale_x = small.shape[1] / img.shape[1]
-        polys_small: List[Polygon] = []
+        polys_small: List[Any] = []
         if polys and abs(scale_x - 1.0) > 1e-6:
+            from shapely.geometry import Polygon
+
             for poly in polys:
                 coords = [(x * scale_x, y * scale_y) for x, y in poly.exterior.coords]
                 try:
@@ -189,31 +299,73 @@ def run_feature_preview(session: Session) -> None:
             lbp_r=session.lbp_r,
             polygons=polys_small,
         )
-        nfeat = len(names)
-        if nfeat == 0:
-            print(f"[{qi}] {stem}: no features toggled on.")
-            continue
-        fig, axes = plt.subplots(nfeat, 1, figsize=(4.5, 2.6 * nfeat), dpi=dpi)
-        axes_arr = np.atleast_1d(axes).ravel()
-        print(f"[{qi}/{len(session.image_queue)}] {stem} shape={small.shape} | {names}")
-        for i, name in enumerate(names):
-            ax = axes_arr[i]
-            ch = stack[..., i]
-            cmap = FEATURE_PREVIEW_CMAPS.get(name, "viridis")
-            if name in ("r", "g", "b"):
-                ax.imshow(ch, cmap=cmap, vmin=0, vmax=255)
-            elif name == "y":
-                ax.imshow(ch, cmap="gray")
-            else:
-                ax.imshow(ch, cmap=cmap)
-            ax.set_title(name, fontsize=10)
-            ax.axis("off")
-        fig.suptitle(stem, fontsize=12)
-        fig.tight_layout()
-        out_png = Path(path).resolve().parent / PREDICTIONS_SUBDIR / f"{stem}_features.png"
-        _show_figure_inline(fig, save_path=out_png, dpi=dpi)
-        print(f"  → {relpath_display(out_png)}")
+        out_png = stem_paths(path, stem=stem).pred.with_name(f"{stem}_features.png")
+        _show_one_feature_column(
+            stack,
+            names,
+            title=f"[{qi}/{len(session.image_queue)}] {stem}",
+            dpi=dpi,
+            save_path=out_png,
+        )
 
+
+def run_scene_feature_preview(
+    scene: Any,
+    feature_toggles: Optional[Dict[str, bool]] = None,
+    *,
+    view_mp: Optional[float] = None,
+    dpi: int = DEFAULT_PREVIEW_DPI,
+) -> None:
+    """
+    Same 3-column layout as ``run_feature_preview``, for a lined-up ``Scene``.
+
+    Builds features with the shared ``build_feature_stack`` on each warped slot
+    (PPL / XPL / BSE). Use multilayer ``EMBED_FEATURES`` as ``feature_toggles``.
+    """
+    from pyPetrograph.align.scene import Scene as _Scene
+
+    if not isinstance(scene, _Scene):
+        raise TypeError("run_scene_feature_preview expects a Scene")
+    toggles = resolve_feature_toggles(
+        feature_toggles if feature_toggles is not None else DEFAULT_EMBED_FEATURE_TOGGLES
+    )
+    toggles["glcm"] = False  # needs polygons; off at embed time
+    mp = resolve_view_target_mp(view_mp)
+    dpi = clip_figure_dpi(dpi)
+    print("Scene feature preview (downsampled; embed uses full res)")
+    print(f"view_mp≈{mp:.2f} | dpi={dpi}")
+    print("toggles:", {k: v for k, v in toggles.items() if v})
+
+    for slot, layer in scene.layers.items():
+        rgb, _mask = scene.warp_layer(slot)
+        small = downsample_to_approx_mp(rgb, mp)
+        stack, names = build_feature_stack(
+            small,
+            toggles=toggles,
+            apply_norm=True,
+            polygons=None,
+        )
+        stem = Path(layer.path).stem
+        sp = stem_paths(layer.path, stem=stem)
+        out_png = sp.pred.with_name(f"{stem}_features.png")
+        out_png.parent.mkdir(parents=True, exist_ok=True)
+        _show_one_feature_column(
+            stack,
+            names,
+            title=f"{slot}: {stem}",
+            dpi=dpi,
+            save_path=out_png,
+        )
+        from pyPetrograph.image_processing.brightness import relative_luminance as _y
+
+        y_small = _y(small)
+        fft_png = sp.pred.with_name(f"{stem}_fft.png")
+        _show_fft_figure(
+            y_small,
+            title=f"{slot}: {stem}",
+            dpi=dpi,
+            save_path=fft_png,
+        )
 
 
 def run_train_cell(
@@ -392,7 +544,7 @@ def run_predict_cell(
 
     images = results["images"]
     n = len(images)
-    dpi = int(session.figure_dpi) or DEFAULT_FIGURE_DPI
+    dpi = clip_figure_dpi(session.figure_dpi)
 
     for i, entry in enumerate(images):
         print(f"[{i + 1}/{n}] {entry['image']}")

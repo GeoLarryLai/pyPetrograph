@@ -6,11 +6,25 @@ dist/
 build/
 .ipynb_checkpoints/
 .venv/
-models/
-labels/
-predictions/
+/models/
+Test images/labels/
+Test images/predictions/
 *.joblib
 *.mp4
+*.zip
+*.pdf
+*.pptx
 AMICS data/
 dataset/
 old codes/
+.cursor/
+AI_EDITING_LOG.md
+Modal_*.ipynb
+SegmentEveryGrain_*.ipynb
+Rich Kyle-BEG Aggregate Mapping Project/
+project images/*.svg
+outputs/models/
+outputs/**/*.npy
+*.npz
+*.keras
+*.pt

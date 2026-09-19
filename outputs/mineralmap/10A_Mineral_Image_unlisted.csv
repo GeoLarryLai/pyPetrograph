@@ -1,0 +1,36 @@
+r,g,b,n_px,nearest,dist
+192,192,192,284580,Rutile,64.0
+150,150,150,1268,Garnet-Spessartine,92.5
+191,255,255,396,Rutile,103.8
+255,99,71,359,Calderite,51.8
+255,255,191,319,Rutile,64.1
+255,224,156,316,Rutile,56.9
+156,224,255,212,Rutile,116.3
+72,0,116,186,Biotite,78.4
+224,156,72,158,Carpholite,69.7
+116,0,72,144,Iron Oxides,73.0
+72,156,224,138,Tourmaline,51.5
+0,116,191,104,Tourmaline,74.2
+116,0,116,89,Topaz,100.2
+0,72,156,87,Tourmaline,100.4
+72,0,0,85,Iron Oxides,56.0
+255,191,116,70,Rutile,87.0
+116,191,255,47,Tourmaline,104.4
+72,72,156,45,Garnet-Spessartine,62.3
+156,72,0,34,Illite,68.9
+72,0,72,18,Biotite,73.2
+156,72,72,10,Carpholite,56.6
+116,72,72,10,Carpholite,93.4
+156,191,156,5,Rutile,109.6
+0,116,116,3,Ilmenite,117.1
+72,72,0,3,Ilmenite,77.3
+191,255,191,3,Rutile,90.6
+0,72,72,2,Biotite,73.2
+191,191,116,2,Carpholite,102.8
+116,116,116,2,Garnet-Spessartine,93.3
+0,72,116,1,Biotite,78.4
+224,191,116,1,Rutile,92.4
+224,255,224,1,Rutile,73.3
+116,116,72,1,Illite,93.1
+116,72,0,1,Iron Oxides,73.0
+116,156,156,1,Garnet-Spessartine,82.8

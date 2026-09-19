@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from matplotlib.patches import PathPatch, Rectangle
+from PIL import Image
 from matplotlib.path import Path as MplPath
 from shapely.geometry import Polygon
 
@@ -36,6 +37,7 @@ from pyPetrograph.image_processing.features import (
 from pyPetrograph.image_processing.viz import class_color_rgba
 from pyPetrograph.labeling_ml.polygons import magic_wand_to_polygon, remove_duplicate_polys
 
+@dataclass
 class UndoState:
     polygons: List[Polygon]
     class_ids: List[int]
@@ -468,6 +470,10 @@ class LabelWindow:
         else:
             self._set_status("No image — run select_images() first.")
 
+    def _source_rgb(self):
+        """RGB shown on the canvas (working image, or a layer composite)."""
+        return self.session.image
+
     # ------------------------------------------------------------------
     # Status / info
     # ------------------------------------------------------------------
@@ -535,7 +541,10 @@ class LabelWindow:
             return
 
         self.session.editing_active = True
-        img = self.session.image
+        img = self._source_rgb()
+        if img is None:
+            self._set_status("No image — run select_images() first.")
+            return
         h, w = img.shape[:2]
 
         for patch in self.patches:
@@ -645,7 +654,9 @@ class LabelWindow:
             return
         self.updating_view = True
         try:
-            img = self.session.image
+            img = self._source_rgb()
+            if img is None:
+                return
             h, w = img.shape[:2]
             x0, x1 = self.ax.get_xlim()
             y1, y0 = self.ax.get_ylim()
