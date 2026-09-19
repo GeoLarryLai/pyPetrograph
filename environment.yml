@@ -1,14 +1,8 @@
-# Conda environment for all three pyPetrograph demos (RGB, mineral-map, multimodal).
-# Create:  conda env create -f environment.yml
-# Update:  conda env update -n work -f environment.yml
-# Then:    conda activate pypetrograph
-#          pip install -e .
-#
-# This repo's working kernel is conda `work` (same packages).
-# TensorFlow / Keras / SegmentEveryGrain stay in pip for the multimodal U-Net
-# (subprocess only — do not import them in the Jupyter kernel).
-# Default outlines = U-Net. Do NOT download SAM 2.1 weights (~860 MB) unless
-# you set USE_SAM2 = True. Uncomment torch / sam2 below only if you will.
+# Recommended env: porosity + mineral-map + multimodal U-Net.
+# Does not download SAM 2.1 weights. For a lighter env see environment-core.yml.
+# conda env create -f environment.yml
+# conda activate pypetrograph
+# pip install -e .
 
 name: pypetrograph
 channels:

@@ -229,14 +229,7 @@ Declared in the repo-root [`environment.yml`](../environment.yml) and [`pyprojec
 | `[xgb]` | xgboost | optional RGB classifier |
 | `[all]` | seg + sam2 + xgb | only if you need SAM refine and xgboost |
 
-```bash
-conda env create -f environment.yml
-conda activate pypetrograph   # this repo also uses conda `work`
-pip install -e .
-# typical multimodal: pip install "pyPetrograph[seg]"
-```
-
-Jupyter kernel never imports TensorFlow. Workers block pyarrow.
+See the [root README](../README.md#install) for install steps. Use `environment-core.yml` if you do not want SegmentEveryGrain.
 
 ---
 
