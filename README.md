@@ -1,28 +1,16 @@
 # pyPetrograph
 
-v0.0.5 — thin-section petrography in Python.
+v0.0.5
 
-**This tool is under development.** Treat v0.0.5 as a research preview. APIs, notebooks, and numbers can still change.
+pyPetrograph measures pores, grains, and minerals on thin-section photos and painted mineral maps. You can label pixels on a plane-polarized image and get porosity; count grains on a flat-color mineral map; or line up PPL and XPL photos, outline grains, and build one table row per object.
+
+> [!WARNING]
+> This tool is under development. Use with caution. Notebooks, APIs, and numbers can still change.
+
+> [!NOTE]
+> Grain outlines adapt [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain). Optional [SAM 2.1](https://github.com/facebookresearch/sam2) can refine those polygons along grain boundaries. Turning that on downloads a large weight file (~860 MB).
 
 The current version is primarily developed by **Larry Syu-Heng Lai**, based on early source code scripted by **Zoltan Sylvester**, at the Quantitative Clastic Laboratory, Bureau of Economic Geology, The University of Texas at Austin. Development is also part of a collaboration with **Priyanka Periwal**, **Lucy Tingwei Ko**, **Kelly Hattori**, and **Amanda Calle** across multiple research groups in the Bureau of Economic Geology.
-
-**Warning — U-Net vs SAM.** RGB and mineral-map demos need neither. Multimodal outlines use the SegmentEveryGrain **U-Net** (~26 MB). That is enough for grain counts, the object table, and area %. **SAM 2.1** (~860 MB) only refines polygon *shape*. Leave `USE_SAM2 = False`. Do not download SAM weights unless you need that extra detail.
-
-Three public demos, all on files in `Test images/`:
-
-| Notebook | What it does |
-|----------|----------------|
-| [`pyPetrograph_rgb_porosity.ipynb`](pyPetrograph_rgb_porosity.ipynb) | Wand/polygon labels on one PPL set → LightGBM → **porosity %** with uncertainty |
-| [`pyPetrograph_mineralmap_count.ipynb`](pyPetrograph_mineralmap_count.ipynb) | Flat-color mineral maps + legend TIFF → grains per class with Poisson / Wilson / method-range uncertainty |
-| [`pyPetrograph_multimodal_grains.ipynb`](pyPetrograph_multimodal_grains.ipynb) | PPL + XPL → align → physics channels → **U-Net** outlines → object table → names / stats |
-
-Package API and file layout: [`pyPetrograph/README.md`](pyPetrograph/README.md).
-
-Mineral-map workflow:
-
-![Mineral-map workflow](project%20images/workflow.png)
-
----
 
 ## Install
 
@@ -53,6 +41,18 @@ check_and_install_packages(include_seg=True)    # also check U-Net worker deps
 ```
 
 U-Net weights (~26 MB) download on the first multimodal run. SAM weights do **not**. TensorFlow is only for the U-Net **subprocess**, never in the Jupyter kernel.
+
+---
+
+# Demo notebooks
+
+| Notebook | What it does |
+|----------|----------------|
+| [`pyPetrograph_rgb_porosity.ipynb`](pyPetrograph_rgb_porosity.ipynb) | Wand/polygon labels on one PPL set → LightGBM → **porosity %** with uncertainty |
+| [`pyPetrograph_mineralmap_count.ipynb`](pyPetrograph_mineralmap_count.ipynb) | Flat-color mineral maps + legend TIFF → grains per class with Poisson / Wilson / method-range uncertainty |
+| [`pyPetrograph_multimodal_grains.ipynb`](pyPetrograph_multimodal_grains.ipynb) | PPL + XPL → align → physics channels → **U-Net** outlines → object table → names / stats. Optional SAM 2.1 refine (`USE_SAM2 = True`) |
+
+Package API and file layout: [`pyPetrograph/README.md`](pyPetrograph/README.md).
 
 ---
 

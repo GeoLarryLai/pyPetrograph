@@ -172,8 +172,9 @@ def snap_to_legend(
     -------
     cmap : uint8 HxW class codes (0 background, 1..K legend; far colors = Unknown)
     valid : bool HxW, False outside the scan
-    remapped : DataFrame ``r, g, b, n_px, nearest, dist`` for colors beyond ``tol``
-        (those pixels are coded Unknown, not a separate class)
+    remapped : DataFrame of map colors beyond ``tol`` (coded Unknown, not a class).
+        Columns: ``map_red``, ``map_green``, ``map_blue``, ``pixels``,
+        ``closest_legend_color``, ``distance_from_legend`` (RGB units; 0 = exact match).
     """
     h, w = rgb.shape[:2]
     valid = np.ones((h, w), dtype=bool) if alpha is None else alpha > 0
@@ -198,12 +199,44 @@ def snap_to_legend(
     unl = np.where((dmin > float(tol)) & (white_d > float(white_tol)) & (n_valid > 0))[0]
     unlisted = pd.DataFrame(
         {
-            "r": cols[unl, 0].astype(int),
-            "g": cols[unl, 1].astype(int),
-            "b": cols[unl, 2].astype(int),
-            "n_px": n_valid[unl].astype(int),
-            "nearest": [names[int(i)] for i in nearest[unl]],
-            "dist": np.round(dmin[unl], 1),
+            "map_red": cols[unl, 0].astype(int),
+            "map_green": cols[unl, 1].astype(int),
+            "map_blue": cols[unl, 2].astype(int),
+            "pixels": n_valid[unl].astype(int),
+            "closest_legend_color": [names[int(i)] for i in nearest[unl]],
+            "distance_from_legend": np.round(dmin[unl], 1),
         }
-    ).sort_values("n_px", ascending=False, ignore_index=True)
+    ).sort_values("pixels", ascending=False, ignore_index=True)
     return cmap, valid, unlisted
+
+
+UNLISTED_COLUMNS = (
+    "map_red",
+    "map_green",
+    "map_blue",
+    "pixels",
+    "closest_legend_color",
+    "distance_from_legend",
+)
+_UNLISTED_ALIASES = {
+    "r": "map_red",
+    "g": "map_green",
+    "b": "map_blue",
+    "n_px": "pixels",
+    "nearest": "closest_legend_color",
+    "dist": "distance_from_legend",
+    "color_distance": "distance_from_legend",
+}
+
+
+def format_unlisted(df: pd.DataFrame) -> pd.DataFrame:
+    """Rename the Unknown-color audit table to the public column names.
+
+    Accepts older files that used ``r, g, b, n_px, nearest, dist``.
+    ``distance_from_legend`` is how far that map color is from the closest
+    legend swatch, in RGB units (0 = exact match).
+    """
+    out = df.rename(columns={k: v for k, v in _UNLISTED_ALIASES.items() if k in df.columns})
+    cols = [c for c in UNLISTED_COLUMNS if c in out.columns]
+    rest = [c for c in out.columns if c not in cols]
+    return out[cols + rest]

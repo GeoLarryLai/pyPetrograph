@@ -1,4 +1,4 @@
-r,g,b,n_px,nearest,dist
+map_red,map_green,map_blue,pixels,closest_legend_color,distance_from_legend
 192,192,192,284580,Rutile,64.0
 150,150,150,1268,Garnet-Spessartine,92.5
 191,255,255,396,Rutile,103.8

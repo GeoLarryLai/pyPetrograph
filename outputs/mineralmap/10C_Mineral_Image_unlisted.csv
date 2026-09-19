@@ -1,4 +1,4 @@
-r,g,b,n_px,nearest,dist
+map_red,map_green,map_blue,pixels,closest_legend_color,distance_from_legend
 192,192,192,143837,Rutile,64.0
 101,157,26,2369,Illite,87.4
 191,255,255,392,Rutile,103.8

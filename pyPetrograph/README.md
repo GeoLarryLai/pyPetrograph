@@ -1,6 +1,6 @@
 # pyPetrograph
 
-**Under development** (v0.0.5 research preview). See the [root README](../README.md) for credits and the U-Net vs SAM note.
+See the [root README](../README.md) for what the package does, the under-development warning, and the SegmentEveryGrain / SAM 2.1 note.
 
 v0.0.5: RGB pixel labeling, a multimodal object pipeline (align → physics channels → grain/pore outlines → object table → group/name/classify), **and** a mineral-map grain counter (flat-color maps → legend snap → split touching grains → counts with uncertainty).
 

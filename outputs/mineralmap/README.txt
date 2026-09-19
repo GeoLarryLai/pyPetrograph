@@ -51,7 +51,8 @@ Per image (replace {stem} with e.g. 10B_Mineral_Image)
 {stem}_unlisted.csv
     Audit only — not a mineral class.
     Map colors farther than 40 RGB units from every legend swatch; those
-    pixels were grouped into Unknown. Columns: r g b n_px nearest dist.
+    pixels were grouped into Unknown. Columns: map_red, map_green, map_blue,
+    pixels, closest_legend_color, distance_from_legend (RGB units; 0 = exact match).
 
 
 Folder

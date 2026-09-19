@@ -7,7 +7,7 @@ Outputs beside the images in ``mineralmap/``::
     {stem}_grains.geojson    polygons (if write_geojson)
     {stem}_class_rgb.png     overlay preview (legend colors)
     {stem}_counts.csv        per-class counts with uncertainty
-    {stem}_unlisted.csv      colors grouped into Unknown (audit table)
+    {stem}_unlisted.csv      colors grouped into Unknown (audit: map RGB, pixels, closest legend, distance)
     all_counts.csv           every image stacked
 """
 from __future__ import annotations

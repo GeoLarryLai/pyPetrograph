@@ -1,4 +1,4 @@
-r,g,b,n_px,nearest,dist
+map_red,map_green,map_blue,pixels,closest_legend_color,distance_from_legend
 192,192,192,119538,Rutile,64.0
 250,128,114,22764,Carpholite,61.7
 150,150,150,3310,Garnet-Spessartine,92.5
