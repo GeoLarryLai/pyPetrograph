@@ -8,9 +8,9 @@ pyPetrograph measures pores, grains, and minerals on thin-section photos and pai
 > This tool is under development. Use with caution. Notebooks, APIs, and numbers can still change.
 
 > [!NOTE]
-> Grain outlines adapt [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain). Optional [SAM 2.1](https://github.com/facebookresearch/sam2) can refine those polygons along grain boundaries. Turning that on downloads a large weight file (~860 MB).
+> For more careful grain-boundary detection and mapping, there is optional support for using [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain) developed by **Zoltan Sylvester**. That extra step requires a large [SAM 2.1](https://github.com/facebookresearch/sam2) model download (~860 MB).
 
-The current version is primarily developed by **Larry Syu-Heng Lai**, based on early source code scripted by **Zoltan Sylvester**, at the Quantitative Clastic Laboratory, Bureau of Economic Geology, The University of Texas at Austin. Development is also part of a collaboration with **Priyanka Periwal**, **Lucy Tingwei Ko**, **Kelly Hattori**, and **Amanda Calle** across multiple research groups in the Bureau of Economic Geology.
+The current version is primarily developed by **Larry Syu-Heng Lai**, based on early source code scripted by **Zoltan Sylvester**, at the Quantitative Clastic Laboratory, Bureau of Economic Geology, The University of Texas at Austin. This development is also part of a collaboration with **Priyanka Periwal**, **Lucy Tingwei Ko**, **Kelly Hattori**, and **Amanda Calle** across multiple research groups and the [e-MAGE lab](https://www.beg.utexas.edu/research/labs/sem) in the Bureau of Economic Geology.
 
 ## Install
 
