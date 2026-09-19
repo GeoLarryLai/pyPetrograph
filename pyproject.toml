@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyPetrograph"
-version = "0.0.5"
-description = "Thin-section petrography: RGB pixel labeling, multimodal grain objects, and mineral-map counts."
-readme = "README.md"
+version = "0.0.6"
+description = "Thin-section petrography: hand-label RGB features, mineral-map grain counts, and multi-image grain segmentation."
+readme = "README-PyPI.md"
 requires-python = ">=3.10"
 license = { text = "AGPL-3.0-or-later" }
 authors = [{ name = "Larry Syu-Heng Lai" }]

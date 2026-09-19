@@ -298,25 +298,44 @@ def compare_outlines(
     unet_lab: Optional[np.ndarray] = None,
     qc_lab: Optional[np.ndarray] = None,
     titles: Optional[Tuple[str, str, str]] = None,
+    greyscale: bool = True,
 ) -> Any:
-    """Three-panel overlay: watershed | U-Net | saved GrainPlot QC. Returns the figure."""
+    """
+    Overlay grain outlines on PPL. Only panels with labels are drawn.
+
+    ``greyscale=True`` (default) uses a grey background. Outlines are darker
+    red (watershed), green (U-Net), blue (GrainPlot QC).
+    """
     import matplotlib.pyplot as plt
 
     titles = titles or ("watershed (no training)", "N-channel U-Net", "GrainPlot QC")
-    labs = (watershed_lab, unet_lab, qc_lab)
-    colors = ((255, 40, 40), (40, 220, 255), (40, 220, 80))
+    colors = ((180, 15, 15), (0, 130, 45), (15, 45, 190))
+    panels = [
+        (lab, title, col)
+        for lab, title, col in zip((watershed_lab, unet_lab, qc_lab), titles, colors)
+        if lab is not None
+    ]
+    if not panels:
+        raise ValueError("compare_outlines: no label maps to plot")
+
     from pyPetrograph.common.constants import clip_figure_dpi
 
-    fig, axes = plt.subplots(1, 3, figsize=(10, 3.6), dpi=clip_figure_dpi())
+    n = len(panels)
+    fig, axes = plt.subplots(1, n, figsize=(3.3 * n + 0.4, 3.6), dpi=clip_figure_dpi())
+    if n == 1:
+        axes = np.asarray([axes])
     bg = np.asarray(rgb, dtype=np.uint8)
-    for ax, lab, title, col in zip(axes, labs, titles, colors):
-        if lab is None:
-            ax.text(0.5, 0.5, "not run", ha="center", va="center")
-            ax.set_title(title)
-        else:
-            ax.imshow(overlay_labels(bg, lab, color=col))
-            n = int(np.sum(np.unique(lab) > 0))
-            ax.set_title(f"{title}\nn={n}")
+    if bg.ndim == 2:
+        bg = np.stack([bg, bg, bg], axis=-1)
+    if greyscale:
+        grey = (
+            0.299 * bg[..., 0] + 0.587 * bg[..., 1] + 0.114 * bg[..., 2]
+        ).astype(np.uint8)
+        bg = np.stack([grey, grey, grey], axis=-1)
+    for ax, (lab, title, col) in zip(axes, panels):
+        ax.imshow(overlay_labels(bg, lab, color=col))
+        n_lab = int(np.sum(np.unique(lab) > 0))
+        ax.set_title(f"{title}\nn={n_lab}")
         ax.axis("off")
     fig.tight_layout()
     return fig

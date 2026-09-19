@@ -2,7 +2,7 @@
 
 See the [root README](../README.md) for what the package does, the under-development warning, and the SegmentEveryGrain / SAM 2.1 note.
 
-v0.0.5: RGB pixel labeling, a multimodal object pipeline (align → physics channels → grain/pore outlines → object table → group/name/classify), **and** a mineral-map grain counter (flat-color maps → legend snap → split touching grains → counts with uncertainty).
+v0.0.6: hand-label RGB features → LightGBM area %; mineral-map grain counts; multi-image overlay grain segmentation (PPL + XPL, SegmentEveryGrain U-Net).
 
 ```python
 from pyPetrograph import Session, launch_app, check_and_install_packages, build_channel_stack

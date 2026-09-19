@@ -67,15 +67,19 @@ def grain_qc_paths(image_path: PathLike) -> Tuple[Path, Path]:
 def overlay_labels(
     rgb: np.ndarray,
     labels: np.ndarray,
-    color: Tuple[int, int, int] = (255, 40, 40),
+    color: Tuple[int, int, int] = (180, 15, 15),
+    thickness: int = 2,
 ) -> np.ndarray:
-    """Draw grain boundaries from a label map on an RGB copy."""
+    """Draw darker grain outlines (slightly thick) on an RGB copy."""
+    from scipy.ndimage import binary_dilation
     from skimage.segmentation import find_boundaries
 
     out = np.asarray(rgb, dtype=np.uint8).copy()
     if out.ndim == 2:
         out = np.stack([out, out, out], axis=-1)
     bound = find_boundaries(np.asarray(labels), mode="outer")
+    if int(thickness) > 1:
+        bound = binary_dilation(bound, iterations=int(thickness) - 1)
     out[bound] = color
     return out
 

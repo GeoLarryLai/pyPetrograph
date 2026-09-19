@@ -56,13 +56,15 @@ def _resize_float(ch: np.ndarray, hw: Tuple[int, int]) -> np.ndarray:
     """Bilinear resize of one float map to ``(h, w)``; always returns a new float32 copy."""
     from PIL import Image
 
-    arr = np.array(ch, dtype=np.float32)  # copy: never touch cs.stack
+    arr = np.array(ch, dtype=np.float32, copy=True)  # never touch cs.stack
     h, w = int(hw[0]), int(hw[1])
     if arr.shape[:2] == (h, w):
         return arr
-    return np.asarray(
+    # PIL's np.asarray view is often write-protected
+    return np.array(
         Image.fromarray(np.ascontiguousarray(arr)).resize((w, h), Image.Resampling.BILINEAR),
         dtype=np.float32,
+        copy=True,
     )
 
 

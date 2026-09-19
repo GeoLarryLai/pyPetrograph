@@ -26,7 +26,13 @@ from pyPetrograph.common.constants import (
     WAND_SLIDER_MIN,
 )
 from pyPetrograph.common.image_io import ensure_rgb_cache
-from pyPetrograph.common.paths import cleanup_legacy_outputs, project_root, relpath_display
+from pyPetrograph.common.paths import (
+    cleanup_legacy_outputs,
+    get_output_dir,
+    project_root,
+    relpath_display,
+    set_output_dir,
+)
 from pyPetrograph.common.session import Session
 from pyPetrograph.image_processing.features import (
     _downsample_for_view,
@@ -964,7 +970,8 @@ def launch_app(session: Optional[Session] = None, *, wait: bool = False):
     uses Matplotlib **QtAgg** (PyQt5), same backend idea as DMG-07's
     ``%matplotlib qt`` pickers.
 
-    Saves still go next to your images (Save button only); re-run Label summary afterward.
+    Saves go under ``set_output_dir`` (or beside the images if that is unset).
+    Re-run Label summary afterward.
     """
     import os
     import subprocess
@@ -1016,7 +1023,9 @@ def launch_app(session: Optional[Session] = None, *, wait: bool = False):
 
 
 def _session_launch_config(session: Session) -> Dict[str, Any]:
+    out = get_output_dir()
     return {
+        "output_dir": str(out) if out is not None else None,
         "image_dir": str(session.image_dir) if session.image_dir else None,
         "image_queue": [str(p) for p in session.image_queue],
         "queue_index": int(session.queue_index) if session.queue_index >= 0 else 0,
@@ -1044,6 +1053,10 @@ def _session_launch_config(session: Session) -> Dict[str, Any]:
 
 
 def _session_from_launch_config(cfg: Dict[str, Any]) -> Session:
+    # Child process does not inherit the notebook's set_output_dir().
+    # Must set this before switch_image so companions load from outputs/labels/.
+    out = cfg.get("output_dir")
+    set_output_dir(out if out else None)
     s = Session()
     s.class_names = {int(k): v for k, v in cfg.get("class_names", s.class_names).items()}
     if cfg.get("default_class_names"):
