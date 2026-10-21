@@ -1,20 +1,19 @@
 [build-system]
-requires = ["setuptools>=69", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyPetrograph"
-version = "0.0.6"
+version = "0.0.7"
 description = "Thin-section petrography: hand-label RGB features, mineral-map grain counts, and multi-image grain segmentation."
 readme = "README-PyPI.md"
 requires-python = ">=3.10"
-license = { text = "AGPL-3.0-or-later" }
-authors = [{ name = "Larry Syu-Heng Lai" }]
+license = "AGPL-3.0-or-later"
+authors = [{ name = "Larry Syu-Heng Lai", email = "larrysyuhenglai@gmail.com" }]
 keywords = ["petrography", "thin-section", "mineralogy", "segmentation", "porosity"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",

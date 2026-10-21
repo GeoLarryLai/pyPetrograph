@@ -6,9 +6,12 @@ dist/
 build/
 .ipynb_checkpoints/
 .venv/
+.env
+*.env
+.pypirc
 /models/
-Test images/labels/
-Test images/predictions/
+example_data/labels/
+example_data/predictions/
 *.joblib
 *.mp4
 *.zip
@@ -22,11 +25,18 @@ AI_EDITING_LOG.md
 Modal_*.ipynb
 SegmentEveryGrain_*.ipynb
 Rich Kyle-BEG Aggregate Mapping Project/
-project images/*.svg
+image/*.svg
 outputs/models/*
 !outputs/models/grain_unet_ppl-xpl.keras
 !outputs/models/grain_unet_ppl-xpl.keras.norm.json
 !outputs/models/grain_unet_ppl-xpl.keras.trained.json
+outputs/README.md
+outputs/align/
+outputs/channels/
+outputs/labels/
+outputs/mineralmap/
+outputs/objects/
+outputs/predictions/
 outputs/**/*.npy
 *.npz
 *.keras

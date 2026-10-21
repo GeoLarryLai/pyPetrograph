@@ -1,8 +1,8 @@
 # pyPetrograph
 
-See the [root README](../README.md) for what the package does, the under-development warning, and the SegmentEveryGrain / SAM 2.1 note.
+See the [root README](README.md) for what the package does, the under-development warning, and the SegmentEveryGrain / SAM 2.1 note.
 
-v0.0.6: hand-label RGB features → LightGBM area %; mineral-map grain counts; multi-image overlay grain segmentation (PPL + XPL; optional SEG U-Net; shipped N-channel U-Net `grain_unet_ppl-xpl.keras`).
+v0.0.7: hand-label RGB features → LightGBM area %; mineral-map grain counts; multi-image overlay grain segmentation (PPL + XPL; optional SEG U-Net; shipped N-channel U-Net `grain_unet_ppl-xpl.keras`).
 
 ```python
 from pyPetrograph import Session, launch_app, check_and_install_packages, build_channel_stack
@@ -14,9 +14,9 @@ from pyPetrograph import Session, launch_app, check_and_install_packages, build_
 
 | Notebook | What it does |
 |----------|----------------|
-| `pyPetrograph_rgb_porosity.ipynb` | Wand/polygon pore + grain labels → LightGBM → porosity % with uncertainty |
-| `pyPetrograph_mineralmap_count.ipynb` | Flat-color mineral maps (legend TIFF) → snap colors → absorb specks → split touching grains → per-class counts with uncertainty |
-| `pyPetrograph_multimodal_grains.ipynb` | PPL + XPL → physics channels → watershed, optional SEG, optional N-channel U-Net (SAM off) → object table → names → stats |
+| `pyPetrograph_1_rgb_porosity.ipynb` | Wand/polygon pore + grain labels → LightGBM → porosity % with uncertainty |
+| `pyPetrograph_2_mineralmap_count.ipynb` | Flat-color mineral maps (legend TIFF) → snap colors → absorb specks → split touching grains → per-class counts with uncertainty |
+| `pyPetrograph_3_multimodal_grains.ipynb` | PPL + XPL → physics channels → watershed, optional SEG, optional N-channel U-Net (SAM off) → object table → names → stats |
 
 Each multimodal stage starts with `LOAD_SAVED_* = True`. Kernel **never imports TensorFlow**. GrainPlot, the N-channel U-Net, and the montage run in subprocesses of conda `work`.
 
@@ -26,7 +26,7 @@ v0.0.3 (multilayer embed notebook + fake-RGB / 16-ch student) lives in `old code
 
 ## Quick start (RGB)
 
-Typical cell order in `pyPetrograph_rgb_porosity.ipynb`:
+Typical cell order in `pyPetrograph_1_rgb_porosity.ipynb`:
 
 1. **deps** — `check_and_install_packages()`
 2. **imports** — `%matplotlib qt`
@@ -44,7 +44,7 @@ Typical cell order in `pyPetrograph_rgb_porosity.ipynb`:
 
 ## Quick start (multimodal)
 
-Edit only the Settings cell in `pyPetrograph_multimodal_grains.ipynb` (default: `Test images` AV03 PPL + XPL).
+Edit only the Settings cell in `pyPetrograph_3_multimodal_grains.ipynb` (default: `example_data` AV03 PPL + XPL).
 
 1. Align (auto + tweak window; Axioscan 2% stack is already on one grid — skip auto)
 2. Physics channels (`build_channel_stack` → `channels/{stem}_channels.npz`)
@@ -59,9 +59,9 @@ Edit only the Settings cell in `pyPetrograph_multimodal_grains.ipynb` (default: 
 
 ## Quick start (mineral map)
 
-Edit only the Settings cell in `pyPetrograph_mineralmap_count.ipynb` (`IMAGE_DIR`, `LEGEND` name → RGB in legend order, `COLOR_TOL`, `SPECK_PX`, `UNKNOWN_SPECK_PX`, `MIN_GRAIN_PX`, `SPLIT`, `BRIDGE_PX`, `H_MIN`, `NOTCH_SOLIDITY`, `NOTCH_HALVES`, `UNKNOWN_FRAC`, `DISPLAY_RGB`, `N_JOBS`). Call `set_output_dir("outputs")` so files land under `outputs/mineralmap/`.
+Edit only the Settings cell in `pyPetrograph_2_mineralmap_count.ipynb` (`IMAGE_DIR`, `LEGEND` name → RGB in legend order, `COLOR_TOL`, `SPECK_PX`, `UNKNOWN_SPECK_PX`, `MIN_GRAIN_PX`, `SPLIT`, `BRIDGE_PX`, `H_MIN`, `NOTCH_SOLIDITY`, `NOTCH_HALVES`, `UNKNOWN_FRAC`, `DISPLAY_RGB`, `N_JOBS`). Call `set_output_dir("outputs")` so files land under `outputs/mineralmap/`.
 
-Workflow figure (repo only, not in the PyPI package): [`project images/workflow.png`](../project%20images/workflow.png). Far-from-legend colors group into Unknown. A grain is named by its largest known color; Unknown only if Unknown pixels ≥ `unknown_frac` (default 0.95).
+Workflow figure (repo only, not in the PyPI package): [`image/workflow.png`](image/workflow.png). Far-from-legend colors group into Unknown. A grain is named by its largest known color; Unknown only if Unknown pixels ≥ `unknown_frac` (default 0.95).
 
 1. Legend check (`read_legend_swatches` + `check_legend` against the legend TIFF)
 2. Run all images (`process_folder`, one loky worker per image, `LOAD_SAVED` reuses `mineralmap/{stem}_counts.csv`)
@@ -220,7 +220,7 @@ Auto-align uses structure maps (`local_grad` + `local_std` + LBP), not color. Sa
 
 ## Dependencies
 
-Declared in the repo-root [`environment.yml`](../environment.yml) and [`pyproject.toml`](../pyproject.toml).
+Declared in the repo-root [`environment.yml`](environment.yml) and [`pyproject.toml`](pyproject.toml).
 
 | Extra | Packages | Used by |
 |-------|----------|---------|
@@ -230,7 +230,7 @@ Declared in the repo-root [`environment.yml`](../environment.yml) and [`pyprojec
 | `[xgb]` | xgboost | optional RGB classifier |
 | `[all]` | seg + sam2 + xgb | only if you need SAM refine and xgboost |
 
-From PyPI: `pip install pypetrograph`. Alternatively, see the [root README](../README.md#install) conda path. After `conda activate pypetrograph`, optional SEG is `pip install segmenteverygrain` (into this env), not SEG’s separate conda env.
+From PyPI: `pip install pypetrograph`. Alternatively, see the [root README](README.md#installation) conda path. After `conda activate pypetrograph`, optional SEG is `pip install segmenteverygrain` (into this env), not SEG’s separate conda env.
 
 ---
 

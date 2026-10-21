@@ -1,6 +1,6 @@
 # pyPetrograph
 
-v0.0.6
+v0.0.7
 
 [![PyPI version](https://img.shields.io/pypi/v/pypetrograph.svg)](https://pypi.org/project/pypetrograph/)
 
