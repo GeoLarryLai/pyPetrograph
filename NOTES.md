@@ -9,3 +9,4 @@
 - Stage 4: index.html, app.css, viewer.js written; next app.js
 - Stage 5: app.js, __init__ main, pyproject web extra + script
 - Stage 6: frontend + main done; equivalence: web=qt=notebook4 for all 26 10B files (tools/md5_table.txt). Committed.
+- Stage 7: test_webapp.py 5 passed; committed

@@ -14,7 +14,8 @@ async function showImg(key, opts = {}) {
   catch (e) { Viewer.clear(); }
 }
 function pill(msg, kind) { const p = $("pill"); p.textContent = msg || ""; p.className = "pill " + (kind || ""); }
-function ctrls(list) { $("ctrls").innerHTML = "<h4>Controls</h4>" + list.map(([k, d]) => `<div><b>${k}</b>${d}</div>`).join(""); }
+function ctrls(list) { $("ctrls").innerHTML = `<details ${localStorage.ctrlsClosed ? "" : "open"}><summary><b>Controls</b> (what every button and key does)</summary>` + list.map(([k, d]) => `<div><b>${k}</b>${d}</div>`).join("") + "</details>";
+  $("ctrls").querySelector("details").ontoggle = e => { localStorage.ctrlsClosed = e.target.open ? "" : "1"; }; }
 function mainBtns(list) {
   $("mainBtns").innerHTML = ""; list.forEach((b, i) => { const e = document.createElement("button");
     e.textContent = b.label; e.title = b.tip || ""; e.className = i === 0 ? "main" : ""; e.id = b.id || ""; e.disabled = !!b.disabled;
@@ -366,7 +367,7 @@ STEPS.push({title: "Grain size", lead: "Grain size distribution curves: all grai
     mainBtns([{label: "Next: outputs", fn: () => go(8)}]);
   }});
 // 9 Outputs
-STEPS.push({title: "Outputs", lead: "Nothing has been written yet. Export the CSV data sheets and the figures here.",
+STEPS.push({title: "Outputs", lead: "Nothing is written to the export folder until you press an Export button here.",
   help: "Exports go to the folder shown below. Click a file name to view an exported figure.",
   controls: [["Export CSV data sheets", "grains, counts, composition, geojson…"], ["Export all figures", "PNG figures"], ["Replot grain knolling diagram", "draw it again"],
     ["Open export folder", "show the folder in your file manager"]],
