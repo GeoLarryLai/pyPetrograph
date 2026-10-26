@@ -32,8 +32,8 @@ def check_dependencies(stream=None) -> bool:
         f"pyPetrograph app: missing package(s) in this Python environment: {names}\n"
         f"  environment: {sys.prefix}\n"
         "Install them into this same environment, then launch again:\n"
-        f"  {sys.executable} -m pip install \"pyPetrograph[app]\"\n"
-        "  (from a repo checkout: pip install -e \".[app]\")",
+        f"  {sys.executable} -m pip install pyPetrograph\n"
+        "  (from a repo checkout: pip install -e .)",
         file=stream,
     )
     return False
@@ -55,7 +55,7 @@ def main(argv=None) -> int:
     if "-h" in args or "--help" in args:
         print("usage: pypetrograph-app [--help] [--version]\n\n"
               "pyPetrograph desktop app: the AMICS workflow (notebook 4) step by step.\n"
-              "Needs the [app] extra: pip install \"pyPetrograph[app]\"")
+              "Installed with: pip install pyPetrograph")
         return 0
     if "--version" in args:
         from pyPetrograph import __version__

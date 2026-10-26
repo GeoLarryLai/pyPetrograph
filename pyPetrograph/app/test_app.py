@@ -443,7 +443,7 @@ def test_dependency_check(monkeypatch, capsys):
                         lambda name, *a: None if name in ("PySide6", "rapidocr_onnxruntime") else real(name, *a))
     assert m.check_dependencies() is False
     err = capsys.readouterr().err
-    assert "PySide6" in err and 'pip install "pyPetrograph[app]"' in err and "rapidocr" in err
+    assert "PySide6" in err and 'pip install pyPetrograph' in err and "rapidocr" in err
     assert m.main([]) == 1  # exits cleanly, no window, no traceback
 
 

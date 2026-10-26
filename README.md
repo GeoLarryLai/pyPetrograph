@@ -18,37 +18,34 @@ Example thin-section images are in `example_data/`. Analyzed results go to `outp
 
 ## Installation
 
-pyPetrograph (and its desktop app) runs in whichever Python environment you launch it from, so it must be installed into that environment first. Any environment name works.
+Requires Python 3.10–3.12 (3.13+ installs, but legend OCR has no wheels there yet). On Linux, PySide6 needs a few system libraries ([list below](#linux-system-libraries)).
 
-1. **Create and activate a Python environment** (name it anything; Python 3.10–3.12 recommended, since legend OCR has no 3.13+ wheels yet):
+### Install from PyPI
 
-   ```bash
-   conda create -n <your-env> python=3.11      # or: python -m venv <your-env>
-   conda activate <your-env>                   # or: source <your-env>/bin/activate
-   ```
+```bash
+pip install pyPetrograph
+```
 
-   From this repo you can instead use `conda env create -f environment.yml -n <your-env>` (`-n` overrides the default name in the file).
+This installs the library, the notebooks' dependencies and the desktop app.
 
-2. **Install pyPetrograph into that activated environment:**
+### Install from the repository
 
-   ```bash
-   pip install pyPetrograph            # notebooks / library only
-   pip install "pyPetrograph[app]"     # plus the desktop app (PySide6 + legend OCR)
-   pip install -e ".[app]"             # or: from a checkout of this repo
-   ```
+```bash
+git clone https://github.com/GeoLarryLai/pyPetrograph.git
+cd pyPetrograph
+pip install .        # or: pip install -e .  (editable, for development)
+```
 
-   Optional: finer grain-boundary mapping with [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain) — `pip install segmenteverygrain` into the same activated env (its “existing environment” path). SAM 2.1 weights (~860 MB) are a further opt-in on their page, not part of this pip install.
-
-3. **Launch the app from that same activated environment** with `pypetrograph-app` (see [The desktop app](#the-desktop-app)). If an app package is missing, it prints the `pip install` command to run and exits.
+Optional extras: `seg` ([SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain), for grain segmentation), `sam2` (SAM 2.1 refine, ~860 MB weights), `xgb`, `test`, `all`, e.g. `pip install "pyPetrograph[seg]"`.
 
 ## The desktop app
 
 `pypetrograph-app` runs the notebook 4 AMICS workflow interactively in one window: steps on the left, the image in the centre, settings on the right. You see and fix each result (legend names, non-grain regions, scale, grains, mineral matches) before moving on. Nothing is written to the export folder until you press an Export button.
 
 ```bash
-conda activate <your-env>           # any Python 3.10-3.12 env (or: source <your-env>/bin/activate)
-pip install "pyPetrograph[app]"     # install the app into it
-pypetrograph-app                    # or: python -m pyPetrograph.app
+pypetrograph-app
+# or
+python -m pyPetrograph.app
 ```
 
 **Files → Legend → BSE & footer → Non-grain regions → Scale (optional) → Grain segmentation → Minerals → Grain size → Outputs**
@@ -60,16 +57,11 @@ pypetrograph-app                    # or: python -m pyPetrograph.app
 | ![Minerals step](docs/images/app_minerals.jpg) | ![Outputs step](docs/images/app_outputs.jpg) |
 | **Minerals:** one row per mineral, ✓ exact colour, ▲ reassigned, ✗ not found. | **Outputs:** knolling diagram and the CSV / figure export buttons. |
 
-Segmentation needs the `seg` extra (and `sam2` for SAM refine). Model weights are looked up in `<output>/models`, `outputs/models`, `models/` and `~/.cache/pyPetrograph/models` (or `$PYPETROGRAPH_MODELS`) and downloaded to the cache only if missing. Headless tests: `pip install -e ".[app,test]"`, then `QT_QPA_PLATFORM=offscreen pytest pyPetrograph/app`.
+Segmentation needs the `seg` extra (and `sam2` for SAM refine). Model weights are looked up in `<output>/models`, `outputs/models`, `models/` and `~/.cache/pyPetrograph/models` (or `$PYPETROGRAPH_MODELS`) and downloaded to the cache only if missing. Headless tests: `pip install -e ".[test]"`, then `QT_QPA_PLATFORM=offscreen pytest pyPetrograph/app`.
 
-**Linux system libraries** (Debian/Ubuntu; PySide6 needs these from the system). On older Ubuntu use `libglib2.0-0` instead of `libglib2.0-0t64`.
+#### Linux system libraries
 
-```bash
-# offscreen / tests
-sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libfontconfig1 libfreetype6 libdbus-1-3 libglib2.0-0t64 libx11-6 libxcb1
-# on-screen window (X11), in addition
-sudo apt-get install -y libxkbcommon-x11-0 libx11-xcb1 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xkb1
-```
+Debian/Ubuntu (use `libglib2.0-0` on older Ubuntu): `sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libxkbcommon-x11-0 libfontconfig1 libfreetype6 libdbus-1-3 libglib2.0-0t64 libx11-6 libx11-xcb1 libxcb1 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xkb1`
 
 ## Citation
 
@@ -160,15 +152,13 @@ docs/images/
 
 Requires Python >=3.10.
 
-Installed with the package: numpy (>=1.24), pillow (>=10), matplotlib (>=3.7), scikit-learn (>=1.3), scipy (>=1.10), geopandas (>=0.14), shapely (>=2), rasterio (>=1.3), affine (>=2.4), joblib (>=1.3), pandas (>=2), lightgbm (>=4), scikit-image (>=0.22), PyQt5 (>=5.15).
+Installed with the package: numpy (>=1.24), pillow (>=10), matplotlib (>=3.7), scikit-learn (>=1.3), scipy (>=1.10), geopandas (>=0.14), shapely (>=2), rasterio (>=1.3), affine (>=2.4), joblib (>=1.3), pandas (>=2), lightgbm (>=4), scikit-image (>=0.22), PyQt5 (>=5.15), PySide6 (>=6.6, desktop app), rapidocr_onnxruntime (>=1.3, legend OCR; Python <3.13 only).
 
 Optional extras (not installed by default):
 
 - segmenteverygrain / tensorflow (`seg`: tensorflow >=2.16,<2.22, keras >=3, segmenteverygrain ==0.5.0)
 - sam2 / torch (`sam2`: torch >=2.2, torchvision, sam2 >=1.0)
 - xgboost (`xgb`: xgboost >=2)
-- legend text (`amics`: rapidocr_onnxruntime >=1.3, which brings onnxruntime; Python 3.10–3.12 only, so on 3.13+ the legend names fall back to swatch_1..N)
-- desktop app (`app`: PySide6 >=6.6, rapidocr_onnxruntime >=1.3) — run with `pypetrograph-app`
 - tests (`test`: pytest >=7, pytest-qt >=4.2)
 - everything except tests: `all`
 

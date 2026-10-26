@@ -29,26 +29,22 @@ The desktop app (`pypetrograph-app`) runs the same workflow step by step; nothin
 ## Install
 
 ```bash
-pip install pypetrograph
+pip install pyPetrograph
 ```
 
-Desktop app (AMICS workflow, PySide6) and legend OCR:
+Or from the repository: `git clone https://github.com/GeoLarryLai/pyPetrograph.git`, `cd pyPetrograph`, `pip install .` (or `pip install -e .`).
+
+Python 3.10–3.12 recommended (legend OCR has no 3.13+ wheels yet). On Linux, PySide6 needs some system libraries; see the [GitHub README](https://github.com/GeoLarryLai/pyPetrograph#linux-system-libraries). Optional extras: `seg`, `sam2`, `xgb`, `test`, `all`.
+
+## Desktop app
+
+Included in the install. Launch with:
 
 ```bash
-pip install "pypetrograph[app]"
-pypetrograph-app            # or: python -m pyPetrograph.app
+pypetrograph-app
+# or
+python -m pyPetrograph.app
 ```
-
-**Linux system libraries** (Debian/Ubuntu; PySide6 needs these from the system). On older Ubuntu use `libglib2.0-0` instead of `libglib2.0-0t64`.
-
-```bash
-# offscreen / tests
-sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libfontconfig1 libfreetype6 libdbus-1-3 libglib2.0-0t64 libx11-6 libxcb1
-# on-screen window (X11), in addition
-sudo apt-get install -y libxkbcommon-x11-0 libx11-xcb1 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xkb1
-```
-
-Other extras: `seg` (SegmentEveryGrain), `sam2`, `xgb`, `amics`, `test`, `all`.
 
 ## Demos
 

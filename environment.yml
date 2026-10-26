@@ -1,7 +1,7 @@
 # Core env for the demos and the desktop app. SegmentEveryGrain is optional — see README.
 # conda env create -f environment.yml            (or: -n <your-env> to use any env name)
 # conda activate pypetrograph                    (or your own name)
-# pip install -e ".[app]"
+# pip install -e .
 # The name below is only a default; change it freely.
 
 name: pypetrograph
