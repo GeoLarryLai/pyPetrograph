@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use pyPetrograph, please cite it as below."
+title: "pyPetrograph: a toolkit for semi-automated, ML-assisted thin-section petrography"
+abstract: "Porosity estimation, mineral counting, grain segmentation and micro-texture analysis of thin sections, including an AMICS (BSE + mineral map) workflow and desktop app."
+type: software
+authors:
+  - family-names: Lai
+    given-names: "Larry Syu-Heng"
+    affiliation: "Bureau of Economic Geology, The University of Texas at Austin"
+version: 0.1.0
+date-released: 2026-10-26
+license: AGPL-3.0-or-later
+repository-code: "https://github.com/GeoLarryLai/pyPetrograph"
+keywords:
+  - petrography
+  - thin-section
+  - mineralogy
+  - grain segmentation
+  - AMICS

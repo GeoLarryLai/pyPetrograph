@@ -1,7 +1,8 @@
-# Core env for the three demos. SegmentEveryGrain is optional — see README.
-# conda env create -f environment.yml
-# conda activate pypetrograph
-# pip install -e .
+# Core env for the demos and the desktop app. SegmentEveryGrain is optional — see README.
+# conda env create -f environment.yml            (or: -n <your-env> to use any env name)
+# conda activate pypetrograph                    (or your own name)
+# pip install -e ".[app]"
+# The name below is only a default; change it freely.
 
 name: pypetrograph
 channels:
@@ -22,7 +23,12 @@ dependencies:
   - lightgbm>=4
   - scikit-image>=0.22
   - pyqt>=5.15
+  - pyside6>=6.6          # desktop app (pypetrograph-app)
   - xgboost>=2
   - jupyterlab
   - ipykernel
   - pip
+  - pip:
+      - rapidocr_onnxruntime>=1.3   # legend OCR (notebook 4 and the app; pulls in onnxruntime)
+      - pytest>=7                   # tests only
+      - pytest-qt>=4.2              # tests only (app GUI tests)

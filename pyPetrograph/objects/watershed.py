@@ -77,7 +77,7 @@ def watershed_labels(
         return markers
     lab = np.asarray(watershed(elev, markers, mask=mask), dtype=np.int32)
     if int(lab.max()) >= 2:
-        lab = np.asarray(remove_small_objects(lab, min_size=int(min_area)), dtype=np.int32)
+        lab = np.asarray(remove_small_objects(lab, max_size=int(min_area)), dtype=np.int32)  # == old min_size (skimage 0.26)
     elif int(lab.max()) == 1 and int((lab == 1).sum()) < int(min_area):
         lab[:] = 0
     return lab

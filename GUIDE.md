@@ -17,10 +17,11 @@ from pyPetrograph import Session, launch_app, check_and_install_packages, build_
 | `pyPetrograph_1_rgb_porosity.ipynb` | Wand/polygon pore + grain labels → LightGBM → porosity % with uncertainty |
 | `pyPetrograph_2_mineralmap_count.ipynb` | Flat-color mineral maps (legend TIFF) → snap colors → absorb specks → split touching grains → per-class counts with uncertainty |
 | `pyPetrograph_3_multimodal_grains.ipynb` | PPL + XPL → physics channels → watershed, optional SEG, optional N-channel U-Net (SAM off) → object table → names → stats |
+| `pyPetrograph_4_AMICSworkflow.ipynb` | AMICS legend (OCR names + swatch colors) → BSE threshold clicks + scale line → SEG on BSE (subprocess, optional SAM 2.1 + GrainPlot) → grain sizes a, b, D, ECD → mineral vote from the map → counts, composition figure (grains by mineral + percent bar), per-mineral CSVs, size figures (all grains and per mineral), knolling |
 
 Each multimodal stage starts with `LOAD_SAVED_* = True`. Kernel **never imports TensorFlow**. GrainPlot, the N-channel U-Net, and the montage run in subprocesses of conda `work`.
 
-v0.0.3 (multilayer embed notebook + fake-RGB / 16-ch student) lives in `old codes/pyPetrograph_v0.0.3/`.
+v0.0.3 (multilayer embed notebook + fake-RGB / 16-ch student) lives in `_archive/old codes/pyPetrograph_v0.0.3/`.
 
 ---
 
@@ -72,6 +73,17 @@ Counts table cells read `n ± √n [n_lo–n_hi]`: Poisson counting error, then 
 
 ---
 
+## Quick start (AMICS)
+
+Edit the Settings cell in `pyPetrograph_4_AMICSworkflow.ipynb`. Leave `LEGEND_PATH`, `BSE_PATH`, `MINERAL_PATH` as `None` for one file window with three labeled rows. The paths you picked last time are filled in (`LOAD_SAVED_FILES`, saved as `outputs/amics/last_files.json`). The threshold window (`BSE_THRESHOLD`) and scale window (`UM_PER_PX`) always open unless you set a number; they start from your saved points / line. With no screen, set those values in Settings. Grains on blank map are Unmapped (`UNMAPPED_FRAC`): dropped from counts, CSVs, and knolling, kept in `minerals.geojson`. Files go to `outputs/amics/{sample}/{sample}_*`.
+
+1. Legend: OCR names + swatch colors; fix misreads in `LEGEND_EDIT`
+2. BSE: click epoxy / holes (threshold), draw the scale line, SEG outlines (`USE_SAM2`, `EDIT_GRAINS`), size metrics (a, b, D = √(a·b), ECD = √(4A/π)) and size figures
+3. Minerals: name unlisted map colors in `EXTRA_LEGEND` (then `AUTO_MATCH_COLORS` keeps exact colors, pairs the rest with unused legend names over the whole set within `MATCH_MAX_DIST`, gives any colored leftover its nearest mineral name, and prints the list), overlay, majority vote per grain (skip `SKIP_NAMES`), Unmapped grains outlined in cyan and dropped, mixed grains circled, counts, composition figure (`{sample}_composition.png`: grains painted by mineral, stacked percent-of-grains bar)
+4. Outputs: counts CSV, one CSV per mineral, knolling image
+
+---
+
 ## Package structure
 
 ```
@@ -84,6 +96,7 @@ pyPetrograph/
   fuse/            # extinction sine fit, channel stack, tiles, Axioscan helpers
   objects/         # watershed, N-ch U-Net worker, GrainPlot, table, cluster, classify, stats
   mineral_map/     # legend snap, speck absorb, colour regions + bridge / h-maxima / notch split, grain table, counts with uncertainty, parallel driver
+  amics/           # legend OCR, BSE threshold / scale pop-ups, SEG-on-BSE worker, axes, mineral vote, CSV / GeoJSON, knolling
 ```
 
 ---
@@ -238,7 +251,7 @@ From PyPI: `pip install pypetrograph`. Alternatively, see the [root README](READ
 
 - **Memory:** uint8 on disk for labels/preds; RGB working image RAM-only until kernel restart; float32 channels; tiled predict; mineral map: uint32-packed color snap, float32 distance transform, one image per worker, workers return only the counts table.
 - **Layout (locked):** notebook-level `models/`; beside image `labels/` + `predictions/` + `align/` + `channels/` + `objects/`.
-- **Do not re-derive live code from `old codes/`** except as a backup snapshot.
+- **Do not re-derive live code from `_archive/old codes/`** except as a backup snapshot.
 
 ---
 

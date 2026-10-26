@@ -190,7 +190,7 @@ def embed_B(
         import torch.nn.functional as F
     except ImportError as exc:
         raise ImportError(
-            "embed_B needs PyTorch. In conda env work: pip install torch --index-url "
+            "embed_B needs PyTorch. In your activated env: pip install torch --index-url "
             "https://download.pytorch.org/whl/cpu"
         ) from exc
 

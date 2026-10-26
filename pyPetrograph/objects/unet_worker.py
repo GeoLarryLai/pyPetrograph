@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import traceback
 from pathlib import Path
@@ -345,14 +346,23 @@ def _predict(args: argparse.Namespace) -> int:
     size = 256
     logits = np.zeros((h, w, 3), dtype=np.float32)
     weight = np.zeros((h, w), dtype=np.float32)
-    for y in range(0, h, size // 2):
-        for x in range(0, w, size // 2):
-            ye, xe = min(h, y + size), min(w, x + size)
-            tile = np.zeros((1, size, size, c), dtype=np.float32)
-            tile[0, : ye - y, : xe - x] = scaled[y:ye, x:xe]
-            tile = (tile - mu) / sd
-            pred = model.predict(tile, verbose=0)[0]
-            logits[y:ye, x:xe] += pred[: ye - y, : xe - x]
+    jobs = [
+        (y, x, min(h, y + size), min(w, x + size))
+        for y in range(0, h, size // 2)
+        for x in range(0, w, size // 2)
+    ]
+    # tiles go through the model in batches (PYPETROGRAPH_SEG_FAST=0: one at a time);
+    # accumulation order is unchanged
+    batch = 1 if os.environ.get("PYPETROGRAPH_SEG_FAST", "1") == "0" else 32
+    for i in range(0, len(jobs), batch):
+        chunk = jobs[i : i + batch]
+        tiles = np.zeros((len(chunk), size, size, c), dtype=np.float32)
+        for j, (y, x, ye, xe) in enumerate(chunk):
+            tiles[j, : ye - y, : xe - x] = scaled[y:ye, x:xe]
+        tiles = (tiles - mu) / sd
+        preds = model.predict(tiles, batch_size=len(chunk), verbose=0)
+        for j, (y, x, ye, xe) in enumerate(chunk):
+            logits[y:ye, x:xe] += preds[j, : ye - y, : xe - x]
             weight[y:ye, x:xe] += 1.0
     weight = np.maximum(weight, 1e-6)
     logits /= weight[..., None]

@@ -1112,7 +1112,7 @@ def _run_label_gui_from_config(config_path: str) -> None:
     except ImportError as exc:
         raise ImportError(
             "PyQt5 is required for the label window (same as DMG-07).\n"
-            "In conda env work:  conda install -c conda-forge pyqt"
+            "In your activated env:  conda install -c conda-forge pyqt"
         ) from exc
 
     cfg = json.loads(Path(config_path).read_text())

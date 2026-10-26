@@ -12,6 +12,8 @@ Outputs beside the images in ``mineralmap/``::
 """
 from __future__ import annotations
 
+import os
+
 import time
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence
@@ -111,7 +113,11 @@ def process_image(
         floor_px=floor_px,
     )
     table_all = grain_table(labels, cmap, legend, unknown_frac=unknown_frac)
-    table_nosplit = grain_table(labels_nosplit, cmap, legend, unknown_frac=unknown_frac)
+    # only class + area_px of the no-split table are used (count_grains)
+    table_nosplit = grain_table(
+        labels_nosplit, cmap, legend, unknown_frac=unknown_frac,
+        with_shape=os.environ.get("PYPETROGRAPH_SEG_FAST", "1") == "0",
+    )
     del labels_nosplit
     counts = count_grains(table_all, table_nosplit, legend, p.stem, min_grain_px=min_grain_px)
 

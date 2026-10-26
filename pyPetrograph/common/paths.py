@@ -18,6 +18,8 @@ from pyPetrograph.common.constants import (
     OBJECTS_SUBDIR,
     PathLike,
     PREDICTIONS_SUBDIR,
+    AMICS_PACKAGES,
+    APP_PACKAGES,
     REQUIRED_PACKAGES,
     SAM2_PACKAGES,
     SEG_PACKAGES,
@@ -335,12 +337,17 @@ def check_and_install_packages(
     *,
     include_seg: bool = False,
     include_sam2: bool = False,
+    include_amics: bool = False,
+    include_app: bool = False,
 ) -> Dict[str, str]:
     """
     Check packages needed by this toolbox; optionally pip-install missing ones
     into the current kernel env (Cursor/VS Code Jupyter: select the env first).
 
-    Kernel-safe extras: ``include_seg`` / ``include_sam2`` use ``find_spec``
+    ``include_app`` only reports whether the desktop app's packages (PySide6, rapidocr)
+    are present; it never installs them (``pip install "pyPetrograph[app]"``).
+
+    Kernel-safe extras: ``include_seg`` / ``include_sam2`` / ``include_amics`` use ``find_spec``
     only — they never ``import tensorflow`` in this process.
 
     Returns
@@ -372,6 +379,8 @@ def check_and_install_packages(
         extra.extend(SEG_PACKAGES)
     if include_sam2:
         extra.extend(SAM2_PACKAGES)
+    if include_amics:
+        extra.extend(AMICS_PACKAGES)
     if extra:
         extra_results: Dict[str, str] = {}
         extra_missing: List[Tuple[str, str]] = []
@@ -382,7 +391,7 @@ def check_and_install_packages(
                 extra_missing.append((import_name, pip_name))
                 extra_results[import_name] = "missing"
         _print_package_status(
-            "SEG / SAM2 check (not imported in this kernel)", extra_results
+            "Optional packages check (not imported in this kernel)", extra_results
         )
         if extra_missing and install:
             extra_results = _install_missing(
@@ -391,6 +400,14 @@ def check_and_install_packages(
         elif extra_missing:
             print("Or: pip install 'pyPetrograph[seg]' / 'pyPetrograph[all]'")
         results.update(extra_results)
+
+    if include_app:
+        app_results = {
+            imp: ("ok" if _spec_present(imp) else "not installed (optional)") for imp, _ in APP_PACKAGES
+        }
+        _print_package_status("Desktop app packages (optional, not installed here)", app_results)
+        if any(v != "ok" for v in app_results.values()):
+            print("Desktop app: pip install 'pyPetrograph[app]', then run pypetrograph-app")
 
     failed = [k for k, v in results.items() if str(v).startswith("failed") or v == "missing"]
     if failed:

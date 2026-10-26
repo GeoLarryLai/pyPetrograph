@@ -18,8 +18,10 @@ example_data/predictions/
 *.pdf
 *.pptx
 AMICS data/
+AMICS data-grain size analysis/
 dataset/
 old codes/
+_archive/
 .cursor/
 AI_EDITING_LOG.md
 Modal_*.ipynb
@@ -42,3 +44,10 @@ outputs/**/*.npy
 *.keras
 !outputs/models/grain_unet_ppl-xpl.keras
 *.pt
+# release / app (0.1.0)
+outputs/amics/
+outputs/**/.pypetrograph/
+.pypetrograph/
+segmenteverygrain-main/
+.pytest_cache/
+*.tgz

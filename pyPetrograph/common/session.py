@@ -1,6 +1,8 @@
 """Session state for multi-image labeling / train / predict."""
 from __future__ import annotations
 
+import os
+
 import csv
 import json
 import warnings
@@ -306,7 +308,10 @@ class Session:
             print("Removed unused image subfolders (cache/, models/ → notebook models/):")
             for p in gone:
                 print(f"  - {relpath_display(p)}")
-        self.cache_queue_images()
+        # Images load on first use (same arrays, via ensure_rgb_cache).
+        # PYPETROGRAPH_EAGER_CACHE=1 restores warming every queued image up front.
+        if os.environ.get("PYPETROGRAPH_EAGER_CACHE", "0") == "1":
+            self.cache_queue_images()
         if open_first and resolved:
             self.switch_image(0, autosave=False)
         else:

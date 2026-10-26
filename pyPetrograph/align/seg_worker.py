@@ -4,127 +4,34 @@ SegmentEveryGrain worker. Run in a subprocess, not inside the Jupyter kernel.
 
 Safe to use conda env ``work``'s Python (TensorFlow 2.21 + numpy 2 imports).
 The worker blocks pyarrow (native crash with TensorFlow). The notebook still
-must not import this module in-process.
+must not import this module in-process. The SEG code itself is shared with the
+AMICS worker in ``objects/tf_env.py``; this file is the align CLI.
 """
 from __future__ import annotations
 
 import argparse
-import faulthandler
 import json
 import os
 import sys
 import traceback
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional  # noqa: F401
 
 
-def _block_pyarrow() -> None:
-    """Stop pyarrow from loading. Its C library SIGSEGVs with TensorFlow 2.21."""
+_OBJECTS = Path(__file__).resolve().parent.parent / "objects"  # shared tf_env.py
+if str(_OBJECTS) not in sys.path:
+    sys.path.insert(0, str(_OBJECTS))
 
-    class _BlockPyarrow:
-        def find_spec(self, fullname, path=None, target=None):  # noqa: ANN001
-            if fullname == "pyarrow" or str(fullname).startswith("pyarrow."):
-                raise ModuleNotFoundError(
-                    "pyarrow blocked (native conflict with TensorFlow)"
-                )
-            return None
-
-    if any(type(finder).__name__ == "_BlockPyarrow" for finder in sys.meta_path):
-        return
-    sys.meta_path.insert(0, _BlockPyarrow())
-
-
-def _prepare_native_libs() -> None:
-    os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
-    os.environ.setdefault("KERAS_BACKEND", "tensorflow")
-    faulthandler.enable()
-    _block_pyarrow()
-
-
-def _device() -> str:
-    try:
-        import torch
-
-        if torch.cuda.is_available():
-            return "cuda"
-        if getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available():
-            return "mps"
-    except Exception:
-        pass
-    return "cpu"
-
-
-def _polygons_to_labels(grains: List[Any], hw: tuple) -> Any:
-    import numpy as np
-    from shapely.geometry import MultiPolygon
-    from skimage.draw import polygon as draw_polygon
-
-    h, w = int(hw[0]), int(hw[1])
-    lab = np.zeros((h, w), dtype=np.int32)
-    for i, g in enumerate(grains, start=1):
-        if g is None or getattr(g, "is_empty", False):
-            continue
-        geoms = list(g.geoms) if isinstance(g, MultiPolygon) else [g]
-        for poly in geoms:
-            if poly is None or poly.is_empty:
-                continue
-            xs, ys = poly.exterior.xy
-            rr, cc = draw_polygon(
-                np.round(ys).astype(int),
-                np.round(xs).astype(int),
-                shape=(h, w),
-            )
-            lab[rr, cc] = i
-    return lab
-
-
-def _load_unet(path: str):
-    from keras.saving import load_model
-    from segmenteverygrain import weighted_crossentropy
-
-    return load_model(
-        path, custom_objects={"weighted_crossentropy": weighted_crossentropy}
-    )
-
-
-def _load_sam(ckpt: str):
-    from sam2.build_sam import build_sam2
-    from sam2.sam2_image_predictor import SAM2ImagePredictor
-
-    device = _device()
-    sam = build_sam2("configs/sam2.1/sam2.1_hiera_l.yaml", ckpt, device=device)
-    return SAM2ImagePredictor(sam)
-
-
-def _run_one(
-    image_path: str,
-    unet,
-    sam,
-    *,
-    use_sam: bool,
-    hw: tuple,
-) -> Dict[str, Any]:
-    import numpy as np
-    from segmenteverygrain import predict_large_image
-
-    grains, _pred, _coords = predict_large_image(
-        image_path,
-        unet,
-        sam=sam if use_sam else None,
-        use_sam=use_sam,
-        remove_edge_grains=False,
-    )
-    grains = list(grains or [])
-    lab = _polygons_to_labels(grains, hw)
-    method = "seg_unet_sam" if use_sam else "seg_unet"
-    return {
-        "ok": True,
-        "n": int(len(grains)),
-        "method": method,
-        "error": None,
-        "labels": lab,
-        "polygons": grains,
-    }
+# shared SEG helpers; re-exported here for qc_worker / seg_qc_worker imports
+from tf_env import (  # noqa: E402,F401
+    _block_pyarrow,
+    _device,
+    _load_sam,
+    _load_unet,
+    _polygons_to_labels,
+    _prepare_native_libs,
+    _run_one,
+)
 
 
 def main(argv: Optional[List[str]] = None) -> int:

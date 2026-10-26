@@ -4,12 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyPetrograph"
-version = "0.0.7"
-description = "Thin-section petrography: hand-label RGB features, mineral-map grain counts, and multi-image grain segmentation."
+version = "0.1.0"
+description = "A toolkit for semi-automated, ML-assisted thin-section petrography: porosity estimation, mineral counting, grain segmentation and micro-texture analysis"
 readme = "README-PyPI.md"
 requires-python = ">=3.10"
 license = "AGPL-3.0-or-later"
-authors = [{ name = "Larry Syu-Heng Lai", email = "larrysyuhenglai@gmail.com" }]
+license-files = ["LICENSE"]
+authors = [{ name = "Larry Syu-Heng Lai" }]
 keywords = ["petrography", "thin-section", "mineralogy", "segmentation", "porosity"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -18,6 +19,8 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Environment :: X11 Applications :: Qt",
     "Topic :: Scientific/Engineering :: GIS",
     "Topic :: Scientific/Engineering :: Image Processing",
 ]
@@ -50,11 +53,29 @@ sam2 = [
     "sam2>=1.0",
 ]
 xgb = ["xgboost>=2"]
-all = ["pyPetrograph[seg,sam2,xgb]"]
+# rapidocr_onnxruntime has no Python 3.13+ wheels: there the legend uses swatch_1..N names
+amics = ["rapidocr_onnxruntime>=1.3; python_version < '3.13'"]
+app = [
+    "PySide6>=6.6",
+    "rapidocr_onnxruntime>=1.3; python_version < '3.13'",
+]
+test = [
+    "pytest>=7",
+    "pytest-qt>=4.2",
+]
+all = ["pyPetrograph[seg,sam2,xgb,amics,app]"]
+
+[project.scripts]
+pypetrograph-app = "pyPetrograph.app:main"
 
 [project.urls]
 Homepage = "https://github.com/GeoLarryLai/pyPetrograph"
 Repository = "https://github.com/GeoLarryLai/pyPetrograph"
+Changelog = "https://github.com/GeoLarryLai/pyPetrograph/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 include = ["pyPetrograph*"]
+
+[tool.pytest.ini_options]
+testpaths = ["pyPetrograph"]
+norecursedirs = ["segmenteverygrain-main", "old codes", "_archive", "models", "dataset", "outputs", "dist", "AMICS data", "AMICS data-grain size analysis", "Rich Kyle-BEG Aggregate Mapping Project", "*.egg-info", ".*"]

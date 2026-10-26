@@ -205,6 +205,17 @@ SAM2_PACKAGES: List[Tuple[str, str]] = [
     ("torch", "torch"),
 ]
 
+# AMICS workflow: OCR for legend names and the BSE footer "PixelSize" text.
+AMICS_PACKAGES: List[Tuple[str, str]] = [
+    ("rapidocr_onnxruntime", "rapidocr_onnxruntime>=1.3"),
+]
+
+# desktop app (``pip install "pyPetrograph[app]"``); checked, never auto-installed by notebooks
+APP_PACKAGES: List[Tuple[str, str]] = [
+    ("PySide6", "PySide6>=6.6"),
+    ("rapidocr_onnxruntime", "rapidocr_onnxruntime>=1.3"),
+]
+
 DEFAULT_CLASSES: Dict[int, str] = {
     1: "olivine",
     2: "clinopyroxene",

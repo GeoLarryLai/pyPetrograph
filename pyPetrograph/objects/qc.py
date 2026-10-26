@@ -111,6 +111,10 @@ def _tf_worker_env(*, mpl_backend: str = "Agg") -> Dict[str, str]:
     env.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
     env.setdefault("KERAS_BACKEND", "tensorflow")
     env["PYTHONFAULTHANDLER"] = "1"
+    # conda (numpy / TF) and PyTorch each load their own libomp. On a Mac a second OpenMP
+    # thread crashes the first CPU torch op (exit -11). SAM runs on the GPU (MPS) there.
+    if sys.platform == "darwin":
+        env["OMP_NUM_THREADS"] = "1"
     return env
 
 

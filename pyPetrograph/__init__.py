@@ -9,7 +9,7 @@ Mineral-map notebook: flat-color mineral maps → legend snap → grains → per
 
 from __future__ import annotations
 
-__version__ = "0.0.7"
+__version__ = "0.1.0"
 
 from pyPetrograph.common.constants import (
     CACHE_SUBDIR,
@@ -27,6 +27,8 @@ from pyPetrograph.common.constants import (
     METHODS,
     MODELS_SUBDIR,
     PREDICTIONS_SUBDIR,
+    AMICS_PACKAGES,
+    APP_PACKAGES,
     REQUIRED_PACKAGES,
     SAM2_PACKAGES,
     SEG_PACKAGES,
@@ -165,6 +167,8 @@ __all__ = [
     "REQUIRED_PACKAGES",
     "SEG_PACKAGES",
     "SAM2_PACKAGES",
+    "AMICS_PACKAGES",
+    "APP_PACKAGES",
     "MODELS_SUBDIR",
     "PREDICTIONS_SUBDIR",
     "LABELS_SUBDIR",

@@ -1,16 +1,20 @@
 """
 Native-lib prep for TensorFlow / SAM2 subprocesses.
 
-Copied from ``align/seg_worker.py`` so outline workers never import
-``pyPetrograph`` (geopandas → pyarrow SIGSEGV with TF 2.21). Import this file
-as a sibling of the worker scripts, never from the Jupyter kernel.
+Shared by every SEG / TF worker (``align/seg_worker.py``, ``amics/seg_worker.py``,
+``objects/*_worker.py``) so outline workers never import ``pyPetrograph``
+(geopandas → pyarrow SIGSEGV with TF 2.21). Import this file as a sibling of
+the worker scripts, never from the Jupyter kernel.
 """
 from __future__ import annotations
 
 import faulthandler
 import os
 import sys
-from typing import Any, List
+from pathlib import Path
+from typing import Any, Dict, List
+
+_AMICS = Path(__file__).resolve().parent.parent / "amics"  # fast_seg.py lives here
 
 
 def _block_pyarrow() -> None:
@@ -96,3 +100,77 @@ def _load_sam_model(ckpt: str):
     device = _device()
     sam = build_sam2("configs/sam2.1/sam2.1_hiera_l.yaml", ckpt, device=device)
     return sam, SAM2ImagePredictor(sam)
+
+
+def _load_unet(path: str):
+    from keras.saving import load_model
+    from segmenteverygrain import weighted_crossentropy
+
+    return load_model(path, custom_objects={"weighted_crossentropy": weighted_crossentropy})
+
+
+def _load_sam(ckpt: str):
+    """SAM2ImagePredictor only (align / QC workers)."""
+    return _load_sam_model(ckpt)[1]
+
+
+def _read_polygons(path: str) -> List:
+    """Shapely polygons from a grains GeoJSON (json + shapely only)."""
+    import json
+
+    from shapely.geometry import shape
+
+    doc = json.loads(Path(path).read_text(encoding="utf-8"))
+    out = []
+    for feat in doc.get("features") or []:
+        geom = (feat or {}).get("geometry")
+        if geom:
+            g = shape(geom)
+            if not g.is_empty:
+                out.append(g)
+    return out
+
+
+def _apply_fast_seg() -> bool:
+    """Patch segmenteverygrain in this process with the identical-output fast path
+    (``amics/fast_seg.py``). Off with ``PYPETROGRAPH_SEG_FAST=0``."""
+    if str(_AMICS) not in sys.path:
+        sys.path.insert(0, str(_AMICS))
+    import fast_seg
+
+    return bool(fast_seg.apply())
+
+
+def _run_one(
+    image_path: str,
+    unet,
+    sam,
+    *,
+    use_sam: bool,
+    hw: tuple,
+) -> Dict[str, Any]:
+    """U-Net (+ SAM) SEG on one image -> labels + polygons (align / QC workers)."""
+    from segmenteverygrain import predict_large_image
+
+    _apply_fast_seg()
+    # predict_large_image wraps ``sam`` in its own SAM2ImagePredictor, so give it the raw model.
+    sam_model = getattr(sam, "model", sam)
+    grains, _pred, _coords = predict_large_image(
+        image_path,
+        unet,
+        sam=sam_model if use_sam else None,
+        min_area=0,  # SEG 0.5.0 passes None to the SAM step when unset (TypeError); 0 is what it uses later
+        use_sam=use_sam,
+        remove_edge_grains=False,
+    )
+    grains = list(grains or [])
+    lab = _polygons_to_labels(grains, hw)
+    method = "seg_unet_sam" if use_sam else "seg_unet"
+    return {
+        "ok": True,
+        "n": int(len(grains)),
+        "method": method,
+        "error": None,
+        "labels": lab,
+        "polygons": grains,
+    }

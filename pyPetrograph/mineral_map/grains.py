@@ -19,6 +19,7 @@ are at least ``unknown_frac`` of the grain (default 0.95).
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
@@ -30,7 +31,7 @@ from scipy import ndimage as ndi
 from shapely.geometry import mapping, shape
 from skimage.draw import line as draw_line
 from skimage.measure import label as cc_label, regionprops_table
-from skimage.morphology import binary_opening, convex_hull_image, disk, h_maxima, remove_small_holes
+from skimage.morphology import convex_hull_image, disk, h_maxima, remove_small_holes
 from skimage.segmentation import find_boundaries, watershed
 
 from pyPetrograph.common.constants import COORD_DECIMALS, PathLike
@@ -47,6 +48,15 @@ _PROPS = (
     "solidity",
 )
 _BOUNDARY_RGB = (60, 60, 60)
+
+# PYPETROGRAPH_SEG_FAST=0 restores the original (slower) code paths below.
+_FAST = os.environ.get("PYPETROGRAPH_SEG_FAST", "1") != "0"
+
+
+def _binary_opening(image: np.ndarray, footprint: np.ndarray) -> np.ndarray:
+    """Same as skimage ``binary_opening`` (mode='ignore'), deprecated in 0.26."""
+    eroded = ndi.binary_erosion(image, structure=footprint, border_value=1)
+    return ndi.binary_dilation(eroded, structure=footprint, border_value=0)
 
 
 def absorb_specks(cmap: np.ndarray, valid: np.ndarray, speck_px: int = 30) -> np.ndarray:
@@ -123,10 +133,19 @@ def _intersect(lab: np.ndarray, regions: np.ndarray) -> np.ndarray:
     """Split ``lab`` wherever it crosses a ``regions`` boundary; renumber 1..n."""
     n = int(regions.max()) + 1
     comb = lab.astype(np.int64) * n + regions.astype(np.int64)
-    comb[lab == 0] = -1
+    fg = lab > 0
+    top = int(comb.max()) + 1 if comb.size else 0
+    if _FAST and 0 < top <= 1 << 27:
+        # rank of each (lab, region) pair in sorted order == np.unique inverse
+        present = np.bincount(comb[fg], minlength=top) > 0
+        rank = np.cumsum(present, dtype=np.int64).astype(np.int32)
+        out = rank[comb]
+        out[~fg] = 0
+        return _relabel_min_area(out, 1)
+    comb[~fg] = -1
     _, inv = np.unique(comb, return_inverse=True)
     out = (inv.reshape(lab.shape) + 1).astype(np.int32)
-    out[lab == 0] = 0
+    out[~fg] = 0
     return _relabel_min_area(out, 1)
 
 
@@ -203,7 +222,7 @@ def _break_bridges(colored: np.ndarray, regions: np.ndarray, bridge_px: int, min
     """
     if bridge_px <= 0 or not colored.any():
         return regions.copy()
-    opened = binary_opening(colored, disk(int(bridge_px)))
+    opened = _binary_opening(colored, disk(int(bridge_px)))
     markers, n = ndi.label(opened)
     markers = markers.astype(np.int32)
     rem = colored & ~opened
@@ -242,7 +261,7 @@ def _split_hmax(pieces: np.ndarray, h_min: float) -> np.ndarray:
         return pieces
     # small holes are filled for the distance map only, so a dust patch inside
     # a grain does not turn its ridge into a ring
-    filled = remove_small_holes(mask, area_threshold=max(1, _HOLE_FILL_PX))
+    filled = remove_small_holes(mask, max_size=max(1, _HOLE_FILL_PX))  # == old area_threshold in skimage 0.26
     dist = ndi.distance_transform_edt(filled).astype(np.float32)
     del filled
     peak = h_maxima(dist, float(h_min)).astype(bool) & mask
@@ -446,6 +465,7 @@ def grain_table(
     legend: Legend,
     *,
     unknown_frac: float = 0.95,
+    with_shape: bool = True,
 ) -> pd.DataFrame:
     """
     One row per grain: class, area, shape, and ``frac_{name}`` columns.
@@ -475,6 +495,19 @@ def grain_table(
     has_known = np.clip(scored, 0.0, None).sum(axis=1) > 0
     too_unknown = frac[:, unk] >= float(unknown_frac)
     dom = np.where(has_known & ~too_unknown, scored.argmax(axis=1), unk)
+    if not with_shape:
+        # class / area only (shape columns NaN); same rows, classes, areas
+        gid = np.flatnonzero(comp.sum(axis=1) > 0) + 1
+        nan = np.full(len(gid), np.nan)
+        df = pd.DataFrame({"grain_id": gid.astype(int)})
+        df["class"] = [names[int(k)] for k in dom[gid - 1]]
+        df["class_frac"] = frac[gid - 1, dom[gid - 1]]
+        df["area_px"] = comp[gid - 1].sum(axis=1).astype(int)
+        for c in cols[4:14]:
+            df[c] = nan
+        for k, nm in enumerate(names[1:], start=1):
+            df[f"frac_{nm}"] = frac[gid - 1, k]
+        return df
     props = regionprops_table(labels, properties=_PROPS)
     order = np.argsort(props["label"])
     df = pd.DataFrame(

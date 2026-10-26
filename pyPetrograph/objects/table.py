@@ -107,7 +107,7 @@ def build_object_table(
         from skimage.morphology import remove_small_objects
 
         leftover = np.asarray(
-            remove_small_objects(leftover, min_size=int(min_leftover_px)),
+            remove_small_objects(leftover, max_size=int(min_leftover_px)),
             dtype=np.int32,
         )
 

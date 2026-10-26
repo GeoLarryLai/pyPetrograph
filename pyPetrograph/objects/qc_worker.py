@@ -168,6 +168,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             from segmenteverygrain.interactions import GrainPlot
 
             gp = GrainPlot(grains=grains_list, image=rgb, predictor=sam_pred)
+            gp.activate()  # connects the click / key handlers; without it the window ignores input
             print("GrainPlot: click to add, D delete, M merge. Close the window to save.")
             plt.show()
             edited = list(gp.get_grains() or [])
