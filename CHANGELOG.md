@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 (unreleased)
+## 0.2.0 (2026-10-26)
 
 ### Changed
 - **The app now runs in the web browser.** `pypetrograph-app` launches the FastAPI browser app (alias `pypetrograph-web`, or `python -m pyPetrograph.webapp`); same nine steps and controls, exports byte-identical to the former Qt app and notebook 4, faster or equal on every timed step. fastapi and uvicorn (~11 MB) are base dependencies, so no extra is needed; default install ~930 MB.
