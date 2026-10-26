@@ -170,7 +170,7 @@ Requires Python >=3.10.
 Installed with the package: numpy (>=1.24), pillow (>=10), matplotlib (>=3.7), scikit-learn (>=1.3), scipy (>=1.10), geopandas (>=0.14), shapely (>=2), rasterio (>=1.3), affine (>=2.4), joblib (>=1.3), pandas (>=2), lightgbm (>=4), scikit-image (>=0.22), PyQt5 (>=5.15), rapidocr_onnxruntime (>=1.3; Python <3.13 only).
 
 > [!NOTE]
-> **rapidocr_onnxruntime** (legend OCR for notebook 4 and the app) is the largest part of the default install: it adds **~220 MB** (onnxruntime ~80 MB, OpenCV ~120 MB, RapidOCR ~16 MB) on top of the other dependencies (~726 MB).
+> **rapidocr_onnxruntime** (legend OCR for notebook 4 and the app) is a large part of the default install: it adds **~220 MB** (onnxruntime ~80 MB, OpenCV ~120 MB, RapidOCR ~16 MB) on top of the other dependencies (~726 MB).
 
 Desktop app only (not installed by default): PySide6-Essentials (>=6.6, ~350 MB), `pip install PySide6-Essentials`.
 
