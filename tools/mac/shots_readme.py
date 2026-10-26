@@ -4,7 +4,7 @@ from pathlib import Path
 from PIL import Image
 from playwright.sync_api import sync_playwright
 URL, OUT, DATA = sys.argv[1], Path(sys.argv[2]), sys.argv[3]; OUT.mkdir(exist_ok=True)
-EX = Path(__file__).resolve().parents[1] / "example_data"
+EX = Path(__file__).resolve().parents[2] / "example_data"
 with sync_playwright() as p:
     b = p.chromium.launch(); pg = b.new_page(viewport={"width": 1440, "height": 855}, device_scale_factor=2)
     pg.on("pageerror", lambda e: print("PAGE ERROR", e))

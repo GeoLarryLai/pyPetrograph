@@ -10,3 +10,4 @@
 - Stage 5: app.js, __init__ main, pyproject web extra + script
 - Stage 6: frontend + main done; equivalence: web=qt=notebook4 for all 26 10B files (tools/md5_table.txt). Committed.
 - Stage 7: test_webapp.py 5 passed; committed
+- Stage 8: shots (10 png), sizes (base 914 MB; +web 11 MB; +PySide6 246 MB), WEBAPP_PARITY.md; committed
