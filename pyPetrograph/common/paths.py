@@ -420,8 +420,6 @@ def check_and_install_packages(
         print("Still missing:", ", ".join(failed))
         print("Fix: conda env create -f environment.yml")
         print("  or: pip install 'pyPetrograph[all]'  (SegmentEveryGrain: " + SEG_INSTALL_URL + ")")
-        if "PyQt5" in failed:
-            print("  PyQt5 (label window): conda install -c conda-forge pyqt")
     elif not missing:
         print("All required packages are available.")
     else:

@@ -423,6 +423,10 @@ def launch_align(scene: Scene, *, overlay_slot: Optional[str] = None, wait: bool
         cfg_path = tmp.name
     env = os.environ.copy()
     env["MPLBACKEND"] = "QtAgg"
+    from pyPetrograph.common.qt import qt_env, require_qt
+
+    require_qt("The alignment window")
+    qt_env(env)
     env["PYTHONPATH"] = root + os.pathsep + env.get("PYTHONPATH", "")
     code = (
         "from pyPetrograph.align.ui import _run_align_from_config; "

@@ -175,7 +175,7 @@ One table row per GrainPlot grain, plus leftover blobs (`kind=leftover`). k-mean
 
 ## Label UI (RGB notebook)
 
-**Important (Cursor / VS Code Jupyter):** a Matplotlib GUI *inside* the kernel often **kills the kernel**. `launch_app(session)` starts a **separate Python process** (QtAgg / PyQt5).
+**Important (Cursor / VS Code Jupyter):** a Matplotlib GUI *inside* the kernel often **kills the kernel**. `launch_app(session)` starts a **separate Python process** (QtAgg; `pip install PySide6-Essentials`).
 
 Save writes `{stem}_polygons.geojson` + `{stem}_session.json`. Train/reload rasterizes from polygons. Settings cell is the source of truth for `y_target`, DPI, method, feature toggles — never read/written from `session.json`.
 
@@ -237,7 +237,7 @@ Declared in the repo-root [`environment.yml`](environment.yml) and [`pyproject.t
 
 | Extra | Packages | Used by |
 |-------|----------|---------|
-| *(core)* | numpy, pillow, matplotlib, scikit-learn, scipy, geopandas, shapely, rasterio, affine, joblib, pandas, lightgbm, scikit-image, **PyQt5** | RGB + mineral-map |
+| *(core)* | numpy, pillow, matplotlib, scikit-learn, scipy, geopandas, shapely, rasterio, affine, joblib, pandas, lightgbm, scikit-image | RGB + mineral-map |
 | `[xgb]` | xgboost | optional RGB classifier |
 | `[all]` | xgb + amics + app | xgboost, legend OCR and the desktop app |
 

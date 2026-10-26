@@ -87,7 +87,7 @@ def _run_qt_picker_from_config(config_path: str) -> None:
     Same idea as ``_run_label_gui_from_config`` — keeps the notebook kernel Qt-free
     so Windows/macOS/Linux Jupyter does not hard-crash (e.g. exit 3221226505).
     """
-    from PyQt5 import QtWidgets
+    from matplotlib.backends.qt_compat import QtWidgets
 
     cfg = json.loads(Path(config_path).read_text(encoding="utf-8"))
     out_path = Path(cfg["out_path"])
@@ -103,10 +103,10 @@ def _run_qt_picker_from_config(config_path: str) -> None:
             box = QtWidgets.QMessageBox()
             box.setWindowTitle("Select images")
             box.setText("Add more images from another folder?")
-            add_btn = box.addButton("Add more", QtWidgets.QMessageBox.AcceptRole)
-            box.addButton("Done", QtWidgets.QMessageBox.RejectRole)
+            add_btn = box.addButton("Add more", QtWidgets.QMessageBox.ButtonRole.AcceptRole)
+            box.addButton("Done", QtWidgets.QMessageBox.ButtonRole.RejectRole)
             box.setDefaultButton(add_btn)
-            box.exec_()
+            box.exec()
             result = {"add_more": box.clickedButton() == add_btn}
         else:
             init = str(cfg.get("initial_dir") or ".")
@@ -157,6 +157,9 @@ def _run_qt_picker_subprocess(cfg: Dict[str, Any]) -> Dict[str, Any]:
     env["PYTHONPATH"] = root + os.pathsep + env.get("PYTHONPATH", "")
     # Keep child free of Matplotlib GUI backends; this process is Qt-only dialogs.
     env.pop("MPLBACKEND", None)
+    from pyPetrograph.common.qt import qt_env
+
+    qt_env(env)
 
     code = (
         "from pyPetrograph import _run_qt_picker_from_config; "
@@ -175,7 +178,7 @@ def _run_qt_picker_subprocess(cfg: Dict[str, Any]) -> Dict[str, Any]:
             err = (r.stderr or r.stdout or "").strip() or f"exit {r.returncode}"
             warnings.warn(
                 f"File picker subprocess failed ({err}). "
-                "Install PyQt5 (conda install -c conda-forge pyqt) "
+                "Install PySide6 (pip install PySide6-Essentials, ~350 MB) "
                 "or set paths manually."
             )
             return {}
@@ -183,7 +186,7 @@ def _run_qt_picker_subprocess(cfg: Dict[str, Any]) -> Dict[str, Any]:
     except Exception as exc:
         warnings.warn(
             f"File picker unavailable ({exc}). "
-            "Install PyQt5 (conda install -c conda-forge pyqt) "
+            "Install PySide6 (pip install PySide6-Essentials, ~350 MB) "
             "or set paths manually."
         )
         return {}
@@ -967,7 +970,7 @@ def launch_app(session: Optional[Session] = None, *, wait: bool = False):
     Open the label window in a **separate Python process** (DMG-07 Qt popup style).
 
     Cursor Jupyter often dies if a GUI runs inside the kernel; the child process
-    uses Matplotlib **QtAgg** (PyQt5), same backend idea as DMG-07's
+    uses Matplotlib **QtAgg** (PySide6-Essentials recommended), same backend idea as DMG-07's
     ``%matplotlib qt`` pickers.
 
     Saves go under ``set_output_dir`` (or beside the images if that is unset).
@@ -1003,6 +1006,10 @@ def launch_app(session: Optional[Session] = None, *, wait: bool = False):
     env = os.environ.copy()
     # Match DMG-07: Qt backend (not Tk — Tk crashes on modern macOS)
     env["MPLBACKEND"] = "QtAgg"
+    from pyPetrograph.common.qt import qt_env, require_qt
+
+    require_qt("The label window")
+    qt_env(env)
     env["PYTHONPATH"] = root + os.pathsep + env.get("PYTHONPATH", "")
     # Prevent any accidental tkinter init in the child
     env["PETROGRAPHY_LABEL_GUI"] = "1"
@@ -1108,11 +1115,11 @@ def _run_label_gui_from_config(config_path: str) -> None:
     matplotlib.use("QtAgg", force=True)
 
     try:
-        import PyQt5  # noqa: F401
+        from matplotlib.backends import qt_compat  # noqa: F401  (PySide6 preferred; any Matplotlib Qt binding works)
     except ImportError as exc:
         raise ImportError(
-            "PyQt5 is required for the label window (same as DMG-07).\n"
-            "In your activated env:  conda install -c conda-forge pyqt"
+            "A Qt binding is required for the label window.\n"
+            "In your activated env:  pip install PySide6-Essentials  (~350 MB)"
         ) from exc
 
     cfg = json.loads(Path(config_path).read_text())

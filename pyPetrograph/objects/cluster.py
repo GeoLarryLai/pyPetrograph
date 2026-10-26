@@ -145,6 +145,10 @@ def launch_montage_labeler(
     worker = Path(__file__).resolve().parent / "montage_worker.py"
     env = os.environ.copy()
     env["MPLBACKEND"] = "QtAgg"
+    from pyPetrograph.common.qt import qt_env, require_qt
+
+    require_qt("The cluster montage window")
+    qt_env(env)
     env.setdefault("PYTHONPATH", str(Path(__file__).resolve().parent.parent.parent))
     with tempfile.TemporaryDirectory(prefix="pypetrograph_montage_") as tmp:
         tmp = Path(tmp)

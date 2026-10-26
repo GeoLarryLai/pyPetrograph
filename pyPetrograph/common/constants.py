@@ -189,7 +189,6 @@ REQUIRED_PACKAGES: List[Tuple[str, str]] = [
     ("pandas", "pandas"),
     ("lightgbm", "lightgbm"),
     ("skimage", "scikit-image"),
-    ("PyQt5", "PyQt5"),  # label window (QtAgg); prefer conda-forge pyqt if pip fails
 ]
 
 # SegmentEveryGrain is optional and installed with its own instructions (it brings TensorFlow,

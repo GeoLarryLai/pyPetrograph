@@ -29,7 +29,7 @@ _WORKER = Path(__file__).resolve().parent / "window_worker.py"
 
 
 class WindowUnavailable(RuntimeError):
-    """The pop-up process could not open a window (no display, missing PyQt5, crash)."""
+    """The pop-up process could not open a window (no display, no Qt binding: pip install PySide6-Essentials, crash)."""
 
 
 def has_screen() -> bool:
@@ -78,6 +78,9 @@ def _run_worker(
         env.pop("PYTHONPATH", None)
         env.pop("PYTHONHOME", None)
         env["MPLBACKEND"] = "QtAgg"
+        from pyPetrograph.common.qt import qt_env
+
+        qt_env(env)
         env["PYTHONIOENCODING"] = "utf-8"
         proc = subprocess.run(
             [sys.executable, str(_WORKER), "--config", str(cfg_path)],

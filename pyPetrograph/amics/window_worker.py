@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AMICS pop-up worker. Subprocess only (matplotlib QtAgg + PyQt5); never import
+AMICS pop-up worker. Subprocess only (matplotlib QtAgg; Qt via matplotlib's qt_compat, PySide6 preferred); never import
 in the Jupyter kernel and never import ``pyPetrograph`` here (it imports sibling
 ``bse.py`` and ``file_match.py`` through ``sys.path`` instead).
 
@@ -194,12 +194,12 @@ def build_points_session(
 
 
 # ---------------------------------------------------------------- Qt helpers
-_APP: Any = None  # keep a reference: PyQt5 destroys a QApplication that is garbage collected
+_APP: Any = None  # keep a reference: Qt destroys a QApplication that is garbage collected
 
 
 def _qt_app():
     global _APP
-    from PyQt5 import QtWidgets
+    from matplotlib.backends.qt_compat import QtWidgets
 
     app = QtWidgets.QApplication.instance()
     if app is None:
@@ -215,7 +215,7 @@ def _front(widget) -> None:
 
 
 def _qt_ask_length(default_length: float, default_unit: str) -> Optional[Tuple[float, str]]:
-    from PyQt5 import QtCore, QtWidgets
+    from matplotlib.backends.qt_compat import QtCore, QtWidgets
 
     _qt_app()
     dlg = QtWidgets.QDialog()
@@ -234,7 +234,7 @@ def _qt_ask_length(default_length: float, default_unit: str) -> Optional[Tuple[f
     row.addWidget(spin)
     row.addWidget(combo)
     layout.addLayout(row)
-    buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+    buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
     buttons.accepted.connect(dlg.accept)
     buttons.rejected.connect(dlg.reject)
     layout.addWidget(buttons)
@@ -245,7 +245,7 @@ def _qt_ask_length(default_length: float, default_unit: str) -> Optional[Tuple[f
     dlg.raise_()
     dlg.activateWindow()
 
-    if dlg.exec_() != QtWidgets.QDialog.Accepted:
+    if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
         return None
     spin.interpretText()
     return float(spin.value()), combo.currentText()
@@ -387,7 +387,7 @@ def run_files_dialog(
     auto: Sequence[str] = (),
 ) -> Optional[Dict[str, str]]:
     """One window with three labeled rows (path box + Browse). Returns the three paths or None."""
-    from PyQt5 import QtWidgets
+    from matplotlib.backends.qt_compat import QtWidgets
 
     _qt_app()
     dlg = QtWidgets.QDialog()
@@ -461,15 +461,15 @@ def run_files_dialog(
         edits[key], status[key] = edit, note
     grid.setColumnStretch(1, 1)
 
-    buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+    buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
     buttons.accepted.connect(dlg.accept)
     buttons.rejected.connect(dlg.reject)
     layout.addWidget(buttons)
-    ok_btn_holder.append(buttons.button(QtWidgets.QDialogButtonBox.Ok))
+    ok_btn_holder.append(buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Ok))
     refresh()
     _front(dlg)
 
-    if dlg.exec_() != QtWidgets.QDialog.Accepted:
+    if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
         return None
     return {k: str(Path(e.text().strip()).expanduser()) for k, e in edits.items()}
 

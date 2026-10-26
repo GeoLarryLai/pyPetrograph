@@ -56,7 +56,7 @@ Without it, everything else works: notebooks 1 and 2, the non-segmentation steps
 
 ## Desktop app
 
-To run the app, install [PySide6-Essentials](https://pypi.org/project/PySide6-Essentials/) (⚠️ **~350 MB**; not part of the base install; full PySide6 also works):
+To run the app or the notebook pop-up windows, install [PySide6-Essentials](https://pypi.org/project/PySide6-Essentials/) (⚠️ **~350 MB**; not part of the base install; full PySide6 also works):
 
 ```bash
 pip install PySide6-Essentials

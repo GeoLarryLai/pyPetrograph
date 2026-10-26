@@ -336,7 +336,7 @@ class AppWindow(QMainWindow):
 
 
 def _own_plugins() -> None:
-    """Use PySide6's own Qt plugins (a conda ``bin/qt.conf`` for PyQt5 would point elsewhere)."""
+    """Use PySide6's own Qt plugins (a conda ``bin/qt.conf`` for another Qt would point elsewhere)."""
     import os
 
     import PySide6

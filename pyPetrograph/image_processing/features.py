@@ -78,9 +78,10 @@ def get_screen_size_px() -> Tuple[int, int]:
     hard-crashes on recent macOS (``NSApplication macOSVersion`` / libtk).
     """
     try:
-        from PyQt5.QtWidgets import QApplication
+        import sys
 
-        app = QApplication.instance()
+        qt_compat = sys.modules.get("matplotlib.backends.qt_compat")  # only if a Qt window is already up
+        app = qt_compat.QtWidgets.QApplication.instance() if qt_compat is not None else None
         if app is not None:
             screen = app.primaryScreen()
             if screen is not None:
