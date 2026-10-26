@@ -233,15 +233,18 @@ Auto-align uses structure maps (`local_grad` + `local_std` + LBP), not color. Sa
 
 ## Dependencies
 
-Declared in the repo-root [`environment.yml`](environment.yml) and [`pyproject.toml`](pyproject.toml).
+Declared in [`pyproject.toml`](pyproject.toml) (`environment.yml` mirrors it as a conda dev convenience).
 
 | Extra | Packages | Used by |
 |-------|----------|---------|
-| *(core)* | numpy, pillow, matplotlib, scikit-learn, scipy, geopandas, shapely, rasterio, affine, joblib, pandas, lightgbm, scikit-image | RGB + mineral-map |
+| *(core)* | numpy, pillow, matplotlib, scikit-learn, scipy, geopandas, shapely, rasterio, affine, joblib, pandas, lightgbm, scikit-image, rapidocr_onnxruntime, fastapi, uvicorn | notebooks, legend OCR, browser app (`pypetrograph-app`) |
 | `[xgb]` | xgboost | optional RGB classifier |
-| `[all]` | xgb + amics + app | xgboost, legend OCR and the desktop app |
+| `[test]` | pytest, httpx | test suite |
+| `[all]` | xgb | everything except tests |
 
-From PyPI: `pip install pypetrograph`. Alternatively, see the [root README](README.md#installation) conda path. SegmentEveryGrain (TensorFlow, PyTorch, SAM 2; multimodal U-Net / GrainPlot / montage, optional SAM shape refine — **do not** download the ~860 MB SAM weights unless `USE_SAM2 = True`) is not a pyPetrograph extra: install it into the same env with [its own instructions](https://github.com/zsylvester/segmenteverygrain).
+Notebook pop-up windows: `pip install PySide6-Essentials` (not an extra).
+
+From PyPI: `pip install pypetrograph`. SegmentEveryGrain (TensorFlow, PyTorch, SAM 2; multimodal U-Net / GrainPlot / montage, optional SAM shape refine — **do not** download the ~860 MB SAM weights unless `USE_SAM2 = True`) is not a pyPetrograph extra: install it into the same env with [its own instructions](https://github.com/zsylvester/segmenteverygrain).
 
 ---
 

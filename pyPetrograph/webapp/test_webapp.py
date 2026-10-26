@@ -48,7 +48,7 @@ def open10b(c, out):
 
 def files_under(p):
     """Export files only (session files in .pypetrograph/ and the remembered last_files.json are the
-    desktop app's own bookkeeping, written there too)."""
+    app's own bookkeeping, written there too)."""
     return sorted(str(q.relative_to(p)) for q in Path(p).rglob("*") if q.is_file() and ".pypetrograph" not in q.parts
                   and q.name != "last_files.json")
 
@@ -173,3 +173,151 @@ def test_seg_availability_probe():
 
     av = backend.seg_availability(refresh=True)
     assert set(av) == {"seg", "sam2", "python"} and (av["seg"] or not av["sam2"])
+
+
+# -- ported from the former Qt app tests (old test_app.py), at API level -------------------------
+
+
+def _to_segment(c, out):
+    """Open 10B, apply legend/footer/non-grain, skip scale, load the saved notebook grains."""
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
+    web_flow = pytest.importorskip("web_flow")
+    if not web_flow.REF.is_dir():
+        pytest.skip("no reference 10B grains")
+    web_flow.seed(out)
+    open10b(c, out)
+    job(c, "/api/legend/apply")
+    f = ok(c.get("/api/footer"))
+    ok(c.post("/api/footer/apply", json={"row": f["footer"]}))
+    ok(c.get("/api/nongrain?activate=true"))
+    ok(c.post("/api/nongrain/op", json={"op": "apply"}))
+    ok(c.get("/api/scale?activate=true"))
+    ok(c.post("/api/scale/op", json={"op": "skip"}))
+    g = ok(c.get("/api/segment?activate=true"))
+    if not g["n"]:
+        job(c, "/api/segment/load")
+    return ok(c.get("/api/segment"))
+
+
+def _centroids(c, k=40):
+    from shapely.geometry import Polygon
+
+    polys = ok(c.get("/api/segment/polys"))["polys"]
+    out = []
+    for i, r in enumerate(polys[:k]):
+        p = Polygon(list(zip(r[0::2], r[1::2])))
+        q = p.representative_point()
+        out.append((i, q.x, q.y, p))
+    return out
+
+
+def test_step_order_gating(client):
+    """Later steps refuse until earlier ones are done (Qt: test_step_order)."""
+    st = ok(client.get("/api/state"))
+    assert [s["ready"] for s in st["steps"]][1:] == [False] * 8
+    for url in ("/api/segment", "/api/minerals", "/api/gsd", "/api/outputs"):
+        assert client.get(url).status_code in (400, 409), url
+    for url in ("/api/outputs/export_data", "/api/outputs/export_figures", "/api/segment/use"):
+        assert client.post(url, json={}).status_code in (400, 409), url
+
+
+@need_data
+def test_legend_tick_and_entry_validation(client, tmp_path):
+    open10b(client, tmp_path)
+    lg = ok(client.post("/api/legend/op", json={"op": "tick", "row": 0, "use": False}))
+    assert lg["rows"][0]["use"] is False
+    assert client.post("/api/legend/op", json={"op": "entry", "rgb": [9, 9, 9], "name": ""}).status_code == 400
+    assert files_under(tmp_path) == []
+
+
+@need_data
+def test_grain_edits_select_delete_merge_undo(client, tmp_path):
+    v = _to_segment(client, tmp_path)
+    n0 = v["n"]
+    assert n0 > 10 and v["edits"] == 0 and not v["edited"]
+    cs = _centroids(client)
+    i, x, y, _ = cs[0]
+    v = ok(client.post("/api/segment/op", json={"op": "click", "x": x, "y": y}))
+    assert v["sel"] == [i]
+    v = ok(client.post("/api/segment/op", json={"op": "click", "x": x, "y": y}))
+    assert v["sel"] == []                                      # click again deselects
+    ok(client.post("/api/segment/op", json={"op": "click", "x": x, "y": y}))
+    v = ok(client.post("/api/segment/op", json={"op": "deselect"}))
+    assert v["sel"] == []
+    ok(client.post("/api/segment/op", json={"op": "click", "x": x, "y": y}))
+    v = ok(client.post("/api/segment/op", json={"op": "delete"}))
+    assert v["n"] == n0 - 1 and v["edits"] == 1 and v["edited"]
+    v = ok(client.post("/api/segment/op", json={"op": "undo"}))
+    assert v["n"] == n0 and v["edits"] == 0 and not v["edited"]
+    # merge two touching grains
+    pair = None
+    for a in cs:
+        for b in cs:
+            if a[0] < b[0] and a[3].buffer(0.6).intersects(b[3]):
+                import shapely
+                if shapely.unary_union([a[3].buffer(0.01), b[3].buffer(0.01)]).geom_type == "Polygon":
+                    pair = (a, b)
+                    break
+        if pair:
+            break
+    if pair:
+        for g in pair:
+            ok(client.post("/api/segment/op", json={"op": "click", "x": g[1], "y": g[2]}))
+        v = ok(client.post("/api/segment/op", json={"op": "merge"}))
+        assert v["n"] in (n0 - 1, n0) and v["sel"] == []
+    ok(client.post("/api/segment/op", json={"op": "click", "x": x, "y": y}))
+    ok(client.post("/api/segment/op", json={"op": "delete"}))
+    v = ok(client.post("/api/segment/op", json={"op": "reset"}))
+    assert v["n"] == n0 and v["edits"] == 0
+    assert all(".pypetrograph" in f or "grains" in f or "threshold" in f for f in files_under(tmp_path))
+
+
+@need_data
+def test_seg_sam_missing_disables(tmp_path):
+    """Without SEG: Run segmentation 400, edited grains cannot be used; without SAM: refine/add off."""
+    from pyPetrograph.webapp.routes import create_app
+
+    app = create_app(testing=True)
+    c = TestClient(app)
+    app.state.st.avail = {"seg": False, "sam2": False, "python": ""}
+    v = _to_segment(c, tmp_path)
+    assert v["avail"] == {"seg": False, "sam2": False, "python": ""}
+    assert c.post("/api/segment/run", json={}).status_code == 400
+    assert c.post("/api/segment/sam_prepare").status_code == 400
+    assert not v["settings"]["use_sam2"] and v["use_ok"]          # unedited saved grains still usable
+    i, x, y, _ = _centroids(c, 1)[0]
+    ok(c.post("/api/segment/op", json={"op": "click", "x": x, "y": y}))
+    v = ok(c.post("/api/segment/op", json={"op": "delete"}))
+    assert v["edited"] and not v["use_ok"]                         # edits need SEG to be saved
+    p = ok(c.post("/api/segment/prompt"))
+    assert p["job"] is None                                        # SAM not ready: no prompt job
+
+
+@need_data
+def test_minerals_add_colour_and_export_gating(tmp_path):
+    from pyPetrograph.webapp.routes import create_app
+
+    c = TestClient(create_app(testing=True))
+    _to_segment(c, tmp_path)
+    before = files_under(tmp_path)
+    job(c, "/api/segment/use")
+    m = ok(c.get("/api/minerals"))
+    assert m["rows"] and "Added colours: 0" in m["summary"]
+    assert c.post("/api/minerals/op", json={"op": "add", "rgb": "", "name": "X"}).status_code == 400
+    assert c.post("/api/minerals/op", json={"op": "add", "rgb": "1,2,3", "name": ""}).status_code == 400
+    sug = ok(c.post("/api/minerals/op", json={"op": "suggest", "row": 0}))["rgb"]
+    assert len(sug) == 3
+    job(c, "/api/minerals/op", {"op": "add", "rgb": "#123456", "name": "Testite"})
+    assert "Added colours: 1" in ok(c.get("/api/minerals"))["summary"]
+    job(c, "/api/minerals/op", {"op": "remove", "mineral": "Testite"})
+    assert "Added colours: 0" in ok(c.get("/api/minerals"))["summary"]
+    g = ok(c.get("/api/gsd"))
+    assert g["figures"] and "grains measured" in g["summary"]
+    out = ok(c.get("/api/outputs"))
+    assert out["state"] == ["Nothing exported yet", "none"] and out["files"] == []
+    assert not [f for f in files_under(tmp_path) if f.endswith(".csv") and f not in before]   # export-only writes
+    job(c, "/api/outputs/export_data")
+    out = ok(c.get("/api/outputs"))
+    assert out["n_csv"] > 0 and "Exported" in out["state"][0]

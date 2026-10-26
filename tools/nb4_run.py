@@ -14,7 +14,7 @@ FIG_DPI = 150
 from pyPetrograph import check_and_install_packages
 _ = check_and_install_packages(
     install=False, include_seg=True, include_sam2=True, include_amics=True,
-    include_app=True,  # reports the desktop app package (pip install PySide6-Essentials); never installs it
+    include_app=True,  # reports PySide6 for the notebook pop-ups (pip install PySide6-Essentials); never installs it
 )
 
 import numpy as np

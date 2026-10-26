@@ -11,3 +11,12 @@
 - Stage 6: frontend + main done; equivalence: web=qt=notebook4 for all 26 10B files (tools/md5_table.txt). Committed.
 - Stage 7: test_webapp.py 5 passed; committed
 - Stage 8: shots (10 png), sizes (base 914 MB; +web 11 MB; +PySide6 246 MB), WEBAPP_PARITY.md; committed
+- Stage R0: replace-Qt run started (remove Qt app, app->web)
+- Stage R1: Qt app removed, app->web, fastapi/uvicorn base; 7 tests pass; equivalence 26/26 SAME vs md5_table
+- Stage R2: README/PyPI/CHANGELOG done; sizes base 926 MB, +PySide6 246 MB; review files README_review.{diff,html,pdf}; commit 0757f03 (not pushed)
+- Stage A0: archive/cleanup run started
+- Stage A1: archive in old codes/qt_desktop_app, docs/env/pyproject cleaned, v0.2.0, MANIFEST.in, ruff exclude
+- Stage A2: steering: old codes NOT in repo (gitignored); staged at /workspace/oldcodes_stage for Mac copy; add Zenodo DOI to README citation
+- Stage A3: 12 tests pass (5 new ported)
+- Stage A4: equivalence 26/26 SAME
+- Stage A5: wheel 0.2.0 fresh venv 925 MB, app 200, no old codes/tools in dists

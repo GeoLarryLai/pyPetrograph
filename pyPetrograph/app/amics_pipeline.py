@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 Larry Syu-Heng Lai
 """
-AMICS workflow state for the desktop app: the ``pyPetrograph_4_AMICSworkflow``
+AMICS workflow state for the browser app (``pyPetrograph.webapp``): the ``pyPetrograph_4_AMICSworkflow``
 notebook, step by step, calling the same ``pyPetrograph.amics`` functions with
-the same arguments. Qt-free (runs headless; the GUI calls it from a job thread).
+the same arguments. Qt-free (runs headless; the app calls it from a job thread).
 """
 from __future__ import annotations
 

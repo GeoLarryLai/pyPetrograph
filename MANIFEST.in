@@ -1,0 +1,8 @@
+prune old codes
+prune _archive
+prune tools
+prune shots
+prune shots_mac
+prune shots_readme
+prune outputs
+prune build

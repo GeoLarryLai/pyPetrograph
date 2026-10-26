@@ -73,7 +73,7 @@ python -m pyPetrograph.webapp
 
 ## Citation
 
-Lai, L.S.-H. (2026) pyPetrograph.
+Lai, L.S.-H. (2026) pyPetrograph. *Zenodo*, https://doi.org/10.5281/zenodo.23659316
 
 ## Key Features
 
@@ -163,7 +163,7 @@ Installed with the package (⚠️ **~930 MB** in total; measured on Linux, Pyth
 > [!NOTE]
 > **rapidocr_onnxruntime** (legend OCR for notebook 4 and the app) is a large part of the default install: it adds **~220 MB** (onnxruntime ~80 MB, OpenCV ~120 MB, RapidOCR ~16 MB) on top of the other dependencies (~700 MB; measured on Linux, Python 3.12).
 
-Notebook pop-up windows (notebook pickers, label/align/GrainPlot windows; not installed by default, the app does not need it): ⚠️ PySide6-Essentials (>=6.6, **~250 MB**), `pip install PySide6-Essentials`. Another Qt binding supported by Matplotlib also works if already installed.
+Notebook pop-up windows (notebook pickers, label/align/GrainPlot windows; not installed by default, the app does not need it): ⚠️ PySide6-Essentials (>=6.6, **~250 MB**), `pip install PySide6-Essentials`. Another Qt binding supported by Matplotlib also works if already installed. On Linux, the pop-up windows' Qt also needs a few system libraries (Debian/Ubuntu; use `libglib2.0-0` on older Ubuntu): `sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libxkbcommon-x11-0 libfontconfig1 libfreetype6 libdbus-1-3 libglib2.0-0t64 libx11-6 libx11-xcb1 libxcb1 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xkb1`. The app needs none of them.
 
 Optional extras (not installed by default):
 

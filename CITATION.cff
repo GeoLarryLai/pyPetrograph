@@ -1,13 +1,13 @@
 cff-version: 1.2.0
 message: "If you use pyPetrograph, please cite it as below."
 title: "pyPetrograph: a toolkit for semi-automated, ML-assisted thin-section petrography"
-abstract: "Porosity estimation, mineral counting, grain segmentation and micro-texture analysis of thin sections, including an AMICS (BSE + mineral map) workflow and desktop app."
+abstract: "Porosity estimation, mineral counting, grain segmentation and micro-texture analysis of thin sections, including an AMICS (BSE + mineral map) workflow and browser app."
 type: software
 authors:
   - family-names: Lai
     given-names: "Larry Syu-Heng"
     orcid: "https://orcid.org/0000-0003-4589-9729"
-version: 0.1.1
+version: 0.2.0
 doi: 10.5281/zenodo.23659316
 identifiers:
   - type: doi

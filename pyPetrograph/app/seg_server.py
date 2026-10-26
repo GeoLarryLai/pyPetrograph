@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 Larry Syu-Heng Lai
 """
-Persistent SEG model server for the desktop app (a subprocess, never imported by the GUI).
+Persistent SEG model server for the browser app (a subprocess, never imported by the app).
 
 Keeps the U-Net and SAM 2.1 loaded between jobs. Never imports ``pyPetrograph``
 (geopandas -> pyarrow crashes with TF 2.21); it uses the stdlib-safe worker
@@ -24,7 +24,7 @@ log text. Ops:
 * ``quit``
 
 Only this file touches the model runtime: an ONNX backend can replace ``_Models``
-without changing the GUI side (``app/backend.py``).
+without changing the app side (``app/backend.py``).
 """
 from __future__ import annotations
 
