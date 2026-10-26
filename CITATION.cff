@@ -14,7 +14,7 @@ identifiers:
     value: 10.5281/zenodo.23659316
     description: "Concept DOI (all versions)"
   - type: doi
-    value: 10.5281/zenodo.23659317
+    value: 10.5281/zenodo.23660019
     description: "Version DOI for v0.1.0"
 date-released: 2026-10-26
 license: AGPL-3.0-or-later
