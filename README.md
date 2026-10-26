@@ -73,7 +73,7 @@ python -m pyPetrograph.webapp
 
 ## Citation
 
-Lai, L.S.-H. (2026) pyPetrograph. *Zenodo*, https://doi.org/10.5281/zenodo.23659316
+Lai, L.S.-H. (2026) pyPetrograph. *Zenodo*, [https://doi.org/10.5281/zenodo.23659316](https://doi.org/10.5281/zenodo.23659316)
 
 ## Key Features
 
