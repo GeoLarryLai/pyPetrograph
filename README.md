@@ -1,6 +1,6 @@
 # pyPetrograph
 
-![PyPI version](https://img.shields.io/pypi/v/pypetrograph.svg) ![PyPI downloads](https://img.shields.io/pypi/dm/pypetrograph.svg) [![pepy downloads](https://static.pepy.tech/badge/pypetrograph)](https://pepy.tech/project/pypetrograph)
+![PyPI version](https://img.shields.io/pypi/v/pypetrograph.svg) ![PyPI downloads](https://img.shields.io/pypi/dm/pypetrograph.svg) [![pepy downloads](https://static.pepy.tech/badge/pypetrograph)](https://pepy.tech/project/pypetrograph) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23659316.svg)](https://doi.org/10.5281/zenodo.23659316)
 
 v0.1.0
 

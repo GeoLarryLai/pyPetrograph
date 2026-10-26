@@ -1,0 +1,18 @@
+{
+  "title": "pyPetrograph: a toolkit for semi-automated, ML-assisted thin-section petrography",
+  "upload_type": "software",
+  "creators": [
+    {
+      "name": "Lai, Larry Syu-Heng",
+      "orcid": "0000-0003-4589-9729"
+    }
+  ],
+  "license": "AGPL-3.0-or-later",
+  "keywords": [
+    "petrography",
+    "thin-section",
+    "mineralogy",
+    "grain segmentation",
+    "AMICS"
+  ]
+}
