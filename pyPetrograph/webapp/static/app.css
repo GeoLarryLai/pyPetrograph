@@ -1,0 +1,32 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Copyright (C) 2026 Larry Syu-Heng Lai */
+#cv{position:absolute;inset:0;width:100%;height:100%;background:#2b2b2e;outline:none;cursor:crosshair}
+#cv.pan{cursor:grabbing}
+#empty{position:absolute;inset:0;display:grid;place-items:center;color:#6b6b70;text-align:center;background:var(--bg)} #empty h1{color:#1d1d1f;font-weight:600}
+#zoomtools{position:absolute;left:10px;top:10px;display:flex;gap:4px;align-items:center;z-index:3}
+#zoomtools button{background:rgba(255,255,255,.92);padding:3px 9px} #coord{color:#ddd;font-size:11px;margin-left:6px;text-shadow:0 1px 2px #000}
+#logp{position:absolute;left:0;right:0;bottom:0;height:34%;margin:0;background:#111;color:#ddd;font:11px ui-monospace,monospace;overflow:auto;padding:8px;z-index:5}
+#mainBtns{display:flex;flex-direction:column;gap:6px}
+.pill{margin-top:8px;padding:5px 8px;border-radius:6px;font-size:12px;background:rgba(142,142,147,.15)} .pill:empty{display:none}
+.pill.saved{background:rgba(48,209,88,.18)} .pill.unsaved{background:rgba(255,159,10,.22)}
+#side .controls{margin:0;border-radius:0;border-top:1px solid var(--line);max-height:34%;overflow:auto}
+.controls b{display:inline-block;min-width:118px;color:var(--ink);font-weight:500}
+.f{display:grid;grid-template-columns:92px 1fr auto;gap:6px;align-items:center;margin:6px 0} .f label{color:var(--mute)}
+.f input[type=text]{width:100%}
+.btns{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0} .btns button{flex:1}
+button.danger{color:var(--err)} button.on{background:#fff7d6;border-color:var(--warn)}
+.hintt{font-size:11.5px;color:var(--mute);margin:4px 0}
+.warnbox{font-size:12px;background:#fff7e6;border:1px solid #f3d38a;border-radius:6px;padding:6px 8px;margin:6px 0}
+table.t td.sw{width:46px} .sw i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.2);vertical-align:middle;margin-left:4px;cursor:pointer}
+table.t tr{cursor:default} table.t tr.rea td{background:#ffe9a8} table.t td.mk{color:#c98a00;width:14px;text-align:center}
+table.t td.nm input{border-color:transparent;background:transparent} table.t td.nm input:focus{border-color:var(--line);background:#fff}
+table.t td.nm.it input{font-style:italic} table.t .st{font-weight:700;text-align:center;width:18px}
+.tbl{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:6px}
+dialog{border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:340px;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+dialog h3{margin-top:0} dialog .prev{height:34px;border-radius:5px;display:flex;align-items:center;padding-left:10px;margin:6px 0}
+dialog .row input[type=number]{width:62px} dialog .err{min-height:16px;font-size:12px}
+dialog .pal{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin:6px 0} dialog .pal i{height:16px;border-radius:3px;cursor:pointer;border:1px solid rgba(0,0,0,.15)}
+dialog .list{max-height:320px;min-width:460px} dialog .list div{cursor:pointer;padding:2px 4px;border-radius:4px} dialog .list div:hover{background:#eef3ff}
+dialog::backdrop{background:rgba(0,0,0,.15)} dialog.nonmodal{position:fixed;right:380px;top:60px;margin:0}
+.files{max-height:200px;overflow:auto;font-size:12px;border:1px solid var(--line);border-radius:6px} .files div{padding:2px 6px;cursor:pointer} .files div:hover{background:#eef3ff}
+a{color:var(--accent)}

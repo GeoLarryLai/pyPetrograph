@@ -1,0 +1,27 @@
+file web qt notebook4(same env) | web=qt web=nb
+10B_Biotite.csv              eec50e3b08 eec50e3b08 eec50e3b08 | Y Y
+10B_Garnet-Spessartine.csv   dcf497c8b0 dcf497c8b0 dcf497c8b0 | Y Y
+10B_Ilmenite.csv             e78d2ad09a e78d2ad09a e78d2ad09a | Y Y
+10B_Iron-Oxides.csv          c8a00d4819 c8a00d4819 c8a00d4819 | Y Y
+10B_Pseudobrookite.csv       37572431c1 37572431c1 37572431c1 | Y Y
+10B_Rutile.csv               85356656f1 85356656f1 85356656f1 | Y Y
+10B_Unknown.csv              645c0065cc 645c0065cc 645c0065cc | Y Y
+10B_Zircon.csv               78e85d905a 78e85d905a 78e85d905a | Y Y
+10B_composition.png          9a3e7decd8 9a3e7decd8 9a3e7decd8 | Y Y
+10B_counts.csv               b62021780a b62021780a b62021780a | Y Y
+10B_grains.geojson           41a0367867 41a0367867 41a0367867 | Y Y
+10B_gsd.png                  bb188287e7 bb188287e7 bb188287e7 | Y Y
+10B_gsd_Ilmenite.png         748c26ad4e 748c26ad4e 748c26ad4e | Y Y
+10B_gsd_Iron-Oxides.png      0ec036fbcc 0ec036fbcc 0ec036fbcc | Y Y
+10B_gsd_Pseudobrookite.png   6319d4ae1b 6319d4ae1b 6319d4ae1b | Y Y
+10B_gsd_Rutile.png           ef0931e86f ef0931e86f ef0931e86f | Y Y
+10B_gsd_Unknown.png          7bf2b9e72b 7bf2b9e72b 7bf2b9e72b | Y Y
+10B_knolling.png             84ef0b61fd 84ef0b61fd 84ef0b61fd | Y Y
+10B_legend.json              79b47577ed 79b47577ed 79b47577ed | Y Y
+10B_legend.png               942a35308e 942a35308e 942a35308e | Y Y
+10B_minerals.geojson         85917d7fcf 85917d7fcf 85917d7fcf | Y Y
+10B_mixed.png                eb633fbb17 eb633fbb17 eb633fbb17 | Y Y
+10B_overlay.png              a01bcefbb8 a01bcefbb8 a01bcefbb8 | Y Y
+10B_threshold.json           74fb662d92 74fb662d92 74fb662d92 | Y Y
+10B_threshold.png            f86d197c69 f86d197c69 f86d197c69 | Y Y
+10B_unmapped.png             81c0b906ff 81c0b906ff 81c0b906ff | Y Y

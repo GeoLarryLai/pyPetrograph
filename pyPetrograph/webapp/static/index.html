@@ -1,0 +1,23 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- Copyright (C) 2026 Larry Syu-Heng Lai -->
+<html lang="en"><head><meta charset="utf-8"><title>pyPetrograph</title>
+<link rel="stylesheet" href="/shell/static/shell.css"><link rel="stylesheet" href="/static/app.css"></head>
+<body>
+<header id="top"><span class="brand">pyPetrograph</span><span class="doc" id="doc">AMICS workflow · no sample open</span>
+  <button id="logBtn" class="ghost" title="Show / hide the log">Log</button>
+  <button id="quitBtn" class="ghost" title="Stop the app">Quit</button></header>
+<nav id="rail"></nav>
+<main id="main"><canvas id="cv" tabindex="0"></canvas>
+  <div id="zoomtools"><button id="fitBtn" title="Fit the whole image (F)">Fit</button><button id="zin" title="Zoom in">+</button><button id="zout" title="Zoom out">−</button><span id="coord"></span></div>
+  <div id="empty"><div><h1>pyPetrograph</h1><p>AMICS thin-section workflow (notebook 4), step by step.<br>Start with <b>1 · Files</b> on the right.</p></div></div>
+  <pre id="logp" hidden></pre>
+</main>
+<aside id="side"><div class="head"><h2 id="stepTitle"></h2><p class="lead" id="stepLead"></p>
+  <div id="mainBtns"></div><div class="pill" id="pill"></div></div>
+  <div class="body" id="stepBody"></div><div class="controls" id="ctrls"></div></aside>
+<footer id="bar"><span class="help" id="help"></span><span id="progtxt"></span><span class="prog" id="prog"><i></i></span></footer>
+<div id="toast"></div>
+<dialog id="dlg"></dialog>
+<script src="/shell/static/shell.js"></script><script src="/static/viewer.js"></script><script src="/static/app.js"></script>
+</body></html>

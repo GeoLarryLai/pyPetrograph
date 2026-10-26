@@ -47,20 +47,28 @@ dependencies = [
 # SegmentEveryGrain (grain segmentation, brings TensorFlow, PyTorch and SAM 2) is optional and is
 # installed with its own instructions: https://github.com/zsylvester/segmenteverygrain
 xgb = ["xgboost>=2"]
+# browser app (pypetrograph-web): small, no Qt
+web = ["fastapi>=0.110", "uvicorn>=0.27"]
 # desktop app (pypetrograph-app): pip install PySide6-Essentials (~350 MB), not an extra
 test = [
     "pytest>=7",
     "pytest-qt>=4.2",
+    "httpx>=0.24",
 ]
 all = ["pyPetrograph[xgb]"]
 
 [project.scripts]
 pypetrograph-app = "pyPetrograph.app:main"
+pypetrograph-web = "pyPetrograph.webapp:main"
 
 [project.urls]
 Homepage = "https://github.com/GeoLarryLai/pyPetrograph"
 Repository = "https://github.com/GeoLarryLai/pyPetrograph"
 Changelog = "https://github.com/GeoLarryLai/pyPetrograph/blob/main/CHANGELOG.md"
+
+[tool.setuptools.package-data]
+"pyPetrograph.webapp" = ["static/*"]
+"pyPetrograph.webapp.shell" = ["static/*"]
 
 [tool.setuptools.packages.find]
 include = ["pyPetrograph*"]
