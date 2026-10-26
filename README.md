@@ -42,7 +42,13 @@ Optional extras: `app` (desktop app), `amics` (legend OCR for notebook 4), `xgb`
 
 ### SegmentEveryGrain (optional, for grain segmentation)
 
-Grain segmentation (notebooks 3 and 4, and *Run segmentation* in the app) uses [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain). Install it into the same environment with its own instructions: https://github.com/zsylvester/segmenteverygrain#installation. It brings TensorFlow, PyTorch and SAM 2.1 (the optional *SAM 2.1 refine*).
+Grain segmentation (notebooks 3 and 4, and *Run segmentation* in the app) uses [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain). Install it into the same environment as pyPetrograph (it brings TensorFlow, PyTorch and SAM 2.1):
+
+```bash
+pip install segmenteverygrain
+```
+
+pyPetrograph downloads the SegmentEveryGrain U-Net and, only if *SAM 2.1 refine* is on, the SAM 2.1 checkpoint (~860 MB) on first use. See the [SegmentEveryGrain repository](https://github.com/zsylvester/segmenteverygrain#installation) for full details and troubleshooting.
 
 Without it, everything else works: notebooks 1 and 2, the non-segmentation steps of notebooks 3 and 4, and every app step, including *Load saved grains* and editing them. In the app, *Run segmentation* is greyed out with a link here.
 
