@@ -26,9 +26,9 @@ const Shell = (() => {
   async function runJob(url, body, label) {
     busy(true);
     try {
-      let j = (await api("POST", url, body)).job;
+      let j = (await api("POST", url, body)).job, wait = 40;
       while (j.state === "running") {
-        progress(j.n, j.N, j.message || label); await new Promise(r => setTimeout(r, 250));
+        progress(j.n, j.N, j.message || label); await new Promise(r => setTimeout(r, wait)); wait = Math.min(250, wait * 2);
         j = await api("GET", "/shell/api/jobs/" + j.id);
       }
       progress(j.N, j.N, (label || j.title) + (j.state === "done" ? ` · done in ${j.seconds} s` : ""));

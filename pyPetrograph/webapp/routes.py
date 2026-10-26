@@ -4,6 +4,7 @@
 ``pyPetrograph.app.amics_pipeline`` / ``pyPetrograph.amics`` (the same calls as the desktop app)."""
 from __future__ import annotations
 
+import time
 import io
 import threading
 from pathlib import Path
@@ -89,7 +90,11 @@ def create_app(state: Optional[WebState] = None, backend=None, testing: bool = F
         def body(j):
             with lock:
                 return fn(j)
-        return {"job": runner.submit(title, body).as_dict()}
+        jb = runner.submit(title, body)
+        t0 = time.monotonic()  # short jobs (exports, small recomputes) answer in this reply: no poll round trip
+        while jb.state == "running" and time.monotonic() - t0 < 0.15:
+            time.sleep(0.004)
+        return {"job": jb.as_dict()}
 
     def err(fn):
         try:
