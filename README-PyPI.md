@@ -40,7 +40,7 @@ cd pyPetrograph
 pip install .
 ```
 
-Python 3.10–3.12 recommended (legend OCR has no 3.13+ wheels yet). On Linux, the desktop app's Qt needs some system libraries; see the [GitHub README](https://github.com/GeoLarryLai/pyPetrograph#linux-system-libraries). Optional extras: `app`, `amics`, `xgb`, `test`, `all`.
+Python 3.10–3.12 recommended (legend OCR has no 3.13+ wheels yet). On Linux, the desktop app's Qt needs some system libraries; see the [GitHub README](https://github.com/GeoLarryLai/pyPetrograph#linux-system-libraries). The default install includes legend OCR (rapidocr_onnxruntime with onnxruntime and OpenCV, **~220 MB**). Optional extras: `xgb`, `test`, `all`.
 
 ## SegmentEveryGrain (optional, for grain segmentation)
 
@@ -56,15 +56,10 @@ Without it, everything else works: notebooks 1 and 2, the non-segmentation steps
 
 ## Desktop app
 
-**Requires** two extra packages, not part of the base install: [PySide6-Essentials](https://pypi.org/project/PySide6-Essentials/) (Qt widgets, ~350 MB; full PySide6 also works) and [RapidOCR](https://pypi.org/project/rapidocr-onnxruntime/) (legend OCR, ~220 MB including onnxruntime and OpenCV). Install them with:
+To run the app, install [PySide6-Essentials](https://pypi.org/project/PySide6-Essentials/) (⚠️ **~350 MB**; not part of the base install; full PySide6 also works):
 
 ```bash
-pip install "pyPetrograph[app]"
-```
-
-Then launch:
-
-```bash
+pip install PySide6-Essentials
 pypetrograph-app
 # or
 python -m pyPetrograph.app

@@ -38,7 +38,7 @@ pip install .
 
 Use `pip install -e .` instead for an editable (development) install.
 
-Optional extras: `app` (desktop app), `amics` (legend OCR for notebook 4), `xgb`, `test`, `all`, e.g. `pip install "pyPetrograph[app]"`.
+Optional extras: `xgb`, `test`, `all`, e.g. `pip install "pyPetrograph[xgb]"`.
 
 ### SegmentEveryGrain (optional, for grain segmentation)
 
@@ -56,15 +56,10 @@ Without it, everything else works: notebooks 1 and 2, the non-segmentation steps
 
 `pypetrograph-app` runs the notebook 4 AMICS workflow interactively in one window: steps on the left, the image in the centre, settings on the right. You see and fix each result (legend names, non-grain regions, scale, grains, mineral matches) before moving on. Nothing is written to the export folder until you press an Export button.
 
-**Requires** two extra packages, not part of the base install: [PySide6-Essentials](https://pypi.org/project/PySide6-Essentials/) (Qt widgets, ~350 MB; full PySide6 also works) and [RapidOCR](https://pypi.org/project/rapidocr-onnxruntime/) (legend OCR, ~220 MB including onnxruntime and OpenCV). Install them with:
+To run the app, install [PySide6-Essentials](https://pypi.org/project/PySide6-Essentials/) (⚠️ **~350 MB**; not part of the base install; full PySide6 also works):
 
 ```bash
-pip install "pyPetrograph[app]"
-```
-
-Then launch:
-
-```bash
+pip install PySide6-Essentials
 pypetrograph-app
 # or
 python -m pyPetrograph.app
@@ -172,9 +167,12 @@ docs/images/
 
 Requires Python >=3.10.
 
-Installed with the package: numpy (>=1.24), pillow (>=10), matplotlib (>=3.7), scikit-learn (>=1.3), scipy (>=1.10), geopandas (>=0.14), shapely (>=2), rasterio (>=1.3), affine (>=2.4), joblib (>=1.3), pandas (>=2), lightgbm (>=4), scikit-image (>=0.22), PyQt5 (>=5.15).
+Installed with the package: numpy (>=1.24), pillow (>=10), matplotlib (>=3.7), scikit-learn (>=1.3), scipy (>=1.10), geopandas (>=0.14), shapely (>=2), rasterio (>=1.3), affine (>=2.4), joblib (>=1.3), pandas (>=2), lightgbm (>=4), scikit-image (>=0.22), PyQt5 (>=5.15), rapidocr_onnxruntime (>=1.3; Python <3.13 only).
 
-Desktop app (`[app]` extra): PySide6-Essentials (>=6.6), rapidocr_onnxruntime (>=1.3, legend OCR; Python <3.13 only). Legend OCR for notebook 4 alone: `[amics]` extra.
+> [!NOTE]
+> **rapidocr_onnxruntime** (legend OCR for notebook 4 and the app) is the largest part of the default install: it adds **~220 MB** (onnxruntime ~80 MB, OpenCV ~120 MB, RapidOCR ~16 MB) on top of the other dependencies (~726 MB).
+
+Desktop app only (not installed by default): PySide6-Essentials (>=6.6, ~350 MB), `pip install PySide6-Essentials`.
 
 Optional extras (not installed by default):
 

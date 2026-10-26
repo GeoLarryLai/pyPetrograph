@@ -345,8 +345,8 @@ def check_and_install_packages(
     Check packages needed by this toolbox; optionally pip-install missing ones
     into the current kernel env (Cursor/VS Code Jupyter: select the env first).
 
-    ``include_app`` only reports whether the desktop app's packages (PySide6, rapidocr)
-    are present; it never installs them (``pip install "pyPetrograph[app]"``).
+    ``include_app`` only reports whether the desktop app's PySide6 is present; it never
+    installs it (``pip install PySide6-Essentials``).
 
     Kernel-safe extras: ``include_seg`` / ``include_sam2`` / ``include_amics`` use ``find_spec``
     only — they never ``import tensorflow`` in this process.
@@ -402,7 +402,7 @@ def check_and_install_packages(
                 pip_missing, extra_results, import_after=False
             )
         elif pip_missing:
-            print("Pass install=True to pip-install them, or: pip install 'pyPetrograph[amics]'")
+            print("Pass install=True to pip-install them (rapidocr_onnxruntime is part of pip install pyPetrograph on Python <3.13)")
         if seg_missing:  # never auto-installed: SegmentEveryGrain has its own install method
             print(f"SegmentEveryGrain (grain segmentation, optional; includes SAM 2): install it with its own instructions: {SEG_INSTALL_URL}")
         results.update(extra_results)
@@ -411,9 +411,9 @@ def check_and_install_packages(
         app_results = {
             imp: ("ok" if _spec_present(imp) else "missing") for imp, _ in APP_PACKAGES
         }
-        _print_package_status("Desktop app packages", app_results)
+        _print_package_status("Desktop app package", app_results)
         if any(v != "ok" for v in app_results.values()):
-            print('Desktop app: pip install "pyPetrograph[app]" (or: pip install PySide6-Essentials rapidocr_onnxruntime), then run pypetrograph-app')
+            print('Desktop app: pip install PySide6-Essentials (~350 MB), then run pypetrograph-app')
 
     failed = [k for k, v in results.items() if str(v).startswith("failed") or v == "missing"]
     if failed:

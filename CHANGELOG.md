@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- rapidocr_onnxruntime (legend OCR; Python <3.13, it has no 3.13+ wheels) is now a base dependency (~220 MB with onnxruntime and OpenCV).
+- Removed the `app` and `amics` extras; `all` is now `[xgb]`. The desktop app needs only `pip install PySide6-Essentials` (~350 MB); `pypetrograph-app` says so when it is missing.
+
 ## 0.1.1 (2026-10-26)
 
 ### Changed
