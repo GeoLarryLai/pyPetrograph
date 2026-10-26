@@ -18,7 +18,7 @@ Example thin-section images are in `example_data/`. Analyzed results go to `outp
 
 ## Installation
 
-Requires Python 3.10–3.12 (3.13+ installs, but legend OCR has no wheels there yet). On Linux, the desktop app's Qt needs a few system libraries ([list below](#linux-system-libraries)).
+Requires Python 3.10–3.12 (3.13+ installs, but legend OCR has no wheels there yet).
 
 ### Install from PyPI
 
@@ -26,7 +26,7 @@ Requires Python 3.10–3.12 (3.13+ installs, but legend OCR has no wheels there 
 pip install pyPetrograph
 ```
 
-This installs the library and the notebooks' dependencies. The desktop app needs one more step ([below](#the-desktop-app)); grain segmentation needs SegmentEveryGrain ([below](#segmenteverygrain-optional-for-grain-segmentation)).
+This installs the library, the notebooks' dependencies and the app (⚠️ **~930 MB** in total, see [Dependencies](#dependencies)). The notebook pop-up windows need one more package ([below](#dependencies)); grain segmentation needs SegmentEveryGrain ([below](#segmenteverygrain-optional-for-grain-segmentation)).
 
 ### Install from the repository
 
@@ -52,33 +52,24 @@ pyPetrograph downloads the SegmentEveryGrain U-Net and, only if *SAM 2.1 refine*
 
 Without it, everything else works: notebooks 1 and 2, the non-segmentation steps of notebooks 3 and 4, and every app step, including *Load saved grains* and editing them. In the app, *Run segmentation* is greyed out with a link here.
 
-## The desktop app
+## The app
 
-`pypetrograph-app` runs the notebook 4 AMICS workflow interactively in one window: steps on the left, the image in the centre, settings on the right. You see and fix each result (legend names, non-grain regions, scale, grains, mineral matches) before moving on. Nothing is written to the export folder until you press an Export button.
-
-To run the app or the notebook pop-up windows, install [PySide6-Essentials](https://pypi.org/project/PySide6-Essentials/) (⚠️ **~350 MB**; not part of the base install; full PySide6 also works):
+`pypetrograph-app` runs the notebook 4 AMICS workflow step by step in your web browser (a local page, nothing is uploaded). You see and fix each result (legend names, non-grain regions, scale, grains, mineral matches) before moving on, and nothing is written to the export folder until you press an Export button. Its exports are byte-identical to notebook 4.
 
 ```bash
-pip install PySide6-Essentials
 pypetrograph-app
 # or
-python -m pyPetrograph.app
+python -m pyPetrograph.webapp
 ```
 
 **Files → Legend → BSE & footer → Non-grain regions → Scale (optional) → Grain segmentation → Minerals → Grain size → Outputs**
 
 | | |
 |---|---|
-| ![Legend step](docs/images/app_legend.jpg) | ![Non-grain regions step](docs/images/app_nongrain.jpg) |
-| **Legend:** OCR names you can edit, add, delete or recolour (✎ edited, + added). | **Non-grain regions:** click epoxy / holes; the blue tint shows what is left out. |
-| ![Minerals step](docs/images/app_minerals.jpg) | ![Outputs step](docs/images/app_outputs.jpg) |
+| ![Legend step](docs/images/app_web_legend.jpg) | ![Grain segmentation step](docs/images/app_web_segmentation_running.jpg) |
+| **Legend:** OCR names you can edit, add, delete or recolour. | **Grain segmentation:** SegmentEveryGrain with live progress; click or box to add grains with SAM 2.1. |
+| ![Minerals step](docs/images/app_web_minerals.jpg) | ![Outputs step](docs/images/app_web_outputs.jpg) |
 | **Minerals:** one row per mineral, ✓ exact colour, ▲ reassigned, ✗ not found. | **Outputs:** knolling diagram and the CSV / figure export buttons. |
-
-Segmentation needs [SegmentEveryGrain](#segmenteverygrain-optional-for-grain-segmentation); without it the step still loads and edits saved grains. Model weights are looked up in `<output>/models`, `outputs/models`, `models/` and `~/.cache/pyPetrograph/models` (or `$PYPETROGRAPH_MODELS`) and downloaded to the cache only if missing. Headless tests: `pip install -e ".[test]"`, then `QT_QPA_PLATFORM=offscreen pytest pyPetrograph/app`.
-
-#### Linux system libraries
-
-Debian/Ubuntu (use `libglib2.0-0` on older Ubuntu): `sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libxkbcommon-x11-0 libfontconfig1 libfreetype6 libdbus-1-3 libglib2.0-0t64 libx11-6 libx11-xcb1 libxcb1 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xkb1`
 
 ## Citation
 
@@ -133,7 +124,7 @@ GrainPlot QC is a further optional window. [SAM 2.1](https://github.com/facebook
 
 [`pyPetrograph_4_AMICSworkflow.ipynb`](pyPetrograph_4_AMICSworkflow.ipynb)
 
-Automated mineralogy (AMICS) gives a BSE image, a painted mineral map and a legend, but no per-grain sizes or counts. This notebook reads the legend (OCR, correctable), outlines every grain on the BSE with [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain), names each grain by the map colour covering most of it, and measures its size. You get grain counts, composition and size distributions per mineral from one field. The same workflow is available in the [desktop app](#the-desktop-app).
+Automated mineralogy (AMICS) gives a BSE image, a painted mineral map and a legend, but no per-grain sizes or counts. This notebook reads the legend (OCR, correctable), outlines every grain on the BSE with [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain), names each grain by the map colour covering most of it, and measures its size. You get grain counts, composition and size distributions per mineral from one field. The same workflow is available in the [app](#the-app).
 
 | Grain segmentation (10B) | Mineral composition (10B) | Knolling diagram (10B) |
 |---|---|---|
@@ -167,17 +158,17 @@ docs/images/
 
 Requires Python >=3.10.
 
-Installed with the package: numpy (>=1.24), pillow (>=10), matplotlib (>=3.7), scikit-learn (>=1.3), scipy (>=1.10), geopandas (>=0.14), shapely (>=2), rasterio (>=1.3), affine (>=2.4), joblib (>=1.3), pandas (>=2), lightgbm (>=4), scikit-image (>=0.22), rapidocr_onnxruntime (>=1.3; Python <3.13 only).
+Installed with the package (⚠️ **~930 MB** in total; measured on Linux, Python 3.12): numpy (>=1.24), pillow (>=10), matplotlib (>=3.7), scikit-learn (>=1.3), scipy (>=1.10), geopandas (>=0.14), shapely (>=2), rasterio (>=1.3), affine (>=2.4), joblib (>=1.3), pandas (>=2), lightgbm (>=4), scikit-image (>=0.22), rapidocr_onnxruntime (>=1.3; Python <3.13 only), fastapi (>=0.110) and uvicorn (>=0.27) for the app (~11 MB).
 
 > [!NOTE]
-> **rapidocr_onnxruntime** (legend OCR for notebook 4 and the app) is a large part of the default install: it adds **~220 MB** (onnxruntime ~80 MB, OpenCV ~120 MB, RapidOCR ~16 MB) on top of the other dependencies (~690 MB; measured on Linux, Python 3.12).
+> **rapidocr_onnxruntime** (legend OCR for notebook 4 and the app) is a large part of the default install: it adds **~220 MB** (onnxruntime ~80 MB, OpenCV ~120 MB, RapidOCR ~16 MB) on top of the other dependencies (~700 MB; measured on Linux, Python 3.12).
 
-Pop-up windows (notebook pickers, label/align/GrainPlot windows) and the desktop app (not installed by default): PySide6-Essentials (>=6.6, ~350 MB), `pip install PySide6-Essentials`. Another Qt binding supported by Matplotlib also works if already installed.
+Notebook pop-up windows (notebook pickers, label/align/GrainPlot windows; not installed by default, the app does not need it): ⚠️ PySide6-Essentials (>=6.6, **~250 MB**), `pip install PySide6-Essentials`. Another Qt binding supported by Matplotlib also works if already installed.
 
 Optional extras (not installed by default):
 
 - xgboost (`xgb`: xgboost >=2)
-- tests (`test`: pytest >=7, pytest-qt >=4.2)
+- tests (`test`: pytest >=7, httpx >=0.24)
 - everything except tests: `all`
 
 SegmentEveryGrain (TensorFlow, PyTorch, SAM 2) is not a pyPetrograph extra; install it with [its own instructions](https://github.com/zsylvester/segmenteverygrain).

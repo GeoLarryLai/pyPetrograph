@@ -213,7 +213,7 @@ AMICS_PACKAGES: List[Tuple[str, str]] = [
     ("rapidocr_onnxruntime", "rapidocr_onnxruntime>=1.3"),
 ]
 
-# desktop app package (``pip install PySide6-Essentials``); checked, never auto-installed by notebooks
+# notebook pop-up windows (``pip install PySide6-Essentials``); checked, never auto-installed by notebooks
 APP_PACKAGES: List[Tuple[str, str]] = [
     ("PySide6", "PySide6-Essentials>=6.6"),
 ]

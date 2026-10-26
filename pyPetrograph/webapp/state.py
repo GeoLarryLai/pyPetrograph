@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 Larry Syu-Heng Lai
 """
-Browser app state: the step logic of the desktop app (``pyPetrograph.app.amics_module``)
+Browser app state: the step logic of the former Qt app (``pyPetrograph.app.amics_module``)
 without Qt. Every science call goes to ``AmicsSession`` (``pyPetrograph.app.amics_pipeline``)
-with the same arguments as the desktop app, so both write the same files.
+with the same arguments as the former Qt app, so both write the same files.
 
-This module only keeps what the widgets kept in the desktop app: legend table rows, picks,
+This module only keeps what the widgets kept in the former Qt app: legend table rows, picks,
 the scale line, grain edits, undo stacks, the extra (hand-named) map colours.
 """
 from __future__ import annotations
@@ -21,7 +21,7 @@ from pyPetrograph.app.amics_pipeline import AmicsSession, AmicsSettings
 ORDER = ["open", "legend", "footer", "nongrain", "scale", "segment", "minerals", "gsd", "outputs"]
 TITLES = ["Files", "Legend", "BSE & footer", "Non-grain regions", "Scale", "Grain segmentation",
           "Minerals", "Grain size", "Outputs"]
-APP_DEFAULTS = dict(min_grain_px=10, dark_drop_frac=0.5)   # same as the desktop app / notebook 4
+APP_DEFAULTS = dict(min_grain_px=10, dark_drop_frac=0.5)   # same as the former Qt app / notebook 4
 MINERAL_FIGURES = [("Composition", "composition"), ("Overlay", "overlay"),
                    ("Mixed grains", "mixed"), ("Unmapped grains", "unmapped")]
 
@@ -232,7 +232,7 @@ class WebState:
                 self._push_legend()
                 rows[i]["name"] = str(kw["name"])
         elif op == "tick":
-            rows[int(kw["row"])]["use"] = bool(kw["use"])   # not an undo step (as in the desktop app)
+            rows[int(kw["row"])]["use"] = bool(kw["use"])   # not an undo step (as in the former Qt app)
         elif op == "entry":
             row = kw.get("row")
             row = None if row is None else int(row)

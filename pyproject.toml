@@ -41,24 +41,24 @@ dependencies = [
     # legend OCR (notebook 4 and the app); pulls in onnxruntime and OpenCV (~220 MB).
     # No Python 3.13+ wheels yet; there the legend uses swatch_1..N names.
     "rapidocr_onnxruntime>=1.3; python_version < '3.13'",
+    # browser app (pypetrograph-app), ~11 MB, no Qt
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
 ]
 
 [project.optional-dependencies]
 # SegmentEveryGrain (grain segmentation, brings TensorFlow, PyTorch and SAM 2) is optional and is
 # installed with its own instructions: https://github.com/zsylvester/segmenteverygrain
 xgb = ["xgboost>=2"]
-# browser app (pypetrograph-web): small, no Qt
-web = ["fastapi>=0.110", "uvicorn>=0.27"]
-# desktop app (pypetrograph-app): pip install PySide6-Essentials (~350 MB), not an extra
+# notebook pop-up windows only: pip install PySide6-Essentials (not an extra)
 test = [
     "pytest>=7",
-    "pytest-qt>=4.2",
     "httpx>=0.24",
 ]
 all = ["pyPetrograph[xgb]"]
 
 [project.scripts]
-pypetrograph-app = "pyPetrograph.app:main"
+pypetrograph-app = "pyPetrograph.webapp:main"
 pypetrograph-web = "pyPetrograph.webapp:main"
 
 [project.urls]

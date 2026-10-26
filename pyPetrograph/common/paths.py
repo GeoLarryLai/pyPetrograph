@@ -345,7 +345,7 @@ def check_and_install_packages(
     Check packages needed by this toolbox; optionally pip-install missing ones
     into the current kernel env (Cursor/VS Code Jupyter: select the env first).
 
-    ``include_app`` only reports whether the desktop app's PySide6 is present; it never
+    ``include_app`` only reports whether PySide6 (notebook pop-ups) is present; it never
     installs it (``pip install PySide6-Essentials``).
 
     Kernel-safe extras: ``include_seg`` / ``include_sam2`` / ``include_amics`` use ``find_spec``
@@ -411,9 +411,9 @@ def check_and_install_packages(
         app_results = {
             imp: ("ok" if _spec_present(imp) else "missing") for imp, _ in APP_PACKAGES
         }
-        _print_package_status("Desktop app package", app_results)
+        _print_package_status("Notebook pop-up windows (Qt)", app_results)
         if any(v != "ok" for v in app_results.values()):
-            print('Desktop app: pip install PySide6-Essentials (~350 MB), then run pypetrograph-app')
+            print('Notebook pop-up windows: pip install PySide6-Essentials (~250 MB). App: pypetrograph-app')
 
     failed = [k for k, v in results.items() if str(v).startswith("failed") or v == "missing"]
     if failed:

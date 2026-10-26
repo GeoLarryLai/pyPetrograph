@@ -16,15 +16,15 @@ pyPetrograph is a machine-learning toolkit for thin-section petrography.
 
 **Segment grains from a multi-image overlay.** Line up several image types of the same field (plane-polarized light, crossed polars, or others) and refine grain outlines with a U-Net, so boundaries are not drawn from one lighting alone.
 
-**AMICS workflow (notebook 4 and the desktop app).** From a BSE image, a mineral map and its legend: read the legend (OCR, editable), outline every grain on the BSE, name each grain from the map, and export counts, per-mineral grain sizes and figures.
+**AMICS workflow (notebook 4 and the app).** From a BSE image, a mineral map and its legend: read the legend (OCR, editable), outline every grain on the BSE, name each grain from the map, and export counts, per-mineral grain sizes and figures.
 
 | Grain segmentation | Mineral composition | Knolling |
 |---|---|---|
 | ![segmentation](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/images/amics_10B_segmentation.jpg) | ![composition](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/images/amics_10B_composition.jpg) | ![knolling](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/images/amics_10B_knolling.jpg) |
 
-The desktop app (`pypetrograph-app`) runs the same workflow step by step; nothing is written until you export.
+The app (`pypetrograph-app`) runs the same workflow step by step in your web browser; nothing is written until you export.
 
-![Legend step of the desktop app](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/images/app_legend.jpg)
+![Grain segmentation step of the app](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/images/app_web_segmentation_running.jpg)
 
 ## Install
 
@@ -40,7 +40,7 @@ cd pyPetrograph
 pip install .
 ```
 
-Python 3.10–3.12 recommended (legend OCR has no 3.13+ wheels yet). On Linux, the desktop app's Qt needs some system libraries; see the [GitHub README](https://github.com/GeoLarryLai/pyPetrograph#linux-system-libraries). The default install includes legend OCR (rapidocr_onnxruntime with onnxruntime and OpenCV, **~220 MB**). Optional extras: `xgb`, `test`, `all`.
+Python 3.10–3.12 recommended (legend OCR has no 3.13+ wheels yet). ⚠️ The default install is **~930 MB**, including legend OCR (rapidocr_onnxruntime with onnxruntime and OpenCV, **~220 MB**) and the app (fastapi + uvicorn, ~11 MB). Optional extras: `xgb`, `test`, `all`.
 
 ## SegmentEveryGrain (optional, for grain segmentation)
 
@@ -54,16 +54,13 @@ pyPetrograph downloads the SegmentEveryGrain U-Net and, only if *SAM 2.1 refine*
 
 Without it, everything else works: notebooks 1 and 2, the non-segmentation steps of notebooks 3 and 4, and every app step, including *Load saved grains* and editing them. In the app, *Run segmentation* is greyed out with a link here.
 
-## Desktop app
-
-To run the app or the notebook pop-up windows, install [PySide6-Essentials](https://pypi.org/project/PySide6-Essentials/) (⚠️ **~350 MB**; not part of the base install; full PySide6 also works):
+## App
 
 ```bash
-pip install PySide6-Essentials
 pypetrograph-app
-# or
-python -m pyPetrograph.app
 ```
+
+Opens the AMICS workflow in your web browser (local only). The notebook pop-up windows need ⚠️ [PySide6-Essentials](https://pypi.org/project/PySide6-Essentials/) (**~250 MB**, not in the default install): `pip install PySide6-Essentials`.
 
 ## Demos
 

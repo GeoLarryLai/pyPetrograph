@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 Larry Syu-Heng Lai
 """FastAPI routes of the browser app. Thin: the step logic is in ``state.py``, the science in
-``pyPetrograph.app.amics_pipeline`` / ``pyPetrograph.amics`` (the same calls as the desktop app)."""
+``pyPetrograph.app.amics_pipeline`` / ``pyPetrograph.amics`` (the same calls as the former Qt app)."""
 from __future__ import annotations
 
 import time
@@ -16,7 +16,7 @@ from pyPetrograph.webapp.shell import JobRunner, mount_shell
 from pyPetrograph.webapp.state import MINERAL_FIGURES, ORDER, TITLES, UserError, WebState, short_count
 
 STATIC = Path(__file__).parent / "static"
-NON_GRAIN_RGBA = (26, 102, 255, 140)   # desktop app / notebook blue tint
+NON_GRAIN_RGBA = (26, 102, 255, 140)   # former Qt app / notebook blue tint
 PREVIEW_MAX = 1600                      # longest side of the zoomed-out preview
 IMG_EXT = (".tif", ".tiff", ".png", ".jpg", ".jpeg", ".bmp")
 
@@ -616,7 +616,7 @@ def create_app(state: Optional[WebState] = None, backend=None, testing: bool = F
 
     @app.post("/api/outputs/folder")
     def outputs_folder():
-        """The export folder, created if needed (desktop app does the same), then opened."""
+        """The export folder, created if needed (as the former Qt app), then opened."""
         need(bool(S.P), "open a sample first")
         d = Path(S.P["folder"])
         d.mkdir(parents=True, exist_ok=True)

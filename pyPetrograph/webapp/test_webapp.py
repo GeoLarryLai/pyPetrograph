@@ -151,3 +151,25 @@ def test_full_flow_export(tmp_path):
     assert {s["name"] for s in st["steps"] if s["done"]} >= {"open", "legend", "footer", "nongrain", "scale", "segment", "outputs"}
     out = ok(c.get("/api/outputs"))
     assert out["files"] and "Exported" in out["state"][0]
+
+
+def test_seg_env_message(monkeypatch):
+    import sys as _sys
+
+    import pytest
+
+    from pyPetrograph.app import backend
+    import pyPetrograph.objects.qc as qc
+
+    monkeypatch.setattr(qc, "_seg_python", lambda: None)
+    with pytest.raises(backend.SegBackendError) as e:
+        backend.SegBackend()._start()
+    msg = str(e.value)
+    assert "'work'" not in msg and _sys.prefix in msg and "launched from" in msg
+
+
+def test_seg_availability_probe():
+    from pyPetrograph.app import backend
+
+    av = backend.seg_availability(refresh=True)
+    assert set(av) == {"seg", "sam2", "python"} and (av["seg"] or not av["sam2"])

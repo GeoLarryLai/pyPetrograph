@@ -178,7 +178,7 @@ def _run_qt_picker_subprocess(cfg: Dict[str, Any]) -> Dict[str, Any]:
             err = (r.stderr or r.stdout or "").strip() or f"exit {r.returncode}"
             warnings.warn(
                 f"File picker subprocess failed ({err}). "
-                "Install PySide6 (pip install PySide6-Essentials, ~350 MB) "
+                "Install PySide6 (pip install PySide6-Essentials, ~250 MB) "
                 "or set paths manually."
             )
             return {}
@@ -186,7 +186,7 @@ def _run_qt_picker_subprocess(cfg: Dict[str, Any]) -> Dict[str, Any]:
     except Exception as exc:
         warnings.warn(
             f"File picker unavailable ({exc}). "
-            "Install PySide6 (pip install PySide6-Essentials, ~350 MB) "
+            "Install PySide6 (pip install PySide6-Essentials, ~250 MB) "
             "or set paths manually."
         )
         return {}
@@ -1119,7 +1119,7 @@ def _run_label_gui_from_config(config_path: str) -> None:
     except ImportError as exc:
         raise ImportError(
             "A Qt binding is required for the label window.\n"
-            "In your activated env:  pip install PySide6-Essentials  (~350 MB)"
+            "In your activated env:  pip install PySide6-Essentials  (~250 MB)"
         ) from exc
 
     cfg = json.loads(Path(config_path).read_text())

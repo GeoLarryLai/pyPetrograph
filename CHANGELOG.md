@@ -3,6 +3,9 @@
 ## Unreleased
 
 ### Changed
+- **The app now runs in the web browser.** `pypetrograph-app` launches the FastAPI browser app (alias `pypetrograph-web`, or `python -m pyPetrograph.webapp`); same nine steps and controls, exports byte-identical to the former Qt app and notebook 4, faster or equal on every timed step. fastapi and uvicorn (~11 MB) are base dependencies, so no extra is needed; default install ~930 MB.
+- Removed the Qt desktop app (`pyPetrograph/app/shell.py`, `main.py`, `amics_module.py`, `viewer.py`, `calibrate.py`, `jobs.py`) and its pytest-qt tests; `pytest-qt` dropped from `test`. `pyPetrograph.app` keeps the Qt-free backend (AMICS pipeline, SEG server) used by the browser app. PySide6-Essentials (~250 MB) is now only for the notebook pop-up windows.
+- README / PyPI readme: app section and screenshots for the browser app.
 - rapidocr_onnxruntime (legend OCR; Python <3.13, it has no 3.13+ wheels) is now a base dependency (~220 MB with onnxruntime and OpenCV).
 - Removed the `app` and `amics` extras; `all` is now `[xgb]`. The desktop app needs only `pip install PySide6-Essentials` (~350 MB); `pypetrograph-app` says so when it is missing.
 - PyQt5 removed from the base dependencies (~200 MB smaller default install). Notebook pop-up windows now use whichever Qt binding is installed via Matplotlib (PySide6-Essentials recommended, the same one the app uses; PyQt5/PyQt6 still work). Without one, pop-ups say `pip install PySide6-Essentials`.
