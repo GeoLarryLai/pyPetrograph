@@ -345,7 +345,7 @@ def check_and_install_packages(
     into the current kernel env (Cursor/VS Code Jupyter: select the env first).
 
     ``include_app`` only reports whether the desktop app's packages (PySide6, rapidocr)
-    are present; it never installs them (they come with ``pip install pyPetrograph``).
+    are present; it never installs them (``pip install "pyPetrograph[app]"``).
 
     Kernel-safe extras: ``include_seg`` / ``include_sam2`` / ``include_amics`` use ``find_spec``
     only — they never ``import tensorflow`` in this process.
@@ -407,7 +407,7 @@ def check_and_install_packages(
         }
         _print_package_status("Desktop app packages", app_results)
         if any(v != "ok" for v in app_results.values()):
-            print("Desktop app: pip install pyPetrograph (includes the app), then run pypetrograph-app")
+            print('Desktop app: pip install "pyPetrograph[app]" (or: pip install PySide6-Essentials rapidocr_onnxruntime), then run pypetrograph-app')
 
     failed = [k for k, v in results.items() if str(v).startswith("failed") or v == "missing"]
     if failed:

@@ -34,11 +34,17 @@ pip install pyPetrograph
 
 Or from the repository: `git clone https://github.com/GeoLarryLai/pyPetrograph.git`, `cd pyPetrograph`, `pip install .` (or `pip install -e .`).
 
-Python 3.10–3.12 recommended (legend OCR has no 3.13+ wheels yet). On Linux, PySide6 needs some system libraries; see the [GitHub README](https://github.com/GeoLarryLai/pyPetrograph#linux-system-libraries). Optional extras: `seg`, `sam2`, `xgb`, `test`, `all`.
+Python 3.10–3.12 recommended (legend OCR has no 3.13+ wheels yet). On Linux, the desktop app's Qt needs some system libraries; see the [GitHub README](https://github.com/GeoLarryLai/pyPetrograph#linux-system-libraries). Optional extras: `seg`, `sam2`, `xgb`, `amics`, `app`, `test`, `all`.
 
 ## Desktop app
 
-Included in the install. Launch with:
+**Requires** two extra packages, not part of the base install: [PySide6-Essentials](https://pypi.org/project/PySide6-Essentials/) (Qt widgets, ~350 MB; full PySide6 also works) and [RapidOCR](https://pypi.org/project/rapidocr-onnxruntime/) (legend OCR, ~220 MB including onnxruntime and OpenCV). Install them with:
+
+```bash
+pip install "pyPetrograph[app]"
+```
+
+Then launch:
 
 ```bash
 pypetrograph-app
@@ -52,7 +58,7 @@ Example notebooks, test images, figures, and optional extras are in the [GitHub 
 
 ## Credits
 
-The current version is primarily developed by **Larry Syu-Heng Lai**, based on early source code scripted by **Zoltan Sylvester**, at the Quantitative Clastic Laboratory, Bureau of Economic Geology, The University of Texas at Austin. This development is also part of a collaboration with **Priyanka Periwal**, **Lucy Tingwei Ko**, **Kelly Hattori**, and **Amanda Calle** across multiple research groups and the [e-MAGE lab](https://www.beg.utexas.edu/research/labs/sem) in the Bureau of Economic Geology.
+pyPetrograph is developed by **Larry Syu-Heng Lai** (larrysyuhenglai@gmail.com). Part of the concept and base design (in Notebook 1) originated from early source code written by **Zoltan Sylvester** at the Quantitative Clastic Laboratory, Bureau of Economic Geology, The University of Texas at Austin. This project was initiated as part of a collaboration with **Priyanka Periwal**, **Lucy Tingwei Ko**, **Kelly Hattori**, and **Amanda Calle** across multiple research groups and the [e-MAGE lab](https://www.beg.utexas.edu/research/labs/sem), and Larry intends to continue it after his departure from the Bureau.
 
 ## License
 

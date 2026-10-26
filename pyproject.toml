@@ -39,9 +39,6 @@ dependencies = [
     "lightgbm>=4",
     "scikit-image>=0.22",
     "PyQt5>=5.15",
-    "PySide6>=6.6",  # desktop app (pypetrograph-app)
-    # legend OCR; no Python 3.13+ wheels yet, there the legend uses swatch_1..N names
-    "rapidocr_onnxruntime>=1.3; python_version < '3.13'",
 ]
 
 [project.optional-dependencies]
@@ -56,9 +53,13 @@ sam2 = [
     "sam2>=1.0",
 ]
 xgb = ["xgboost>=2"]
-# the app and legend OCR are in the base install now; kept as empty aliases so old commands still work
-amics = []
-app = []
+# legend OCR (notebook 4); no Python 3.13+ wheels yet, there the legend uses swatch_1..N names
+amics = ["rapidocr_onnxruntime>=1.3; python_version < '3.13'"]
+# desktop app (pypetrograph-app): Qt widgets only (~350 MB) + legend OCR (~220 MB)
+app = [
+    "PySide6-Essentials>=6.6",
+    "rapidocr_onnxruntime>=1.3; python_version < '3.13'",
+]
 test = [
     "pytest>=7",
     "pytest-qt>=4.2",

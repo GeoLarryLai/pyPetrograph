@@ -210,9 +210,9 @@ AMICS_PACKAGES: List[Tuple[str, str]] = [
     ("rapidocr_onnxruntime", "rapidocr_onnxruntime>=1.3"),
 ]
 
-# desktop app packages (part of ``pip install pyPetrograph``); checked, never auto-installed by notebooks
+# desktop app packages (``pip install "pyPetrograph[app]"``); checked, never auto-installed by notebooks
 APP_PACKAGES: List[Tuple[str, str]] = [
-    ("PySide6", "PySide6>=6.6"),
+    ("PySide6", "PySide6-Essentials>=6.6"),
     ("rapidocr_onnxruntime", "rapidocr_onnxruntime>=1.3"),
 ]
 

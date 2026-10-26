@@ -12,13 +12,13 @@ pyPetrograph is a machine-learning toolkit for thin-section petrography. You can
 > [!NOTE]
 > For more careful grain-boundary detection and mapping, there is optional support for using [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain) developed by **Zoltan Sylvester**. [SAM 2.1](https://github.com/facebookresearch/sam2) weights (~860 MB) are a further opt-in on their page, not part of the default install.
 
-The current version is primarily developed by **Larry Syu-Heng Lai**, based on early source code scripted by **Zoltan Sylvester**, at the Quantitative Clastic Laboratory, Bureau of Economic Geology, The University of Texas at Austin. This development is also part of a collaboration with **Priyanka Periwal**, **Lucy Tingwei Ko**, **Kelly Hattori**, and **Amanda Calle** across multiple research groups and the [e-MAGE lab](https://www.beg.utexas.edu/research/labs/sem) in the Bureau of Economic Geology.
+pyPetrograph is developed by **Larry Syu-Heng Lai** (larrysyuhenglai@gmail.com). Part of the concept and base design (in Notebook 1) originated from early source code written by **Zoltan Sylvester** at the Quantitative Clastic Laboratory, Bureau of Economic Geology, The University of Texas at Austin. This project was initiated as part of a collaboration with **Priyanka Periwal**, **Lucy Tingwei Ko**, **Kelly Hattori**, and **Amanda Calle** across multiple research groups and the [e-MAGE lab](https://www.beg.utexas.edu/research/labs/sem), and Larry intends to continue it after his departure from the Bureau.
 
 Example thin-section images are in `example_data/`. Analyzed results go to `outputs/`.
 
 ## Installation
 
-Requires Python 3.10–3.12 (3.13+ installs, but legend OCR has no wheels there yet). On Linux, PySide6 needs a few system libraries ([list below](#linux-system-libraries)).
+Requires Python 3.10–3.12 (3.13+ installs, but legend OCR has no wheels there yet). On Linux, the desktop app's Qt needs a few system libraries ([list below](#linux-system-libraries)).
 
 ### Install from PyPI
 
@@ -26,7 +26,7 @@ Requires Python 3.10–3.12 (3.13+ installs, but legend OCR has no wheels there 
 pip install pyPetrograph
 ```
 
-This installs the library, the notebooks' dependencies and the desktop app.
+This installs the library and the notebooks' dependencies. The desktop app needs one more step ([below](#the-desktop-app)).
 
 ### Install from the repository
 
@@ -36,11 +36,19 @@ cd pyPetrograph
 pip install .        # or: pip install -e .  (editable, for development)
 ```
 
-Optional extras: `seg` ([SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain), for grain segmentation), `sam2` (SAM 2.1 refine, ~860 MB weights), `xgb`, `test`, `all`, e.g. `pip install "pyPetrograph[seg]"`.
+Optional extras: `seg` ([SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain), for grain segmentation), `sam2` (SAM 2.1 refine, ~860 MB weights), `xgb`, `amics` (legend OCR for notebook 4), `app` (desktop app), `test`, `all`, e.g. `pip install "pyPetrograph[seg]"`.
 
 ## The desktop app
 
 `pypetrograph-app` runs the notebook 4 AMICS workflow interactively in one window: steps on the left, the image in the centre, settings on the right. You see and fix each result (legend names, non-grain regions, scale, grains, mineral matches) before moving on. Nothing is written to the export folder until you press an Export button.
+
+**Requires** two extra packages, not part of the base install: [PySide6-Essentials](https://pypi.org/project/PySide6-Essentials/) (Qt widgets, ~350 MB; full PySide6 also works) and [RapidOCR](https://pypi.org/project/rapidocr-onnxruntime/) (legend OCR, ~220 MB including onnxruntime and OpenCV). Install them with:
+
+```bash
+pip install "pyPetrograph[app]"
+```
+
+Then launch:
 
 ```bash
 pypetrograph-app
@@ -66,8 +74,6 @@ Debian/Ubuntu (use `libglib2.0-0` on older Ubuntu): `sudo apt-get install -y lib
 ## Citation
 
 Lai, L.S.-H. (2026) pyPetrograph.
-
-Contact: larrysyuhenglai@gmail.com
 
 ## Key Features
 
@@ -152,7 +158,9 @@ docs/images/
 
 Requires Python >=3.10.
 
-Installed with the package: numpy (>=1.24), pillow (>=10), matplotlib (>=3.7), scikit-learn (>=1.3), scipy (>=1.10), geopandas (>=0.14), shapely (>=2), rasterio (>=1.3), affine (>=2.4), joblib (>=1.3), pandas (>=2), lightgbm (>=4), scikit-image (>=0.22), PyQt5 (>=5.15), PySide6 (>=6.6, desktop app), rapidocr_onnxruntime (>=1.3, legend OCR; Python <3.13 only).
+Installed with the package: numpy (>=1.24), pillow (>=10), matplotlib (>=3.7), scikit-learn (>=1.3), scipy (>=1.10), geopandas (>=0.14), shapely (>=2), rasterio (>=1.3), affine (>=2.4), joblib (>=1.3), pandas (>=2), lightgbm (>=4), scikit-image (>=0.22), PyQt5 (>=5.15).
+
+Desktop app (`[app]` extra): PySide6-Essentials (>=6.6), rapidocr_onnxruntime (>=1.3, legend OCR; Python <3.13 only). Legend OCR for notebook 4 alone: `[amics]` extra.
 
 Optional extras (not installed by default):
 

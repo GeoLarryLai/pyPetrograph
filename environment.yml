@@ -23,12 +23,12 @@ dependencies:
   - lightgbm>=4
   - scikit-image>=0.22
   - pyqt>=5.15
-  - pyside6>=6.6          # desktop app (pypetrograph-app)
   - xgboost>=2
   - jupyterlab
   - ipykernel
   - pip
   - pip:
       - rapidocr_onnxruntime>=1.3   # legend OCR (notebook 4 and the app; pulls in onnxruntime)
+      - PySide6-Essentials>=6.6     # desktop app (pypetrograph-app); Qt widgets only
       - pytest>=7                   # tests only
       - pytest-qt>=4.2              # tests only (app GUI tests)

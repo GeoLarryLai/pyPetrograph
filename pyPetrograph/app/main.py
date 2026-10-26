@@ -8,7 +8,7 @@ import sys
 
 
 # import name -> pip name; the app cannot start without these
-REQUIRED = [("PySide6", "PySide6>=6.6"), ("numpy", "numpy"), ("pandas", "pandas"), ("shapely", "shapely"),
+REQUIRED = [("PySide6", "PySide6-Essentials>=6.6"), ("numpy", "numpy"), ("pandas", "pandas"), ("shapely", "shapely"),
             ("matplotlib", "matplotlib"), ("PIL", "pillow"), ("skimage", "scikit-image")]
 # optional: the app starts, with a reduced feature
 OPTIONAL = [("rapidocr_onnxruntime", "rapidocr_onnxruntime>=1.3", "legend names are not read (swatch_1..N)")]
@@ -32,8 +32,9 @@ def check_dependencies(stream=None) -> bool:
         f"pyPetrograph app: missing package(s) in this Python environment: {names}\n"
         f"  environment: {sys.prefix}\n"
         "Install them into this same environment, then launch again:\n"
-        f"  {sys.executable} -m pip install pyPetrograph\n"
-        "  (from a repo checkout: pip install -e .)",
+        f"  {sys.executable} -m pip install \"pyPetrograph[app]\"\n"
+        f"  (or: {sys.executable} -m pip install PySide6-Essentials rapidocr_onnxruntime;\n"
+        "   full PySide6 also works)",
         file=stream,
     )
     return False
@@ -55,7 +56,7 @@ def main(argv=None) -> int:
     if "-h" in args or "--help" in args:
         print("usage: pypetrograph-app [--help] [--version]\n\n"
               "pyPetrograph desktop app: the AMICS workflow (notebook 4) step by step.\n"
-              "Installed with: pip install pyPetrograph")
+              "Requires: pip install \"pyPetrograph[app]\"  (PySide6-Essentials + rapidocr_onnxruntime)")
         return 0
     if "--version" in args:
         from pyPetrograph import __version__
