@@ -82,7 +82,7 @@ Debian/Ubuntu (use `libglib2.0-0` on older Ubuntu): `sudo apt-get install -y lib
 
 ## Citation
 
-Lai, L.S.-H. (2026) pyPetrograph.
+Lai, L.S.-H. (2026) pyPetrograph. *Zenodo*, https://doi.org/10.5281/zenodo.23659316
 
 ## Key Features
 
