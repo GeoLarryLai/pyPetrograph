@@ -192,16 +192,20 @@ REQUIRED_PACKAGES: List[Tuple[str, str]] = [
     ("PyQt5", "PyQt5"),  # label window (QtAgg); prefer conda-forge pyqt if pip fails
 ]
 
+# SegmentEveryGrain is optional and installed with its own instructions (it brings TensorFlow,
+# PyTorch and SAM 2); pyPetrograph only checks for it and never installs it.
+SEG_INSTALL_URL = "https://github.com/zsylvester/segmenteverygrain"
+
 # GrainPlot / SEG U-Net workers only. Never import these in the Jupyter kernel.
 SEG_PACKAGES: List[Tuple[str, str]] = [
-    ("tensorflow", "tensorflow>=2.16,<2.22"),
-    ("keras", "keras>=3"),
-    ("segmenteverygrain", "segmenteverygrain==0.5.0"),
+    ("tensorflow", "tensorflow"),
+    ("keras", "keras"),
+    ("segmenteverygrain", "segmenteverygrain"),
 ]
 
-# Optional SAM 2.1 refinement (also pulled by segmenteverygrain). Weights ~860 MB stay opt-in.
+# Optional SAM 2.1 refinement (comes with SegmentEveryGrain). Weights ~860 MB stay opt-in.
 SAM2_PACKAGES: List[Tuple[str, str]] = [
-    ("sam2", "sam2>=1.0"),
+    ("sam2", "sam2"),
     ("torch", "torch"),
 ]
 

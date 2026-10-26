@@ -1,5 +1,6 @@
 {
   "title": "pyPetrograph: a toolkit for semi-automated, ML-assisted thin-section petrography",
+  "version": "0.1.1",
   "upload_type": "software",
   "creators": [
     {

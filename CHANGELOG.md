@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1 (2026-10-26)
+
+### Changed
+- Removed the `seg` and `sam2` extras (and from `all`). SegmentEveryGrain, which brings TensorFlow, PyTorch and SAM 2, is installed with its own instructions (https://github.com/zsylvester/segmenteverygrain); notebooks and the app point there and never install it.
+- Desktop app: checks SegmentEveryGrain / SAM 2.1 in the SEG server's Python in the background. Without SegmentEveryGrain, *Run segmentation* (and saving edited grains) is disabled with an inline hint and link; *Load saved grains*, editing and *Use this grain map* on unedited grains still work. Without SAM 2.1, *SAM 2.1 refine* and *Add grain* are disabled. One-line note on SEG vs the optional SAM 2.1 refine in the Grain segmentation step.
+- README / PyPI readme: one install command per line and a separate *SegmentEveryGrain (optional)* section.
+
 ## 0.1.0 (2026-10-26)
 
 ### Added

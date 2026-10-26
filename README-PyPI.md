@@ -1,6 +1,6 @@
 # pyPetrograph
 
-v0.1.0
+v0.1.1
 
 [![PyPI version](https://img.shields.io/pypi/v/pypetrograph.svg)](https://pypi.org/project/pypetrograph/) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23659316.svg)](https://doi.org/10.5281/zenodo.23659316)
 
@@ -32,9 +32,21 @@ The desktop app (`pypetrograph-app`) runs the same workflow step by step; nothin
 pip install pyPetrograph
 ```
 
-Or from the repository: `git clone https://github.com/GeoLarryLai/pyPetrograph.git`, `cd pyPetrograph`, `pip install .` (or `pip install -e .`).
+Or from the repository:
 
-Python 3.10–3.12 recommended (legend OCR has no 3.13+ wheels yet). On Linux, the desktop app's Qt needs some system libraries; see the [GitHub README](https://github.com/GeoLarryLai/pyPetrograph#linux-system-libraries). Optional extras: `seg`, `sam2`, `xgb`, `amics`, `app`, `test`, `all`.
+```bash
+git clone https://github.com/GeoLarryLai/pyPetrograph.git
+cd pyPetrograph
+pip install .
+```
+
+Python 3.10–3.12 recommended (legend OCR has no 3.13+ wheels yet). On Linux, the desktop app's Qt needs some system libraries; see the [GitHub README](https://github.com/GeoLarryLai/pyPetrograph#linux-system-libraries). Optional extras: `app`, `amics`, `xgb`, `test`, `all`.
+
+## SegmentEveryGrain (optional, for grain segmentation)
+
+Grain segmentation (notebooks 3 and 4, and *Run segmentation* in the app) uses [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain). Install it into the same environment with its own instructions: https://github.com/zsylvester/segmenteverygrain#installation. It brings TensorFlow, PyTorch and SAM 2.1 (the optional *SAM 2.1 refine*).
+
+Without it, everything else works: notebooks 1 and 2, the non-segmentation steps of notebooks 3 and 4, and every app step, including *Load saved grains* and editing them. In the app, *Run segmentation* is greyed out with a link here.
 
 ## Desktop app
 

@@ -10,7 +10,7 @@ from typing import List, Optional
 
 import numpy as np
 
-from pyPetrograph.common.constants import PathLike
+from pyPetrograph.common.constants import SEG_INSTALL_URL, PathLike
 
 
 def read_polygons_geojson(path: PathLike) -> List:
@@ -74,6 +74,14 @@ def run_seg_bse(
             "No Python found for the SEG worker. It runs in the environment this was launched from "
             f"({sys.prefix}) unless PYPETROGRAPH_SEG_PYTHON points to another python."
         )
+    if Path(py) == Path(sys.executable):
+        import importlib.util
+
+        if importlib.util.find_spec("segmenteverygrain") is None:
+            raise RuntimeError(
+                f"SegmentEveryGrain is not installed in this environment ({sys.prefix}). It is optional and "
+                "installed with its own instructions: https://github.com/zsylvester/segmenteverygrain"
+            )
     weights = ensure_seg_weights(sam2=bool(use_sam))
     worker = Path(__file__).resolve().parent / "seg_worker.py"
     out = Path(out_geojson)
@@ -114,7 +122,7 @@ def run_seg_bse(
         if proc.returncode != 0:
             tail = log.read_text(encoding="utf-8", errors="replace").splitlines()[-25:]
             print("\n".join(tail))
-            raise RuntimeError(f"SEG worker exited {proc.returncode}")
+            raise RuntimeError(f"SEG worker exited {proc.returncode} (SegmentEveryGrain setup: {SEG_INSTALL_URL})")
     if not out.exists():
         raise RuntimeError(f"SEG worker finished but wrote no file: {out}")
     return read_polygons_geojson(out)

@@ -216,6 +216,8 @@ def test_sam_prompts(ui, qtbot):
 
     win, mod, _ = ui
     seg = mod.step(SegmentStep)
+    qtbot.waitUntil(lambda: seg.seg_ok is not None, timeout=10000)
+    seg.set_availability({"seg": True, "sam2": True, "python": ""})  # this test fakes the backend
     win.backend = _FakeBackend()
     seg.polys = [box(0, 0, 10, 10)]
     seg._sam_ready = True  # skip loading SAM
@@ -619,3 +621,67 @@ def test_legend_edit_add_delete_undo_reload(ui, qtbot, tmp_path):
     lg2.reset()
     assert lg2.edited()[0] == ocr
     win2.jobs.wait()
+
+
+# -- SegmentEveryGrain / SAM 2.1 availability ---------------------------------------------
+def _seg_module(qtbot, monkeypatch, av):
+    from pyPetrograph.app import backend
+    from pyPetrograph.app.amics_module import AmicsModule, SegmentStep
+    from pyPetrograph.app.shell import AppWindow
+
+    monkeypatch.setattr(backend, "seg_availability", lambda refresh=False: dict(av))
+    win = AppWindow()
+    qtbot.addWidget(win)
+    mod = AmicsModule(win)
+    seg = mod.step(SegmentStep)
+    qtbot.waitUntil(lambda: seg.seg_ok is not None, timeout=10000)
+    return win, mod, seg
+
+
+def test_seg_missing_disables_run(qtbot, monkeypatch):
+    from shapely.geometry import box
+
+    win, mod, seg = _seg_module(qtbot, monkeypatch, {"seg": False, "sam2": False, "python": "/x/python"})
+    assert seg.seg_ok is False and seg.sam_ok is False
+    assert not seg.run_btn.isEnabled() and "not installed" in seg.run_btn.toolTip()
+    assert not seg.sam.isEnabled() and not seg.sam.isChecked()
+    assert not seg.add.isEnabled()
+    assert not seg.seg_hint.isHidden()
+    t = seg.seg_hint.text()
+    assert "SegmentEveryGrain is not installed" in t and "https://github.com/zsylvester/segmenteverygrain" in t
+    assert "No grains yet" in seg.state_lbl.text() and "SegmentEveryGrain" in seg.state_lbl.text()
+    seg.run()  # guarded: no job starts
+    assert not win.jobs.busy
+    seg._got([box(0, 0, 10, 10), box(20, 0, 30, 10)], "saved")  # loaded grains: editing and use still work
+    assert seg.use_btn.isEnabled()
+    seg.sel = {0}
+    seg.delete()
+    assert seg.edited and len(seg.polys) == 1
+    assert not seg.use_btn.isEnabled()  # saving edits needs SegmentEveryGrain
+    seg.add.setChecked(True)
+    assert not seg.add.isChecked()
+    win.jobs.wait()
+
+
+def test_sam_missing_disables_refine_and_add(qtbot, monkeypatch):
+    win, mod, seg = _seg_module(qtbot, monkeypatch, {"seg": True, "sam2": False, "python": "/x/python"})
+    assert seg.run_btn.isEnabled()
+    assert not seg.sam.isEnabled() and not seg.sam.isChecked() and "SAM 2.1" in seg.sam.toolTip()
+    assert not seg.add.isEnabled() and "not installed" in seg.add.toolTip()
+    assert not seg.seg_hint.isHidden() and "SAM 2.1 is not installed" in seg.seg_hint.text()
+    win.jobs.wait()
+
+
+def test_seg_present_all_enabled(qtbot, monkeypatch):
+    win, mod, seg = _seg_module(qtbot, monkeypatch, {"seg": True, "sam2": True, "python": "/x/python"})
+    assert seg.run_btn.isEnabled() and seg.sam.isEnabled() and seg.add.isEnabled()
+    assert seg.seg_hint.isHidden()
+    assert any("not an alternative" in lb.text() for lb in seg.panel.findChildren(type(seg.seg_hint)))
+    win.jobs.wait()
+
+
+def test_seg_availability_probe():
+    from pyPetrograph.app import backend
+
+    av = backend.seg_availability(refresh=True)
+    assert set(av) == {"seg", "sam2", "python"} and (av["seg"] or not av["sam2"])

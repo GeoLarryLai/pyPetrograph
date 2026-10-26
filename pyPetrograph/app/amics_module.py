@@ -23,7 +23,9 @@ from pathlib import Path
 from typing import List, Optional
 
 import numpy as np
-from PySide6.QtCore import QSize, Qt
+import threading
+
+from PySide6.QtCore import QObject, QSize, Qt, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QCheckBox, QComboBox, QDialog, QDoubleSpinBox, QFileDialog, QFormLayout, QGroupBox, QLabel, QLineEdit,
@@ -68,6 +70,11 @@ def png_image(path) -> np.ndarray:
     from PIL import Image
 
     return np.asarray(Image.open(path).convert("RGB"))
+
+
+class _Relay(QObject):
+    """Carries a worker-thread result to the GUI thread (queued signal)."""
+    got = Signal(object)
 
 
 def hint(text: str = "") -> QLabel:
@@ -1213,9 +1220,17 @@ class SegmentStep(_AStep):
     def __init__(self, mod) -> None:
         super().__init__(mod)
         st = mod.session.s
+        self.seg_ok: Optional[bool] = None   # None = still checking (controls stay enabled)
+        self.sam_ok: Optional[bool] = None
         self.lay.addWidget(title("6  Grain segmentation", "Run SegmentEveryGrain (or load the saved grains), then fix outlines on the image. Yellow = grains. 'Use this grain map' measures the grains and computes minerals, sizes and figures for the next steps."))
         g = QGroupBox("Segmentation")
         f = QFormLayout(g)
+        f.addRow(hint("SEG (SegmentEveryGrain U-Net) finds the grains; SAM 2.1 refine is an optional extra pass on SEG's outlines, not an alternative."))
+        self.seg_hint = hint()
+        self.seg_hint.setTextFormat(Qt.RichText)
+        self.seg_hint.setOpenExternalLinks(True)
+        self.seg_hint.setVisible(False)
+        f.addRow(self.seg_hint)
         self.sam = QCheckBox("SAM 2.1 refine", checked=st.use_sam2)
         self.min_px = QSpinBox(maximum=100000, value=int(st.min_grain_px))
         self.drop = QDoubleSpinBox(decimals=2, maximum=1.0, singleStep=0.05, value=st.dark_drop_frac)
@@ -1264,7 +1279,7 @@ class SegmentStep(_AStep):
         self.lay.addWidget(clear)
         self.finish_layout()
         self.set_controls(EDIT_CONTROLS)
-        self.add_primary("Run segmentation", self.run)
+        self.run_btn = self.add_primary("Run segmentation", self.run)
         self.use_btn = self.add_primary("Use this grain map", self.apply)
         self.polys: List = []
         self.base: List = []
@@ -1279,6 +1294,51 @@ class SegmentStep(_AStep):
         self.preview = None           # shapely Polygon from SAM
         self.win.canvas.boxDragged.connect(self.on_box)
         self._show_add_ui(False)
+        self.update_state()
+        self._avail = _Relay()
+        self._avail.got.connect(self.set_availability)
+        threading.Thread(target=self._check_seg, daemon=True).start()
+
+    def _check_seg(self) -> None:
+        from pyPetrograph.app import backend as _backend
+
+        try:
+            av = _backend.seg_availability()
+        except Exception:
+            av = {"seg": False, "sam2": False, "python": ""}
+        try:
+            self._avail.got.emit(av)
+        except RuntimeError:  # window already closed
+            pass
+
+    def set_availability(self, av) -> None:
+        """Enable / disable SEG and SAM 2.1 controls from ``backend.seg_availability()``."""
+        from pyPetrograph.app.backend import SEG_INSTALL_URL
+
+        self.seg_ok, self.sam_ok = bool(av.get("seg")), bool(av.get("sam2"))
+        py = av.get("python") or "this Python"
+        link = f'<a href="{SEG_INSTALL_URL}">SegmentEveryGrain install instructions</a>'
+        self.run_btn.setEnabled(self.seg_ok)
+        self.run_btn.setToolTip("" if self.seg_ok else f"SegmentEveryGrain is not installed for {py}")
+        if not self.sam_ok:
+            self.sam.setChecked(False)
+            if self.add.isChecked():
+                self.add.setChecked(False)
+        no_sam = "SAM 2.1 (sam2 + torch) is not installed" + ("" if self.seg_ok else "; it comes with SegmentEveryGrain")
+        for w in (self.sam, self.add):
+            w.setEnabled(self.sam_ok)
+        self.sam.setToolTip("" if self.sam_ok else no_sam)
+        self.add.setToolTip("Add grain with SAM 2.1 prompts (A)" if self.sam_ok else no_sam)
+        if not self.seg_ok:
+            msg = ("<b>SegmentEveryGrain is not installed</b>, so Run segmentation is off. Load saved grains, "
+                   f"editing and 'Use this grain map' on unedited grains still work. Install it with its own "
+                   f"instructions: {link}")
+        elif not self.sam_ok:
+            msg = f"SAM 2.1 is not installed, so SAM 2.1 refine and Add grain are off. See {link}"
+        else:
+            msg = ""
+        self.seg_hint.setText(msg)
+        self.seg_hint.setVisible(bool(msg))
         self.update_state()
 
     def _show_add_ui(self, on: bool) -> None:
@@ -1302,6 +1362,9 @@ class SegmentStep(_AStep):
         self.canvas_focus()
 
     def run(self) -> None:
+        if self.seg_ok is False:
+            self.win.status.setText("SegmentEveryGrain is not installed: Run segmentation is off")
+            return
         if self.edited and not confirm(self.panel, "Run segmentation", "Discard your unsaved grain edits and segment again?"):
             return
         self._sync_settings()
@@ -1348,13 +1411,20 @@ class SegmentStep(_AStep):
         p = self.s.saved_path("grains") if self.s.P else None
         on_disk = p is not None
         n = len(self.polys)
-        self.use_btn.setEnabled(bool(n))
+        # saving edited grains goes through SegmentEveryGrain (polygons_to_grains) in the SEG server
+        self.use_btn.setEnabled(bool(n) and not (self.edited and self.seg_ok is False))
         self.del_btn.setEnabled(bool(self.sel))
         self.merge_btn.setEnabled(len(self.sel) >= 2)
         self.undo_btn.setEnabled(bool(self.history))
         self.reset_btn.setEnabled(bool(self.history))
         if not n:
-            self.set_state("No grains yet: Run segmentation" + (" or Load saved grains" if on_disk else ""), "none")
+            if self.seg_ok is False:
+                self.set_state("No grains yet: Load saved grains" if on_disk else
+                               "No grains yet: no saved grains and SegmentEveryGrain is not installed", "none")
+            else:
+                self.set_state("No grains yet: Run segmentation" + (" or Load saved grains" if on_disk else ""), "none")
+        elif self.edited and self.seg_ok is False:
+            self.set_state(f"{n} grains, {len(self.history)} edits: saving edits needs SegmentEveryGrain", "unsaved")
         elif self.edited:
             self.set_state(f"{n} grains, {len(self.history)} edits not saved: 'Use this grain map' saves them", "unsaved")
         elif on_disk and self.source in ("saved", "segmented", "measured"):
@@ -1451,6 +1521,9 @@ class SegmentStep(_AStep):
         if not on:
             self.clear_prompts()
         self._show_add_ui(on)
+        if on and self.sam_ok is False:
+            self.add.setChecked(False)
+            return
         if not on or self._sam_ready:
             return
         self._sync_settings()

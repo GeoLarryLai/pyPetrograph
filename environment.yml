@@ -1,4 +1,4 @@
-# Core env for the demos and the desktop app. SegmentEveryGrain is optional — see README.
+# Core env for the demos and the desktop app. SegmentEveryGrain is optional: install it with its own instructions, https://github.com/zsylvester/segmenteverygrain
 # conda env create -f environment.yml            (or: -n <your-env> to use any env name)
 # conda activate pypetrograph                    (or your own name)
 # pip install -e .

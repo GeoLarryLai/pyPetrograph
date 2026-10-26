@@ -87,8 +87,9 @@ def overlay_labels(
 def seg_setup_hint() -> str:
     models = project_models_dir()
     return (
-        "Grain U-Net / GrainPlot run as a subprocess of this Python (conda work). "
+        "Grain U-Net / GrainPlot run as a subprocess of this Python (or PYPETROGRAPH_SEG_PYTHON). "
         "The notebook kernel does not import TensorFlow.\n"
+        "  SegmentEveryGrain is optional; install it with its own instructions: https://github.com/zsylvester/segmenteverygrain\n"
         f"  {models / SEG_UNET_NAME}\n"
         f"  {models / SEG_SAM_NAME}"
     )

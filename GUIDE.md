@@ -238,12 +238,10 @@ Declared in the repo-root [`environment.yml`](environment.yml) and [`pyproject.t
 | Extra | Packages | Used by |
 |-------|----------|---------|
 | *(core)* | numpy, pillow, matplotlib, scikit-learn, scipy, geopandas, shapely, rasterio, affine, joblib, pandas, lightgbm, scikit-image, **PyQt5** | RGB + mineral-map |
-| `[seg]` | TensorFlow, Keras, `segmenteverygrain` | **optional** multimodal U-Net / GrainPlot / montage (finer grain boundaries) |
-| `[sam2]` | torch, torchvision, `sam2` | optional SAM shape refine — **do not** download the ~860 MB weights unless `USE_SAM2 = True` |
 | `[xgb]` | xgboost | optional RGB classifier |
-| `[all]` | seg + sam2 + xgb | only if you need SAM refine and xgboost |
+| `[all]` | xgb + amics + app | xgboost, legend OCR and the desktop app |
 
-From PyPI: `pip install pypetrograph`. Alternatively, see the [root README](README.md#installation) conda path. After `conda activate pypetrograph`, optional SEG is `pip install segmenteverygrain` (into this env), not SEG’s separate conda env.
+From PyPI: `pip install pypetrograph`. Alternatively, see the [root README](README.md#installation) conda path. SegmentEveryGrain (TensorFlow, PyTorch, SAM 2; multimodal U-Net / GrainPlot / montage, optional SAM shape refine — **do not** download the ~860 MB SAM weights unless `USE_SAM2 = True`) is not a pyPetrograph extra: install it into the same env with [its own instructions](https://github.com/zsylvester/segmenteverygrain).
 
 ---
 

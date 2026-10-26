@@ -18,6 +18,42 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Optional
 
 _TAG = "@@PP@@ "
+SEG_INSTALL_URL = "https://github.com/zsylvester/segmenteverygrain"
+_SEG_MODULES = ("segmenteverygrain", "tensorflow", "keras")
+_SAM_MODULES = ("sam2", "torch")
+_AVAIL: Optional[Dict[str, Any]] = None
+
+
+def seg_availability(refresh: bool = False) -> Dict[str, Any]:
+    """What the SEG server's interpreter (``_seg_python``) can import, without importing it.
+
+    ``{"seg": bool, "sam2": bool, "python": str}``. Same interpreter as the app: ``find_spec`` in
+    process (milliseconds); a ``PYPETROGRAPH_SEG_PYTHON`` interpreter: one short subprocess.
+    Cached; call it off the GUI thread."""
+    global _AVAIL
+    if _AVAIL is not None and not refresh:
+        return dict(_AVAIL)
+    from pyPetrograph.objects.qc import _seg_python, _tf_worker_env
+
+    py = _seg_python()
+    names = _SEG_MODULES + _SAM_MODULES
+    found: Dict[str, bool] = {}
+    if py is not None and Path(py) == Path(sys.executable):
+        import importlib.util
+
+        found = {n: importlib.util.find_spec(n) is not None for n in names}
+    elif py is not None:
+        code = ("import importlib.util as u, json; "
+                f"print(json.dumps({{n: u.find_spec(n) is not None for n in {names!r}}}))")
+        try:
+            r = subprocess.run([str(py), "-c", code], capture_output=True, text=True, timeout=60,
+                               env=_tf_worker_env(mpl_backend="Agg"))
+            found = json.loads(r.stdout.strip().splitlines()[-1])
+        except Exception:
+            found = {}
+    seg = all(found.get(n) for n in _SEG_MODULES)
+    _AVAIL = {"seg": seg, "sam2": seg and all(found.get(n) for n in _SAM_MODULES), "python": str(py or "")}
+    return dict(_AVAIL)
 _SERVER = Path(__file__).resolve().parent / "seg_server.py"
 
 
@@ -46,8 +82,8 @@ class SegBackend:
             raise SegBackendError(
                 "No Python found for the SEG server. It runs in the environment the app was "
                 f"launched from ({sys.prefix}, python {sys.executable}) unless "
-                "PYPETROGRAPH_SEG_PYTHON points elsewhere; install the seg extra there: "
-                f'{sys.executable} -m pip install "pyPetrograph[seg]"'
+                "PYPETROGRAPH_SEG_PYTHON points elsewhere. Install SegmentEveryGrain there with "
+                f"its own instructions: {SEG_INSTALL_URL}"
             )
         env = _tf_worker_env(mpl_backend="Agg")
         env["PYTHONIOENCODING"] = "utf-8"

@@ -2,7 +2,7 @@
 
 ![PyPI version](https://img.shields.io/pypi/v/pypetrograph.svg) ![PyPI downloads](https://img.shields.io/pypi/dm/pypetrograph.svg) [![pepy downloads](https://static.pepy.tech/badge/pypetrograph)](https://pepy.tech/project/pypetrograph) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23659316.svg)](https://doi.org/10.5281/zenodo.23659316)
 
-v0.1.0
+v0.1.1
 
 pyPetrograph is a machine-learning toolkit for thin-section petrography. You can hand-label features on an RGB photo and train a LightGBM pixel model to map area % of each class (porosity in the demo). You can count grains on a painted mineral map by matching a color legend. You can stack several image types of the same field (PPL, XPL, or others) and segment grains from that overlay. Or, from an AMICS set (BSE, mineral map, and legend), you can outline grains on the BSE and name each grain from the map.
 
@@ -26,17 +26,25 @@ Requires Python 3.10–3.12 (3.13+ installs, but legend OCR has no wheels there 
 pip install pyPetrograph
 ```
 
-This installs the library and the notebooks' dependencies. The desktop app needs one more step ([below](#the-desktop-app)).
+This installs the library and the notebooks' dependencies. The desktop app needs one more step ([below](#the-desktop-app)); grain segmentation needs SegmentEveryGrain ([below](#segmenteverygrain-optional-for-grain-segmentation)).
 
 ### Install from the repository
 
 ```bash
 git clone https://github.com/GeoLarryLai/pyPetrograph.git
 cd pyPetrograph
-pip install .        # or: pip install -e .  (editable, for development)
+pip install .
 ```
 
-Optional extras: `seg` ([SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain), for grain segmentation), `sam2` (SAM 2.1 refine, ~860 MB weights), `xgb`, `amics` (legend OCR for notebook 4), `app` (desktop app), `test`, `all`, e.g. `pip install "pyPetrograph[seg]"`.
+Use `pip install -e .` instead for an editable (development) install.
+
+Optional extras: `app` (desktop app), `amics` (legend OCR for notebook 4), `xgb`, `test`, `all`, e.g. `pip install "pyPetrograph[app]"`.
+
+### SegmentEveryGrain (optional, for grain segmentation)
+
+Grain segmentation (notebooks 3 and 4, and *Run segmentation* in the app) uses [SegmentEveryGrain](https://github.com/zsylvester/segmenteverygrain). Install it into the same environment with its own instructions: https://github.com/zsylvester/segmenteverygrain#installation. It brings TensorFlow, PyTorch and SAM 2.1 (the optional *SAM 2.1 refine*).
+
+Without it, everything else works: notebooks 1 and 2, the non-segmentation steps of notebooks 3 and 4, and every app step, including *Load saved grains* and editing them. In the app, *Run segmentation* is greyed out with a link here.
 
 ## The desktop app
 
@@ -65,7 +73,7 @@ python -m pyPetrograph.app
 | ![Minerals step](docs/images/app_minerals.jpg) | ![Outputs step](docs/images/app_outputs.jpg) |
 | **Minerals:** one row per mineral, ✓ exact colour, ▲ reassigned, ✗ not found. | **Outputs:** knolling diagram and the CSV / figure export buttons. |
 
-Segmentation needs the `seg` extra (and `sam2` for SAM refine). Model weights are looked up in `<output>/models`, `outputs/models`, `models/` and `~/.cache/pyPetrograph/models` (or `$PYPETROGRAPH_MODELS`) and downloaded to the cache only if missing. Headless tests: `pip install -e ".[test]"`, then `QT_QPA_PLATFORM=offscreen pytest pyPetrograph/app`.
+Segmentation needs [SegmentEveryGrain](#segmenteverygrain-optional-for-grain-segmentation); without it the step still loads and edits saved grains. Model weights are looked up in `<output>/models`, `outputs/models`, `models/` and `~/.cache/pyPetrograph/models` (or `$PYPETROGRAPH_MODELS`) and downloaded to the cache only if missing. Headless tests: `pip install -e ".[test]"`, then `QT_QPA_PLATFORM=offscreen pytest pyPetrograph/app`.
 
 #### Linux system libraries
 
@@ -164,11 +172,11 @@ Desktop app (`[app]` extra): PySide6-Essentials (>=6.6), rapidocr_onnxruntime (>
 
 Optional extras (not installed by default):
 
-- segmenteverygrain / tensorflow (`seg`: tensorflow >=2.16,<2.22, keras >=3, segmenteverygrain ==0.5.0)
-- sam2 / torch (`sam2`: torch >=2.2, torchvision, sam2 >=1.0)
 - xgboost (`xgb`: xgboost >=2)
 - tests (`test`: pytest >=7, pytest-qt >=4.2)
 - everything except tests: `all`
+
+SegmentEveryGrain (TensorFlow, PyTorch, SAM 2) is not a pyPetrograph extra; install it with [its own instructions](https://github.com/zsylvester/segmenteverygrain).
 
 ## License
 

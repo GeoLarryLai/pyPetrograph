@@ -19,6 +19,7 @@ from pyPetrograph.common.constants import (
     PathLike,
     PREDICTIONS_SUBDIR,
     AMICS_PACKAGES,
+    SEG_INSTALL_URL,
     APP_PACKAGES,
     REQUIRED_PACKAGES,
     SAM2_PACKAGES,
@@ -393,12 +394,17 @@ def check_and_install_packages(
         _print_package_status(
             "Optional packages check (not imported in this kernel)", extra_results
         )
-        if extra_missing and install:
+        seg_names = {n for n, _ in SEG_PACKAGES + SAM2_PACKAGES}
+        seg_missing = [m for m in extra_missing if m[0] in seg_names]
+        pip_missing = [m for m in extra_missing if m[0] not in seg_names]
+        if pip_missing and install:
             extra_results = _install_missing(
-                extra_missing, extra_results, import_after=False
+                pip_missing, extra_results, import_after=False
             )
-        elif extra_missing:
-            print("Or: pip install 'pyPetrograph[seg]' / 'pyPetrograph[all]'")
+        elif pip_missing:
+            print("Pass install=True to pip-install them, or: pip install 'pyPetrograph[amics]'")
+        if seg_missing:  # never auto-installed: SegmentEveryGrain has its own install method
+            print(f"SegmentEveryGrain (grain segmentation, optional; includes SAM 2): install it with its own instructions: {SEG_INSTALL_URL}")
         results.update(extra_results)
 
     if include_app:
@@ -413,7 +419,7 @@ def check_and_install_packages(
     if failed:
         print("Still missing:", ", ".join(failed))
         print("Fix: conda env create -f environment.yml")
-        print("  or: pip install 'pyPetrograph[all]'")
+        print("  or: pip install 'pyPetrograph[all]'  (SegmentEveryGrain: " + SEG_INSTALL_URL + ")")
         if "PyQt5" in failed:
             print("  PyQt5 (label window): conda install -c conda-forge pyqt")
     elif not missing:
