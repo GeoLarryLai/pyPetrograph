@@ -107,9 +107,10 @@ const Viewer = (() => {
   const zc = f => { tx = W / 2 - (W / 2 - tx) * f; ty = H / 2 - (H / 2 - ty) * f; k *= f; moved(); };
   document.getElementById("zin").onclick = () => zc(1.4); document.getElementById("zout").onclick = () => zc(1 / 1.4);
   window.addEventListener("resize", resize); setTimeout(resize, 0);
+  if (window.ResizeObserver) new ResizeObserver(() => { const r = cv.getBoundingClientRect(); if (r.width !== W || r.height !== H) { const f = !!base; resize(); if (f) fit(); } }).observe(cv);
   return {setImage, setMask, showMask, setOverlay, fit, zoomTo, clear, draw,
     set onClick(f) { onClick = f; }, set onBox(f) { onBox = f; }, set onKey(f) { onKey = f; },
-    set boxMode(b) { boxMode = b; boxNow = null; }, get paintMs() { return lastPaintMs; }, get size() { return [W, H]; }, get k() { return k; }, focus: () => cv.focus()};
+    set boxMode(b) { boxMode = b; boxNow = null; }, get paintMs() { return lastPaintMs; }, screen: (x, y) => { const r = cv.getBoundingClientRect(); return [r.left + tx + x * k, r.top + ty + y * k]; }, get size() { return [W, H]; }, get k() { return k; }, focus: () => cv.focus()};
 })();
 // overlay helpers (image coordinates)
 const Draw = {

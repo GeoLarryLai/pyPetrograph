@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 Larry Syu-Heng Lai
-// app.js - the nine AMICS steps (notebook 4 order). The server holds the state; every step
+// app.js - start page, job switching and the nine AMICS steps (notebook 4 order). The optical
+// job (notebook 1) is in optical.js. The server holds the state; every step
 // renders from GET /api/<step> and changes it with POST /api/<step>/op.
 "use strict";
 const {api, runJob, toast, $} = Shell;
@@ -10,7 +11,8 @@ const fromHex = h => { const m = /^#?([0-9a-f]{6})$/i.exec(h.trim()); return m ?
 let G = {steps: []}, cur = 0, V = {};          // global state, current step, per-step view
 let tick = 0;                                    // cache-buster for images that change
 async function showImg(key, opts = {}) {
-  try { const s = await api("GET", "/api/imgsize/" + encodeURIComponent(key)); Viewer.setImage(`/api/img/${encodeURIComponent(key)}?v=${opts.v ?? G.version}`, s.w, s.h, opts); }
+  const b = JOBS[JOB]?.api || "/api";
+  try { const s = await api("GET", `${b}/imgsize/` + encodeURIComponent(key)); Viewer.setImage(`${b}/img/${encodeURIComponent(key)}?v=${opts.v ?? G.version}`, s.w, s.h, opts); }
   catch (e) { Viewer.clear(); }
 }
 function pill(msg, kind) { const p = $("pill"); p.textContent = msg || ""; p.className = "pill " + (kind || ""); }
@@ -24,8 +26,9 @@ function mainBtns(list) {
 const body = html => { $("stepBody").innerHTML = html; };
 const on = (id, ev, fn) => { const e = $(id); if (e) e[ev] = fn; };
 async function refreshGlobal() {
-  G = await api("GET", "/api/state"); if (G.status) toast(G.status);
-  $("doc").textContent = G.sample ? `AMICS · sample ${G.sample}` + (G.folder ? ` · export folder ${G.folder}` : "") : "AMICS workflow · no sample open";
+  if (!JOB) return; const J = JOBS[JOB];
+  G = await api("GET", J.api + "/state"); if (G.status) toast(G.status);
+  $("doc").textContent = J.doc(G);
   $("logp").textContent = G.log.join("\n"); $("logp").scrollTop = 1e9;
   $("rail").innerHTML = "<ol>" + G.steps.map((s, i) => `<li data-i="${i}" title="${s.ready ? "" : "finish the earlier steps first"}" class="${i === cur ? "cur" : ""} ${s.done ? "done" : ""} ${s.ready ? "" : "locked"}">${esc(s.title)}</li>`).join("") + "</ol>";
   $("rail").querySelectorAll("li").forEach(li => li.onclick = () => { const i = +li.dataset.i; if (G.steps[i].ready) go(i); });
@@ -93,9 +96,13 @@ function entryDialog({title, rgb, name, row, check, submit, dropSrc}) {
   upd(); $("eName").focus();
 }
 // ---- steps ----------------------------------------------------------------------------------
-const STEPS = [];
+const AMICS_STEPS = [];
+let STEPS = AMICS_STEPS, JOB = null;
+const JOBS = {amics: {steps: AMICS_STEPS, api: "/api", name: "AMICS grain counting",
+  empty: "AMICS thin-section workflow (notebook 4), step by step.<br>Start with <b>1 · Files</b> on the right.",
+  doc: G => G.sample ? `AMICS · sample ${G.sample}` + (G.folder ? ` · export folder ${G.folder}` : "") : "AMICS workflow · no sample open"}};
 // 1 Files
-STEPS.push({title: "Files", lead: "Pick the three AMICS images of one sample and where exports go. Picking one file fills in its companions.",
+AMICS_STEPS.push({title: "Files", lead: "Pick the three AMICS images of one sample and where exports go. Picking one file fills in its companions.",
   help: "Use <b>…</b> to browse. Nothing is written until you press an Export button in step 9.",
   controls: [["BSE image", "the back-scattered electron image (.tif)"], ["Mineral map", "the AMICS mineral colour map"], ["Legend", "the legend image the colours are read from (OCR)"],
     ["Output folder", "exports go to &lt;folder&gt;/amics/&lt;sample&gt;/"], ["Sample", "name used in file names (blank = from the BSE file name)"], ["Open", "load the sample and read its legend (step 2)"]],
@@ -121,7 +128,7 @@ STEPS.push({title: "Files", lead: "Pick the three AMICS images of one sample and
       await api("POST", "/api/open", b); await finish(1); }}]);
   }});
 // 2 Legend
-STEPS.push({title: "Legend", lead: "Check the mineral names read from the legend (OCR). Untick what to leave out, fix names and colours.",
+AMICS_STEPS.push({title: "Legend", lead: "Check the mineral names read from the legend (OCR). Untick what to leave out, fix names and colours.",
   help: "Double-click a name to edit it. Click a colour square to change the colour. Changes are only saved by <b>Use this legend</b>.",
   controls: [["Show", "legend image / legend as used / mineral map on the left"], ["Use ☑", "untick to leave a mineral out (grains count as Unmapped)"],
     ["Name", "click to rename (✎ = edited, + = added)"], ["Colour square", "change colour (RGB / hex / palette / eyedropper)"], ["Row click", "select (Shift / Ctrl for more)"],
@@ -181,7 +188,7 @@ STEPS.push({title: "Legend", lead: "Check the mineral names read from the legend
   key(k, e) { if (k === "delete" && this.sel.size) { this.op("delete", {rows: [...this.sel]}); this.sel.clear(); return true; }
     if (k === "z") { this.op("undo"); return true; } }});
 // 3 BSE & footer
-STEPS.push({title: "BSE & footer", lead: "The red dashed line marks where the image ends and the footer (scale bar, text) starts.",
+AMICS_STEPS.push({title: "BSE & footer", lead: "The red dashed line marks where the image ends and the footer (scale bar, text) starts.",
   help: "Change the footer row if the line is off, or press <b>Use detected</b>. Everything below the line is ignored.",
   controls: [["Footer row", "first row of the footer strip"], ["Use detected", "go back to the automatically detected row"], ["Use this footer", "keep it and go on (step 4)"]],
   async enter() {
@@ -194,7 +201,7 @@ STEPS.push({title: "BSE & footer", lead: "The red dashed line marks where the im
     mainBtns([{label: "Use this footer", fn: async () => { await api("POST", "/api/footer/apply", {row: +$("ftRow").value}); await finish(3); }}]);
   }});
 // 4 Non-grain
-STEPS.push({title: "Non-grain", lead: "Click a few dark non-grain spots (epoxy, holes). Everything as dark as the brightest pick turns blue.",
+AMICS_STEPS.push({title: "Non-grain", lead: "Click a few dark non-grain spots (epoxy, holes). Everything as dark as the brightest pick turns blue.",
   help: "Click = pick, right-click a pick = remove it. Or type a gray level. Blue = non-grain.",
   controls: [["Click", "pick a dark non-grain spot"], ["Right-click", "remove the nearest pick"], ["Z", "undo last pick"], ["C", "reset picks"], ["T", "show / hide the blue tint"],
     ["Gray level threshold", "type one instead of picking (blank = from the picks)"], ["Load saved", "the threshold saved for this sample"], ["Clear saved…", "delete it"],
@@ -224,7 +231,7 @@ STEPS.push({title: "Non-grain", lead: "Click a few dark non-grain spots (epoxy, 
   },
   key(k) { if (k === "z") this.op("undo"); else if (k === "c") this.op("reset"); else if (k === "t") this.toggle(); else if (k === "enter") this.apply(); else return false; return true; }});
 // 5 Scale
-STEPS.push({title: "Scale", lead: "Optional: click both ends of the scale bar and type its length, or type µm per pixel. Without a scale, sizes stay in pixels.",
+AMICS_STEPS.push({title: "Scale", lead: "Optional: click both ends of the scale bar and type its length, or type µm per pixel. Without a scale, sizes stay in pixels.",
   help: "Click = line end (2 clicks), right-click = remove the nearest end. Orange dashed = the saved scale.",
   controls: [["Click ×2", "the two ends of the scale bar"], ["Right-click", "remove the nearest end"], ["B", "whole image / footer strip"], ["Bar length + Unit", "the number on the bar"],
     ["µm/px", "type it directly instead (wins over the line)"], ["Undo last point (Z)", ""], ["Reset line (C)", ""], ["Check footer text (OCR)", "compare with the µm/px printed in the footer"],
@@ -260,7 +267,7 @@ STEPS.push({title: "Scale", lead: "Optional: click both ends of the scale bar an
   },
   key(k) { if (k === "z") this.op("undo"); else if (k === "c") this.op("reset"); else if (k === "b") this.zoom(); else if (k === "enter") this.apply(); else return false; return true; }});
 // 6 Segmentation
-STEPS.push({title: "Segmentation", lead: "Find the grains, check them, fix mistakes, then use the grain map.",
+AMICS_STEPS.push({title: "Segmentation", lead: "Find the grains, check them, fix mistakes, then use the grain map.",
   help: "Click a grain to select it; each click adds another (click again to unselect). D delete, M merge, Z undo. With Add grain (A): click points or drag a box, Enter accepts.",
   controls: [["Run segmentation", "SegmentEveryGrain (U-Net + SAM); progress shows n / N"], ["SAM 2.1 refine", "optional extra pass over SEG's grains"],
     ["Min grain (px)", "smaller grains are dropped"], ["Non-grain drop fraction", "drop grains mostly inside the blue non-grain area"], ["Load saved grains", "the grains saved for this sample"],
@@ -335,7 +342,7 @@ STEPS.push({title: "Segmentation", lead: "Find the grains, check them, fix mista
 const MISSING = "Map colours not in legend";
 const ST = {ok: ["✓", "#30a14e", "colour matches the legend"], reassigned: ["▲", "#c98a00", "near colours were given to this mineral"],
   missing: ["✗", "#d70015", "in the legend but not in the map"], unlisted: ["✗", "#d70015", "map colour not in the legend: counts as Unknown"]};
-STEPS.push({title: "Minerals", lead: "How the map colours were matched to legend minerals. Add a map colour the legend misses.",
+AMICS_STEPS.push({title: "Minerals", lead: "How the map colours were matched to legend minerals. Add a map colour the legend misses.",
   help: "✓ exact · ▲ near colours reassigned · ✗ missing / not in legend. Pick a figure on the left.",
   controls: [["Figure", "composition / overlay / mixed grains / unmapped grains"], ["+ Add map colour not in legend", "name a ✗ map colour so its grains count"],
     ["Remove added colour", "remove the selected added colour"], ["Clear saved…", "delete the saved added colours"], ["Next", "to the grain size curves (step 8)"]],
@@ -362,7 +369,7 @@ STEPS.push({title: "Minerals", lead: "How the map colours were matched to legend
     mainBtns([{label: "Next: grain size", fn: () => go(7)}]);
   }});
 // 8 Grain size
-STEPS.push({title: "Grain size", lead: "Grain size distribution curves: all grains and one per mineral.",
+AMICS_STEPS.push({title: "Grain size", lead: "Grain size distribution curves: all grains and one per mineral.",
   help: "Pick a curve on the left. Replot after changing settings.", controls: [["Figure", "all grains or one mineral"], ["Replot grain size curves", "draw the curves again"], ["Next", "to the outputs (step 9)"]],
   async enter() {
     const v = await api("GET", "/api/gsd"); pill(v.state[0], v.state[1]);
@@ -373,7 +380,7 @@ STEPS.push({title: "Grain size", lead: "Grain size distribution curves: all grai
     mainBtns([{label: "Next: outputs", fn: () => go(8)}]);
   }});
 // 9 Outputs
-STEPS.push({title: "Outputs", lead: "Nothing is written to the export folder until you press an Export button here.",
+AMICS_STEPS.push({title: "Outputs", lead: "Nothing is written to the export folder until you press an Export button here.",
   help: "Exports go to the folder shown below. Click a file name to view an exported figure.",
   controls: [["Export CSV data sheets", "grains, counts, composition, geojson…"], ["Export all figures", "PNG figures"], ["Replot grain knolling diagram", "draw it again"],
     ["Open export folder", "show the folder in your file manager"]],
@@ -422,4 +429,12 @@ $("advBtn").onclick = advanced;
 $("logBtn").onclick = () => { $("logp").hidden = !$("logp").hidden; };
 Shell.init({steps: [], onStep() {}});
 setInterval(() => { if (!$("logp").hidden) refreshGlobal(); }, 3000);
-go(0);
+// ---- start page: pick a job -----------------------------------------------------------------
+function home() { document.body.classList.add("home"); closeDlg(); Viewer.clear(); JOB = null; $("rail").innerHTML = ""; $("doc").textContent = "Choose a job"; Shell.help(""); }
+function startJob(j) {
+  const J = JOBS[j]; JOB = j; STEPS = J.steps; document.body.classList.remove("home"); document.body.dataset.job = j;
+  Viewer.clear(); $("empty").hidden = false; $("empty").innerHTML = `<div><h1>pyPetrograph</h1><p>${J.empty}</p></div>`; go(0);
+}
+$("homeBtn").onclick = home;
+document.querySelectorAll("[data-job]").forEach(b => b.onclick = () => startJob(b.dataset.job));
+home();

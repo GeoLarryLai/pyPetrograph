@@ -3,8 +3,8 @@
 <!-- Copyright (C) 2026 Larry Syu-Heng Lai -->
 <html lang="en"><head><meta charset="utf-8"><title>pyPetrograph</title>
 <link rel="stylesheet" href="/shell/static/shell.css"><link rel="stylesheet" href="/static/app.css"></head>
-<body>
-<header id="top"><span class="brand">pyPetrograph</span><span class="doc" id="doc">AMICS workflow · no sample open</span>
+<body class="home">
+<header id="top"><span class="brand">pyPetrograph</span><button id="homeBtn" class="ghost" title="Back to the start page">⌂ Start</button><span class="doc" id="doc">Choose a job</span>
   <button id="advBtn" class="ghost" title="Notebook 4 settings: tolerances, shares, figure strengths">Advanced</button>
   <button id="logBtn" class="ghost" title="Show / hide the log">Log</button>
   <button id="quitBtn" class="ghost" title="Stop the app">Quit</button></header>
@@ -13,6 +13,22 @@
   <div id="zoomtools"><button id="fitBtn" title="Fit the whole image (F)">Fit</button><button id="zin" title="Zoom in">+</button><button id="zout" title="Zoom out">−</button><span id="coord"></span></div>
   <div id="empty"><div><h1>pyPetrograph</h1><p>AMICS thin-section workflow (notebook 4), step by step.<br>Start with <b>1 · Files</b> on the right.</p></div></div>
   <pre id="logp" hidden></pre>
+  <div id="startScreen">
+    <div class="intro"><h1>pyPetrograph</h1><p>Measure thin sections from photos or AMICS maps, step by step, on this computer.<br>Choose what you want to do:</p></div>
+    <div class="cards">
+      <button class="card big" id="goOptical" data-job="optical"><span class="ic"><svg width="96" height="54" viewBox="0 0 96 54" aria-hidden="true">
+        <rect x="1" y="1" width="94" height="52" rx="5" fill="#1f2a3a" stroke="#8a93a3" stroke-width="1.5"/>
+        <g fill="#f1ead8" stroke="#c4b48f" stroke-width="1"><path d="M6 8 L20 5 L26 15 L17 23 L7 19Z"/><path d="M30 6 L44 9 L42 21 L29 20Z"/><path d="M49 5 L63 7 L65 17 L52 20 L47 13Z"/>
+        <path d="M69 6 L88 5 L90 17 L76 21 L68 15Z"/><path d="M5 28 L16 26 L21 37 L13 47 L5 42Z"/><path d="M23 26 L37 24 L40 37 L27 41Z"/><path d="M44 25 L57 24 L61 35 L50 42 L42 36Z"/>
+        <path d="M65 24 L78 25 L80 37 L66 39Z"/><path d="M83 23 L91 24 L91 44 L82 41Z"/><path d="M19 44 L33 45 L31 50 L18 50Z"/><path d="M38 44 L52 46 L50 50 L37 50Z"/><path d="M57 42 L72 43 L73 50 L56 50Z"/></g>
+        <g fill="#111"><circle cx="27" cy="23" r="2.4"/><circle cx="62" cy="21" r="2"/><circle cx="42" cy="41" r="1.8"/></g></svg></span><h2>Thin-section photos (PPL / CPL)</h2>
+        <p>Open microscope photos, click a few pores and grains as examples, and let the computer colour every pixel and report the porosity % of each photo (notebook 1).</p></button>
+      <button class="card big" id="goAmics" data-job="amics"><span class="ic"><svg width="132" height="54" viewBox="0 0 132 54" aria-hidden="true">
+        <g stroke="#2563eb" stroke-width="1.6" stroke-linejoin="round"><polygon points="21.1,22.2 12.0,27.5 2.9,22.2 2.9,11.8 12.0,6.5 21.1,11.7" fill="#e8f0ff"/><polygon points="39.3,22.2 30.2,27.5 21.1,22.2 21.1,11.8 30.2,6.5 39.3,11.7" fill="#ffd6d6"/><polygon points="57.5,22.2 48.4,27.5 39.3,22.2 39.3,11.8 48.4,6.5 57.5,11.7" fill="#e8f0ff"/><polygon points="75.7,22.2 66.6,27.5 57.5,22.2 57.5,11.8 66.6,6.5 75.7,11.7" fill="#d8f5d8"/><polygon points="93.8,22.2 84.7,27.5 75.7,22.2 75.7,11.8 84.7,6.5 93.8,11.7" fill="#fff1c2"/><polygon points="112.0,22.2 102.9,27.5 93.8,22.2 93.8,11.8 102.9,6.5 112.0,11.7" fill="#e8f0ff"/><polygon points="30.2,38.0 21.1,43.2 12.0,38.0 12.0,27.5 21.1,22.2 30.2,27.5" fill="#d8f5d8"/><polygon points="48.4,38.0 39.3,43.2 30.2,38.0 30.2,27.5 39.3,22.2 48.4,27.5" fill="#fff1c2"/><polygon points="66.6,38.0 57.5,43.2 48.4,38.0 48.4,27.5 57.5,22.2 66.6,27.5" fill="#e8f0ff"/><polygon points="84.7,38.0 75.7,43.2 66.6,38.0 66.6,27.5 75.7,22.2 84.7,27.5" fill="#e8f0ff"/><polygon points="102.9,38.0 93.8,43.2 84.7,38.0 84.7,27.5 93.8,22.2 102.9,27.5" fill="#ffd6d6"/></g></svg></span><h2>AMICS grain counting</h2>
+        <p>Open the BSE image, mineral map and legend of one sample, find the grains and count minerals, grain sizes and associations (notebook 4).</p></button>
+    </div>
+    <p class="note foot">Your files stay on this computer. Nothing is written until you press a Save / Export button (labels are saved as you mark them).</p>
+  </div>
 </main>
 <aside id="side"><div class="head"><h2 id="stepTitle"></h2><p class="lead" id="stepLead"></p>
   <div id="mainBtns"></div><div class="pill" id="pill"></div></div>
@@ -20,5 +36,5 @@
 <footer id="bar"><span class="help" id="help"></span><span id="progtxt"></span><span class="prog" id="prog"><i></i></span></footer>
 <div id="toast"></div>
 <dialog id="dlg"></dialog>
-<script src="/shell/static/shell.js"></script><script src="/static/viewer.js"></script><script src="/static/app.js"></script>
+<script src="/shell/static/shell.js"></script><script src="/static/viewer.js"></script><script src="/static/app.js"></script><script src="/static/optical.js"></script>
 </body></html>
