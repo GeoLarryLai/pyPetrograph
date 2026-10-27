@@ -694,5 +694,7 @@ def create_app(state: Optional[WebState] = None, backend=None, testing: bool = F
         if _backend["b"] is not None:
             _backend["b"].close()
 
+    from .optical import mount_optical
+    mount_optical(app, job, err, lock)
     st.preview_bse = ""
     return app
