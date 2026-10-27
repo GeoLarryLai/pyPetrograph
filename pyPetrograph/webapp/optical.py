@@ -42,6 +42,11 @@ class OpticalState:
         self.pred: List[Dict[str, Any]] = []
         self.features_on = {k: (k in NB1_FEATURES) for k, _ in FEATURES}
         self.wand_threshold = 70.0
+        self.scope = "universal"           # notebook 1 Train: "universal" (one model) | "per_image"
+        self.model_from = "retrain"        # "retrain" | "load" (a saved .joblib, training skipped)
+        self.loaded_model: Optional[Path] = None
+        self.summary_text = ""
+        self.summary_done = False
 
     # -- helpers --------------------------------------------------------------------------
     def log(self, text: str) -> None:
@@ -73,10 +78,8 @@ class OpticalState:
             return True
         if self.S is None or not self.S.image_queue:
             return False
-        if i <= 3:
+        if i <= 4:      # Train opens with photos: train from examples, or load a saved model
             return True
-        if i == 4:
-            return self.n_labelled() > 0
         if i == 5:
             return "train" in self.done
         return "predict" in self.done
@@ -119,6 +122,7 @@ class OpticalState:
             S.set_image_queue(files, open_first=True)
         self.done = {"photos"}
         self.train_text, self.train_acc, self.pred = "", None, []
+        self.loaded_model, self.summary_text, self.summary_done = None, "", False
         self.version += 1
         self.status = f"Opened {len(files)} photo(s). Labels are read from / saved to {self.out / 'labels'}"
 
@@ -225,27 +229,107 @@ class OpticalState:
         with self.ctx():
             return stem_paths(p).pred.with_name(f"{p.stem}_features.png")
 
-    def train(self) -> None:
+    # -- label summary (notebook 1 "print_label_summary" cell) ---------------------------------
+    def label_summary(self) -> List[Dict[str, Any]]:
+        """Run the notebook's label summary: one figure per photo, saved as labels/{stem}_labels.png."""
+        from pyPetrograph.common.notebook_runners import print_label_summary
+
+        if self.S.image is not None:
+            self._save()
+        cur = self.S.queue_index
+        with self.ctx() as buf:
+            print_label_summary(self.S)
+        self.summary_text = buf.getvalue().strip()
+        self.summary_done = True
+        if 0 <= cur < len(self.S.image_queue) and self.S.queue_index != cur:
+            self.open_index(cur)
+        self.version += 1
+        return self.summary_images()
+
+    def labels_png(self, i: int) -> Path:
+        from pyPetrograph.common.paths import stem_paths
+
+        p = self.S.image_queue[i]
+        with self.ctx():
+            return stem_paths(p).labels
+
+    def summary_images(self) -> List[Dict[str, Any]]:
+        if self.S is None:
+            return []
+        return [{"name": p.stem, "png": str(self.labels_png(i)), "ready": self.summary_done and self.labels_png(i).exists()}
+                for i, p in enumerate(self.S.image_queue)]
+
+    # -- train ----------------------------------------------------------------------------
+    def models_dir(self) -> Path:
+        from pyPetrograph.common.paths import project_models_dir
+
+        with self.ctx():
+            return Path(project_models_dir())
+
+    def saved_models(self) -> List[str]:
+        d = self.models_dir()
+        return [str(p) for p in sorted(d.glob("*.joblib"))] if d.is_dir() else []
+
+    def train(self, mode: str = "retrain", scope: str = "universal", model_path: str = "") -> None:
+        """Notebook 1 Train cell: ``mode`` "retrain" (``scope`` universal / per_image) or "load"."""
         from pyPetrograph.common.notebook_runners import print_train_metrics, run_train_cell
 
+        mode = (mode or "retrain").lower().strip()
+        scope = (scope or "universal").lower().strip()
+        if mode not in ("retrain", "load"):
+            raise ValueError("Pick: train a new model, or load a saved one.")
+        if scope not in ("universal", "per_image"):
+            raise ValueError("Pick: one model for all photos, or one model per photo.")
         self.S.feature_toggles = dict(self.features_on)
-        with self.ctx():
-            res = run_train_cell(self.S, mode="retrain", scope="universal", prompt_load=False)
+        if mode == "load":
+            path = Path(str(model_path or "").strip()).expanduser()
+            if not str(model_path or "").strip():
+                raise ValueError("Pick a saved model (.joblib) to load.")
+            if not path.is_file():
+                raise ValueError(f"Model file not found: {path}")
+            if path.suffix.lower() != ".joblib":
+                raise ValueError(f"{path.name} is not a saved model: pick a .joblib file.")
+            with self.ctx():
+                res = run_train_cell(self.S, mode="load", model_path=path, prompt_load=False)
+            self.loaded_model = path.resolve()
+        else:
+            with self.ctx():
+                res = run_train_cell(self.S, mode="retrain", scope=scope, prompt_load=False)
+            self.loaded_model = None
+            self.scope = scope
+        self.model_from = mode
         with self.ctx() as buf:
             print_train_metrics(res, session=self.S)
         text = buf.getvalue()
+        if mode == "load":
+            text = f"Loaded {self.loaded_model.name} (training skipped)\n" + text
         self.train_text = text.strip()
-        self.train_acc = res.get("accuracy")
+        accs = [r.get("accuracy") for r in res.get("trained") or [] if r.get("accuracy") is not None]
+        self.train_acc = res.get("accuracy") if res.get("accuracy") is not None else (
+            float(np.mean(accs)) if accs else None)
         self.done.add("train")
         self.done.discard("predict")
         self.version += 1
+
+    def model_source(self) -> str:
+        return "per_image" if (self.model_from == "retrain" and self.scope == "per_image") else "universal"
 
     def predict(self) -> None:
         from pyPetrograph.common.notebook_runners import run_predict_cell
 
         cur = self.S.queue_index
-        with self.ctx():
-            res = run_predict_cell(self.S, model_source="universal")
+        S = self.S
+        loaded = self.loaded_model if self.model_from == "load" else None
+        if loaded is not None:
+            # Predict with the loaded file itself (the notebook reads models/universal_model.joblib;
+            # pointing that lookup at the loaded file gives the same outputs without copying it).
+            S.universal_model_path = lambda image_path=None, _p=loaded: _p
+        try:
+            with self.ctx():
+                res = run_predict_cell(S, model_source=self.model_source())
+        finally:
+            if loaded is not None:
+                del S.universal_model_path
         self.pred = res.get("images", [])
         if 0 <= cur < len(self.S.image_queue):
             with self.ctx():
@@ -374,6 +458,9 @@ def mount_optical(app, job, err, lock, runner=None):
         if kind == "feat":
             p = O.feature_png(i)
             return (read_rgb(p) if p.exists() else None), False
+        if kind == "labels":
+            p = O.labels_png(i)
+            return (read_rgb(p) if p.exists() else None), False
         ent = O.pred[i] if 0 <= i < len(O.pred) else None
         if ent is None:
             return None, False
@@ -437,12 +524,30 @@ def mount_optical(app, job, err, lock, runner=None):
     def opt_train():
         need(4)
         return {"text": O.train_text, "accuracy": O.train_acc, "n_labelled": O.n_labelled(),
-                "n": len(O.S.image_queue), "features": [lab for k, lab in FEATURES if O.features_on.get(k)]}
+                "n": len(O.S.image_queue), "features": [lab for k, lab in FEATURES if O.features_on.get(k)],
+                "mode": O.model_from, "scope": O.scope, "loaded": str(O.loaded_model) if O.loaded_model else "",
+                "models": O.saved_models(), "models_dir": str(O.models_dir())}
 
     @app.post("/api/opt/train")
-    def opt_train_run():
+    def opt_train_run(body: dict = Body(default={})):
+        mode = (body.get("mode") or "retrain")
         need(4)
-        return job("Training the pixel classifier", lambda j: user(O.train)())
+        title = "Loading the saved model" if mode == "load" else "Training the pixel classifier"
+        return job(title, lambda j: user(O.train)(mode, body.get("scope") or "universal", body.get("model_path") or ""))
+
+    @app.get("/api/opt/labelsummary")
+    def opt_labelsummary():
+        need(2)
+        return {"text": O.summary_text, "images": O.summary_images(), "labels_dir": str(O.out / "labels")}
+
+    @app.post("/api/opt/labelsummary")
+    def opt_labelsummary_run():
+        need(2)
+        def run(j):
+            r = user(O.label_summary)()
+            cache.clear()
+            return {"images": r}
+        return job("Label summary figures", run)
 
     @app.get("/api/opt/predict")
     def opt_predict():

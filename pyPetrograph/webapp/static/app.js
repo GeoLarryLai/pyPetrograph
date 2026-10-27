@@ -46,11 +46,11 @@ const dlg = $("dlg");
 function openDlg(html, modal = true) { dlg.innerHTML = html; dlg.className = modal ? "" : "nonmodal"; if (dlg.open) dlg.close(); modal ? dlg.showModal() : dlg.show(); }
 function closeDlg() { if (dlg.open) dlg.close(); Viewer.onClick = STEPS[cur]?.click || null; }
 // file / folder browser (server side, the files never leave the computer)
-function browse(start, dirsOnly, title) {
+function browse(start, dirsOnly, title, ext = "") {
   return new Promise(res => {
     let path = start || "";
     async function load(p) {
-      const r = await api("GET", `/api/ls?path=${encodeURIComponent(p)}&dirs_only=${dirsOnly}`); path = r.path;
+      const r = await api("GET", `/api/ls?path=${encodeURIComponent(p)}&dirs_only=${dirsOnly}` + (ext ? "&ext=" + encodeURIComponent(ext) : "")); path = r.path;
       openDlg(`<h3>${esc(title)}</h3><div class="hintt">${esc(r.path)}</div><div class="list files">
         <div data-p="${esc(r.parent)}" data-d="1">⬆ ..</div>${r.items.map(it => `<div data-p="${esc(r.path + "/" + it.name)}" data-d="${it.dir ? 1 : ""}">${it.dir ? "📁 " : "🖼 "}${esc(it.name)}</div>`).join("")}</div>
         <div class="btns"><button id="bwCancel">Cancel</button>${dirsOnly ? '<button class="main" id="bwHere">Use this folder</button>' : ""}</div>`);

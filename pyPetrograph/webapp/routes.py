@@ -211,7 +211,7 @@ def create_app(state: Optional[WebState] = None, backend=None, testing: bool = F
         return st.complete_files(body["key"], body.get("cur") or {})
 
     @app.get("/api/ls")
-    def ls(path: str = "", dirs_only: bool = False):
+    def ls(path: str = "", dirs_only: bool = False, ext: str = ""):
         p = Path(path).expanduser() if path else Path.home()
         if p.is_file():
             p = p.parent
@@ -224,7 +224,7 @@ def create_app(state: Optional[WebState] = None, backend=None, testing: bool = F
                     continue
                 if c.is_dir():
                     out.append({"name": c.name, "dir": True})
-                elif not dirs_only and c.suffix.lower() in IMG_EXT:
+                elif not dirs_only and c.suffix.lower() in (tuple(e.strip().lower() for e in ext.split(",") if e.strip()) or IMG_EXT):
                     out.append({"name": c.name, "dir": False})
         except PermissionError:
             pass
