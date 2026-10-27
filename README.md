@@ -89,9 +89,9 @@ This job teaches a model what pores and grains look like from a few examples you
 
 This job outlines every grain on the BSE image, names each grain from the mineral map, and writes counts, grain sizes and figures. Its exports are byte-identical to notebook 4, and nothing is written until you press an Export button.
 
-[![Demo: counting grains on two AMICS samples](docs/videos/pyPetrograph_amics_demo.webp)](docs/videos/pyPetrograph_amics_demo.mp4)
+[![Demo: counting grains on one AMICS sample](docs/videos/pyPetrograph_amics_demo.webp)](docs/videos/pyPetrograph_amics_demo.mp4)
 
-*Sped-up demo. Click it to [watch the 1080p video](docs/videos/pyPetrograph_amics_demo.mp4) (about 45 seconds).*
+*Sped-up demo. Click it to [watch the 1080p video](docs/videos/pyPetrograph_amics_demo.mp4) (about 25 seconds).*
 
 **Files → Legend → BSE & footer → Non-grain regions → Scale (optional) → Grain segmentation → Minerals → Grain size → Outputs**
 
