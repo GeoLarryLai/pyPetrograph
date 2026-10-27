@@ -69,6 +69,7 @@ OPT_STEPS.push({title: "Mark examples", lead: "Show the computer a few examples 
       <div class="hintt">Tool</div><div class="btns"><button id="tW" class="${OV.tool === "wand" ? "on" : ""}">Wand</button><button id="tO" class="${OV.tool === "outline" ? "on" : ""}">Outline</button></div>
       <div class="f"><label>Tolerance</label><input type="range" id="tTol" min="5" max="200" step="5" value="${v.threshold}"><span id="tTolV">${v.threshold}</span></div>
       <div class="btns"><button id="tU">Undo</button><button id="tC" class="danger">Clear class</button></div>
+      <p class="warnbox">Mark grains of every colour (white, pink, yellow, dark), not just the clear ones, or dark grains get counted as pores.</p>
       <p class="hintt">${v.n_labelled} of ${v.images.length} photo(s) have examples. Saved in ${esc(v.labels_dir)}</p>
       <div class="hintt">Label summary</div><div class="btns"><button id="tS" title="One figure per photo, saved as labels/&lt;photo&gt;_labels.png">Label summary</button></div>
       <div class="clsbtn" id="sumB"></div><pre class="rep" id="sumT" style="display:none"></pre>`);
@@ -147,7 +148,7 @@ OPT_STEPS.push({title: "Train", lead: "Teach the model from your examples, or lo
       <div id="trLoad" style="margin-left:22px">
         <div class="f"><label>Saved model</label><select id="tmSel"><option value="">${v.models.length ? "pick one…" : "none in models/ yet"}</option>${opts}</select><span></span></div>
         <div class="f"><label>or file</label><input type="text" id="tmPath" placeholder="path to a .joblib" value="${esc(v.loaded && !v.models.includes(v.loaded) ? v.loaded : "")}"><button id="tmB" title="Browse">…</button></div>
-        <p class="hintt">Saved models are in ${esc(v.models_dir)}. The model must use the same features as when it was trained.</p></div>
+        <p class="hintt">A saved model only works on photos like the ones it was trained on (same microscope, light and stain), with labels that covered every kind of grain. Saved models are in ${esc(v.models_dir)}.</p></div>
       ${v.accuracy != null ? `<div class="hintt">Accuracy (cross-validation${v.scope === "per_image" && v.mode === "retrain" ? ", mean of the photos" : ""})</div><div class="big-num">${(v.accuracy * 100).toFixed(2)}%</div>` : ""}
       ${v.text ? `<pre class="rep">${esc(v.text)}</pre>` : ""}`);
     const sync = () => { const m = document.querySelector("[name=tm]:checked").value; V.optMode = m;
