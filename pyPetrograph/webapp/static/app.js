@@ -114,7 +114,9 @@ AMICS_STEPS.push({title: "Files", lead: "Pick the three AMICS images of one samp
       `<div class="f"><label>Sample</label><input type="text" id="f_sample" value="${esc(last.sample || "")}" placeholder="from the BSE file name"></div>
       <p class="hintt">The BSE image is shown on the left once it is picked. Wheel = zoom, drag = pan, F or double-click = fit.</p>`);
     const cur_ = () => ({bse: $("f_bse").value, mineral: $("f_mineral").value, legend: $("f_legend").value});
-    const after = async k => { const fill = await api("POST", "/api/files/complete", {key: k, cur: cur_()});
+    let lastBse = $("f_bse").value;              // refill companions only when the BSE file really changes
+    const after = async k => { if (k === "bse") { if ($("f_bse").value === lastBse) return; lastBse = $("f_bse").value; }
+      const fill = await api("POST", "/api/files/complete", {key: k, cur: cur_()});
       if (k === "bse") $("f_sample").value = "";     // new BSE = new sample: name comes from the file again
       for (const [kk, v] of Object.entries(fill)) $("f_" + kk).value = v;
       if (k === "bse" && (!fill.mineral || !fill.legend)) toast("No matching " + [!fill.mineral && "mineral map", !fill.legend && "legend"].filter(Boolean).join(" or ") + " found beside this BSE image: pick it with …"); V.files = {...V.files, ...cur_()}; preview(); };

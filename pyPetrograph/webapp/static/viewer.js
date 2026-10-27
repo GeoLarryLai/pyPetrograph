@@ -8,6 +8,7 @@ const Viewer = (() => {
   const PREVIEW = 1600;
   const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
   let W = 0, H = 0, k = 1, tx = 0, ty = 0, dpr = 1;
+  let stale = null;              // last shown layer: kept on screen while the next image loads (no dark flash)
   let base = null, mask = null, maskOn = true, overlay = null, boxMode = false;
   let onClick = null, onBox = null, onKey = null, dragging = null, boxNow = null;
   function layer(url, w, h, nearest) {
@@ -35,10 +36,12 @@ const Viewer = (() => {
   }
   function setImage(url, w, h, opts = {}) {
     const same = base && base.w === w && base.h === h;
+    const old = base && (base.prev || base.full) ? base : stale;
+    stale = old && old.w === w && old.h === h ? old : (old ? {...old, other: true} : null);
     base = layer(url, w, h, false); document.getElementById("empty").hidden = true;
     if (!same || opts.fit) fit(); else draw();
   }
-  function clear() { base = null; mask = null; overlay = null; draw(); }
+  function clear() { stale = null; base = null; mask = null; overlay = null; draw(); }
   function setMask(url) { mask = url && base ? layer(url, base.w, base.h, true) : null; draw(); }
   function showMask(on) { maskOn = on; draw(); }
   function setOverlay(fn) { overlay = fn; draw(); }
@@ -55,6 +58,16 @@ const Viewer = (() => {
     const t0 = performance.now();
     raf = 0; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
     if (!base) return;
+    if (!base.prev && !base.full) {         // still loading: keep the last image, or say so
+      const im = stale && (stale.prev || stale.full);
+      if (im && !stale.other) { ctx.imageSmoothingEnabled = k < 2; ctx.drawImage(im, tx, ty, stale.w * k, stale.h * k); }
+      else if (im) { const s = Math.min(W / stale.w, H / stale.h) * 0.98; ctx.globalAlpha = 0.55;
+        ctx.drawImage(im, (W - stale.w * s) / 2, (H - stale.h * s) / 2, stale.w * s, stale.h * s); ctx.globalAlpha = 1; }
+      ctx.font = "13px system-ui, sans-serif"; const t = "Loading image…", tw = ctx.measureText(t).width;
+      ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(W / 2 - tw / 2 - 10, H / 2 - 14, tw + 20, 28);
+      ctx.fillStyle = "#fff"; ctx.fillText(t, W / 2 - tw / 2, H / 2 + 5);
+      return;
+    }
     for (const L of [base, maskOn ? mask : null]) {
       if (!L) continue; const im = pick(L); if (!im) continue;
       ctx.imageSmoothingEnabled = !L.nearest && k < 2;
