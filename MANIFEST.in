@@ -6,3 +6,5 @@ prune shots_mac
 prune shots_readme
 prune outputs
 prune build
+prune docs/videos
+global-exclude *.mp4 *.webp
