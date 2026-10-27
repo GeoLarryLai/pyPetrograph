@@ -1,4 +1,6 @@
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 Stage 3 outlines: watershed baseline, N-channel U-Net (SEG weights), SAM2 + GrainPlot.
 
 The Jupyter kernel never imports TensorFlow. Train / predict / GrainPlot run in
@@ -36,17 +38,17 @@ from pyPetrograph.objects.watershed import run_watershed
 
 
 def grain_unet_path(channel_set_id: str) -> Path:
-    """Notebook-level ``models/grain_unet_{channel_set}.keras``."""
+    """Experimental (incomplete): Notebook-level ``models/grain_unet_{channel_set}.keras``."""
     return project_models_dir() / f"{GRAIN_UNET_PREFIX}{channel_set_id}.keras"
 
 
 def grain_unet_trained_marker(channel_set_id: str) -> Path:
-    """Sidecar written after a finished train (init-only ``.keras`` is not trained)."""
+    """Experimental (incomplete): Sidecar written after a finished train (init-only ``.keras`` is not trained)."""
     return Path(str(grain_unet_path(channel_set_id)) + ".trained.json")
 
 
 def grain_unet_is_trained(channel_set_id: str) -> bool:
-    """True if weights exist and a train pass wrote the sidecar."""
+    """Experimental (incomplete): True if weights exist and a train pass wrote the sidecar."""
     return grain_unet_path(channel_set_id).exists() and grain_unet_trained_marker(
         channel_set_id
     ).exists()
@@ -73,7 +75,7 @@ def _write_field(tmp: Path, cs: ChannelStack) -> Path:
 
 def init_grain_unet(cs: ChannelStack, *, out: Optional[Path] = None) -> Dict[str, Any]:
     """
-    Copy SEG RGB U-Net weights into an N-channel first layer.
+    Experimental (incomplete): Copy SEG RGB U-Net weights into an N-channel first layer.
 
     RGB kernel → ``cs.primary_rgb_indices()``; other slots start small-random.
     Writes ``models/grain_unet_{channel_set}.keras`` + ``.norm.json``.
@@ -133,7 +135,7 @@ def train_grain_unet(
     max_patches: int = DEFAULT_OUTLINE_MAX_PATCHES,
     out: Optional[Path] = None,
 ) -> Dict[str, Any]:
-    """Train the N-channel U-Net from the QC mask beside ``image_path``."""
+    """Experimental (incomplete): Train the N-channel U-Net from the QC mask beside ``image_path``."""
     py = _seg_python()
     if py is None:
         return {"ok": False, "error": "no Python for grain U-Net worker", "hint": seg_setup_hint()}
@@ -205,7 +207,7 @@ def predict_grain_unet(
     unet_path: Optional[Path] = None,
 ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], Dict[str, Any]]:
     """
-    Predict 3-class probabilities + connected-component labels on ``cs``.
+    Experimental (incomplete): Predict 3-class probabilities + connected-component labels on ``cs``.
 
     Returns ``(probs HxWx3, labels HxW, info)``. Either array may be None on failure.
     """
@@ -272,7 +274,7 @@ def run_outlines(
     init: bool = False,
 ) -> Dict[str, Any]:
     """
-    One-shot outline pass.
+    Experimental (incomplete): One-shot outline pass.
 
     ``method="watershed"``: no training; optional GrainPlot on those labels.
     ``method="unet"``: optional ``init``, optional ``train`` from saved QC, predict,
@@ -327,7 +329,7 @@ def compare_outlines(
     greyscale: bool = True,
 ) -> Any:
     """
-    Overlay grain outlines on PPL. Only panels with labels are drawn.
+    Experimental (incomplete): Overlay grain outlines on PPL. Only panels with labels are drawn.
 
     ``greyscale=True`` (default) uses a grey background. Outlines are darker
     red (watershed), blue (SEG / GrainPlot), green (N-channel U-Net).

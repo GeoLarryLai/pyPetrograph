@@ -1,4 +1,6 @@
-"""Scene: named measurement layers on one working pixel grid."""
+"""Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
+Scene: named measurement layers on one working pixel grid."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -14,7 +16,7 @@ from pyPetrograph.common.image_io import load_image
 
 @dataclass
 class Affine2D:
-    """Map moving pixel (x, y) = (col, row) → working/base pixel."""
+    """Experimental (incomplete): Map moving pixel (x, y) = (col, row) → working/base pixel."""
 
     scale: float = 1.0
     rotation_deg: float = 0.0
@@ -54,7 +56,7 @@ class Affine2D:
 
 def slot_kind(slot: str) -> str:
     """
-    Layer kind from its slot name: ``"xpl_015"`` → ``"xpl"``, ``"ppl"`` → ``"ppl"``.
+    Experimental (incomplete): Layer kind from its slot name: ``"xpl_015"`` → ``"xpl"``, ``"ppl"`` → ``"ppl"``.
 
     Kinds: ``ppl`` (plane-polarized), ``xpl`` (cross-polarized; several angles allowed
     as ``xpl_000``, ``xpl_015``, …), ``bse`` (SEM), ``bright`` (bright field),
@@ -64,7 +66,7 @@ def slot_kind(slot: str) -> str:
 
 
 def xpl_slot(angle_deg: float) -> str:
-    """Slot name for one cross-polarized angle, e.g. ``xpl_015``."""
+    """Experimental (incomplete): Slot name for one cross-polarized angle, e.g. ``xpl_015``."""
     return f"xpl_{int(round(float(angle_deg))):03d}"
 
 
@@ -88,7 +90,7 @@ class Layer:
 
 @dataclass
 class Scene:
-    """One working grid (usually the train-on layer) plus other measurements."""
+    """Experimental (incomplete): One working grid (usually the train-on layer) plus other measurements."""
 
     working_slot: str = "ppl"
     layers: Dict[str, Layer] = field(default_factory=dict)

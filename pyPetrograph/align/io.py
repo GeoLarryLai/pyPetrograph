@@ -1,4 +1,6 @@
-"""Save / reload lineup JSON under {image_folder}/align/."""
+"""Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
+Save / reload lineup JSON under {image_folder}/align/."""
 from __future__ import annotations
 
 import json

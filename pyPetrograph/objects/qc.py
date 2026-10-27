@@ -59,7 +59,7 @@ def ensure_seg_weights(
 
 
 def grain_qc_paths(image_path: PathLike) -> Tuple[Path, Path]:
-    """``labels/{stem}_grains.geojson`` and ``labels/{stem}_grains_mask.png``."""
+    """Experimental (incomplete): ``labels/{stem}_grains.geojson`` and ``labels/{stem}_grains_mask.png``."""
     sp = stem_paths(image_path)
     return sp.grains, sp.grains_mask
 
@@ -70,7 +70,7 @@ def overlay_labels(
     color: Tuple[int, int, int] = (180, 15, 15),
     thickness: int = 2,
 ) -> np.ndarray:
-    """Draw darker grain outlines (slightly thick) on an RGB copy."""
+    """Experimental (incomplete): Draw darker grain outlines (slightly thick) on an RGB copy."""
     from scipy.ndimage import binary_dilation
     from skimage.segmentation import find_boundaries
 
@@ -124,7 +124,7 @@ def _tf_worker_env(*, mpl_backend: str = "Agg") -> Dict[str, str]:
 
 
 def load_grain_mask(image_path: PathLike) -> Optional[np.ndarray]:
-    """Load saved grain QC mask, or None."""
+    """Experimental (incomplete): Load saved grain QC mask, or None."""
     _geo, mask = grain_qc_paths(image_path)
     if not mask.exists():
         return None
@@ -143,7 +143,7 @@ def _n_labels(labels: np.ndarray) -> int:
 
 def load_grain_qc(image_path: PathLike) -> Dict[str, Any]:
     """
-    Load grains already saved by GrainPlot (this notebook or SegmentEveryGrain_PPL).
+    Experimental (incomplete): Load grains already saved by GrainPlot (this notebook or SegmentEveryGrain_PPL).
 
     Does not open GrainPlot. If only the GeoJSON exists, rasterize a mask (no TF).
     """
@@ -211,7 +211,7 @@ def launch_ppl_grain_qc(
     reuse: bool = True,
     **kwargs: Any,
 ) -> Dict[str, Any]:
-    """Alias for ``launch_grain_qc`` (PPL teacher / ``SegmentEveryGrain_PPL``)."""
+    """Experimental (incomplete): Alias for ``launch_grain_qc`` (PPL teacher / ``SegmentEveryGrain_PPL``)."""
     return launch_grain_qc(image_path, wait=wait, reuse=reuse, **kwargs)
 
 
@@ -231,7 +231,7 @@ def launch_grain_qc(
     interactive: bool = True,
 ) -> Dict[str, Any]:
     """
-    Open GrainPlot on ``image_path`` (subprocess; kernel never imports TensorFlow).
+    Experimental (incomplete): Open GrainPlot on ``image_path`` (subprocess; kernel never imports TensorFlow).
 
     ``pred_path``: HxWx3 probability cube from the N-channel U-Net (skips RGB U-Net).
     ``labels_path``: HxW instance ids (e.g. watershed bootstrap).

@@ -1,4 +1,6 @@
-"""Multi-layer lineup: register PPL / XPL / BSE onto one working grid."""
+"""Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
+Multi-layer lineup: register PPL / XPL / BSE onto one working grid."""
 
 from pyPetrograph.align.embed import embed_scene, stack_feature_slots
 from pyPetrograph.align.grains import (

@@ -1,4 +1,6 @@
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 Stage 5: group look-alike objects (PCA + k-means) then name them in a montage.
 
 Clustering uses the numeric columns of the object table (no VGG16 by default).
@@ -38,7 +40,7 @@ def numeric_feature_matrix(
     feature_cols: Optional[Sequence[str]] = None,
 ) -> Tuple[np.ndarray, List[str], np.ndarray]:
     """
-    Numeric columns for clustering / LightGBM.
+    Experimental (incomplete): Numeric columns for clustering / LightGBM.
 
     Returns ``(X, columns, row_ok)`` where ``row_ok`` is a bool mask of finite rows.
     """
@@ -66,7 +68,7 @@ def cluster_objects(
     feature_cols: Optional[Sequence[str]] = None,
 ) -> pd.DataFrame:
     """
-    Standardise → optional PCA → k-means. Adds a ``cluster_id`` column (copy).
+    Experimental (incomplete): Standardise → optional PCA → k-means. Adds a ``cluster_id`` column (copy).
 
     Rows with NaNs get ``cluster_id = -1``.
     """
@@ -101,7 +103,7 @@ def cluster_objects(
 
 
 def load_object_labels(image_path: PathLike) -> Optional[Dict[str, object]]:
-    """Reload ``objects/{stem}_object_labels.json``, or None."""
+    """Experimental (incomplete): Reload ``objects/{stem}_object_labels.json``, or None."""
     p = stem_paths(image_path).object_labels
     if not p.exists():
         return None
@@ -109,7 +111,7 @@ def load_object_labels(image_path: PathLike) -> Optional[Dict[str, object]]:
 
 
 def apply_object_labels(table: pd.DataFrame, blob: Dict[str, object]) -> pd.DataFrame:
-    """Add ``class_id`` / ``class_name`` from a montage JSON blob."""
+    """Experimental (incomplete): Add ``class_id`` / ``class_name`` from a montage JSON blob."""
     out = table.copy()
     names = {int(k): str(v) for k, v in (blob.get("class_names") or {}).items()}
     labels = {int(k): int(v) for k, v in (blob.get("labels") or {}).items()}
@@ -129,7 +131,7 @@ def launch_montage_labeler(
     grid_cols: int = 16,
 ) -> Dict[str, object]:
     """
-    Open SEG ClusterMontageLabeler (subprocess). Close the window to save.
+    Experimental (incomplete): Open SEG ClusterMontageLabeler (subprocess). Close the window to save.
 
     Needs a ``cluster_id`` column (run ``cluster_objects`` first). Crops come from
     ``objects_mask`` on the RGB photo ``image_path``.

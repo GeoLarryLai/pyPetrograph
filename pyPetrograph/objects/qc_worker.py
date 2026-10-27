@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 GrainPlot QC worker. Subprocess only — never import in the Jupyter kernel.
 
 If ``--pred`` (HxWx3 bg/grain/boundary probabilities) is given, skip the RGB

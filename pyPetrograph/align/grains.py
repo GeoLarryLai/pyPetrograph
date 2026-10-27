@@ -1,4 +1,6 @@
-"""PPL GrainPlot aliases for ``SegmentEveryGrain_PPL.ipynb``.
+"""Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
+PPL GrainPlot aliases for ``SegmentEveryGrain_PPL.ipynb``.
 
 Outlines live in ``pyPetrograph.objects.qc``. This module only re-exports the
 names that notebook still imports.

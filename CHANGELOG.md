@@ -5,6 +5,7 @@
 ### Added
 - **Two jobs in the app.** A start page offers *Thin-section photos (PPL / CPL)* (notebook 1: mark examples, features, train or load a model, predict, porosity %) next to *AMICS grain counting* (notebook 4).
 - Plain-language hints: mark grains of every colour; saved models only fit similar photos and labels.
+- Notebook 3 (multi-image overlay grain segmentation and classifier training: `pyPetrograph.align`, `pyPetrograph.fuse`, most of `pyPetrograph.objects`) is marked experimental and incomplete in the notebook, docstrings and READMEs.
 - README: one demo video per job (`docs/videos/`, not in the PyPI package) and new screenshots.
 
 ## 0.2.0 (2026-10-26)

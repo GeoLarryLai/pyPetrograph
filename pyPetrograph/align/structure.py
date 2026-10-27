@@ -1,4 +1,6 @@
-"""Structure maps for lineup: edges + texture, not color or brightness."""
+"""Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
+Structure maps for lineup: edges + texture, not color or brightness."""
 from __future__ import annotations
 
 import numpy as np
@@ -26,7 +28,7 @@ def structure_map(
     use_lbp: bool = True,
 ) -> np.ndarray:
     """
-    HxW float32 map for matching: local_grad + local_std + LBP.
+    Experimental (incomplete): HxW float32 map for matching: local_grad + local_std + LBP.
 
     Luminance is only used to compute texture; the map is not a brightness photo.
     """
@@ -42,6 +44,6 @@ def structure_map(
 
 
 def structure_map_preview(rgb: np.ndarray, target_mp: float = 2.0) -> np.ndarray:
-    """Downsampled structure map for fast auto-align / UI."""
+    """Experimental (incomplete): Downsampled structure map for fast auto-align / UI."""
     small = downsample_to_approx_mp(rgb, target_mp=target_mp)
     return structure_map(small)

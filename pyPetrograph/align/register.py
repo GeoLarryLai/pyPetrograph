@@ -1,4 +1,6 @@
-"""Auto lineup on structure maps (edges + texture). Always try auto first."""
+"""Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
+Auto lineup on structure maps (edges + texture). Always try auto first."""
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -81,7 +83,7 @@ def auto_register(
     neighborhood: Optional[Tuple[int, int, int, int]] = None,
 ) -> Affine2D:
     """
-    Always-run auto lineup on structure maps.
+    Experimental (incomplete): Always-run auto lineup on structure maps.
 
     ``neighborhood`` is (r0, r1, c0, c1) in base pixels to search (re-auto in view).
     Hints (scale/tx/ty) set the start; a scale sweep is allowed inside ``scale_range``.
@@ -163,7 +165,7 @@ def refine_register(
     *,
     neighborhood: Optional[Tuple[int, int, int, int]] = None,
 ) -> Affine2D:
-    """Re-run auto around the current transform of ``slot``."""
+    """Experimental (incomplete): Re-run auto around the current transform of ``slot``."""
     base = scene.working().ensure_rgb()
     moving = scene.layers[slot].ensure_rgb()
     cur = scene.layers[slot].transform
@@ -186,7 +188,7 @@ def fit_click_pairs(
     tolerance_px: float = 8.0,
 ) -> Optional[Affine2D]:
     """
-    Click pairs are loose hints: each dict has ``base`` [x, y] and ``moving`` [x, y].
+    Experimental (incomplete): Click pairs are loose hints: each dict has ``base`` [x, y] and ``moving`` [x, y].
 
     ``tolerance_px`` is stored for the UI; with 1 pair we take translation only,
     with 2+ we fit scale + translation (no fake points).

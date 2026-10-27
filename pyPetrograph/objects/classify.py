@@ -1,4 +1,6 @@
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 Stage 5: name objects with LightGBM and write a class overlay.
 
 Training reuses ``labeling_ml.train.train_classifier_from_xy``. The model is
@@ -25,7 +27,7 @@ from pyPetrograph.objects.cluster import numeric_feature_matrix
 
 
 def object_model_path(channel_set_id: str) -> Path:
-    """Notebook-level ``models/object_model_{channel_set_id}.joblib``."""
+    """Experimental (incomplete): Notebook-level ``models/object_model_{channel_set_id}.joblib``."""
     return project_models_dir() / f"object_model_{channel_set_id}.joblib"
 
 
@@ -39,7 +41,7 @@ def train_object_classifier(
     channel_set_id: str = "default",
 ) -> Dict[str, Any]:
     """
-    Train on rows with ``class_id > 0`` (from ``apply_object_labels``).
+    Experimental (incomplete): Train on rows with ``class_id > 0`` (from ``apply_object_labels``).
 
     Saves ``models/object_model_{channel_set_id}.joblib``. Returns ``ok`` False
     if fewer than 2 classes or 4 labeled rows.
@@ -97,7 +99,7 @@ def _class_names_from_bundle_or_table(
 
 
 def predict_object_classes(table: pd.DataFrame, bundle: Dict[str, Any]) -> pd.DataFrame:
-    """Predict ``class_id`` / ``proba`` / ``class_name`` for every finite row."""
+    """Experimental (incomplete): Predict ``class_id`` / ``proba`` / ``class_name`` for every finite row."""
     out = table.copy()
     n = len(out)
     class_id = np.zeros(n, dtype=np.int32)
@@ -134,7 +136,7 @@ def save_classes(
     image_path: PathLike,
     class_names: Dict[int, str],
 ) -> Tuple[Path, Path]:
-    """Write ``objects/{stem}_classes.csv`` and ``objects/{stem}_classes_rgb.png``."""
+    """Experimental (incomplete): Write ``objects/{stem}_classes.csv`` and ``objects/{stem}_classes_rgb.png``."""
     from PIL import Image
 
     sp = stem_paths(image_path)
@@ -198,7 +200,7 @@ def save_classes(
 
 
 def load_classes(image_path: PathLike) -> Optional[pd.DataFrame]:
-    """Reload ``objects/{stem}_classes.csv``, or None."""
+    """Experimental (incomplete): Reload ``objects/{stem}_classes.csv``, or None."""
     p = stem_paths(image_path).classes_csv
     if not p.exists():
         return None

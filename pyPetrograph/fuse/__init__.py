@@ -1,4 +1,6 @@
-"""Stage 2: physics channel stack (PPL RGB + XPL extinction fit + BSE) from an aligned Scene."""
+"""Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
+Stage 2: physics channel stack (PPL RGB + XPL extinction fit + BSE) from an aligned Scene."""
 
 from pyPetrograph.fuse.extinction import MIN_ANGLES, fit_extinction, phi_deg_from_cos_sin
 from pyPetrograph.fuse.preview import run_channel_preview

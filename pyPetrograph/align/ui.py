@@ -1,4 +1,6 @@
-"""Interactive lineup window (subprocess Qt, same idea as LabelWindow)."""
+"""Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
+Interactive lineup window (subprocess Qt, same idea as LabelWindow)."""
 from __future__ import annotations
 
 import json
@@ -53,7 +55,7 @@ def _scene_from_cfg(cfg: Dict[str, Any]) -> Scene:
 
 
 class AlignWindow:
-    """Overlay working image + one moving layer; auto first, then drag/scale/re-auto."""
+    """Experimental (incomplete): Overlay working image + one moving layer; auto first, then drag/scale/re-auto."""
 
     def __init__(self, scene: Scene, overlay_slot: Optional[str] = None):
         import matplotlib.pyplot as plt
@@ -410,7 +412,7 @@ class AlignWindow:
 
 
 def launch_align(scene: Scene, *, overlay_slot: Optional[str] = None, wait: bool = False) -> Scene:
-    """Open lineup UI in a subprocess (kernel stays Qt-free). Always call auto in the window."""
+    """Experimental (incomplete): Open lineup UI in a subprocess (kernel stays Qt-free). Always call auto in the window."""
     root = str(Path(__file__).resolve().parent.parent.parent)
     cfg = _scene_to_cfg(scene)
     if overlay_slot:

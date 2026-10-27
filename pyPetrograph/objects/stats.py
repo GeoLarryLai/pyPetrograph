@@ -1,4 +1,6 @@
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 Stage 6: point-count style stats from the object table (area %, QFL, Folk & Ward).
 """
 from __future__ import annotations
@@ -28,7 +30,7 @@ def folk_ward_percentiles(
     weights: np.ndarray,
     ps: Sequence[float] = _FW_PS,
 ) -> dict:
-    """Area-weighted φ percentiles. ``φp`` is where cumulative area reaches p% of grain area."""
+    """Experimental (incomplete): Area-weighted φ percentiles. ``φp`` is where cumulative area reaches p% of grain area."""
     phi = np.asarray(phi, dtype=np.float64).ravel()
     weights = np.asarray(weights, dtype=np.float64).ravel()
     n = min(int(phi.size), int(weights.size))
@@ -118,7 +120,7 @@ def compute_object_stats(
     class_names: Optional[dict] = None,
 ) -> pd.DataFrame:
     """
-    Per-class area rows, then summary rows (porosity, cement, matrix, IGV, QFL, Folk & Ward).
+    Experimental (incomplete): Per-class area rows, then summary rows (porosity, cement, matrix, IGV, QFL, Folk & Ward).
 
     Returns columns ``name, n, area_px, area_pct, count_pct, note``. Unused summary
     stats are NaN with a note. Folk & Ward numbers sit in ``area_pct``.
@@ -287,7 +289,7 @@ def compute_object_stats(
 
 
 def save_object_stats(stats: pd.DataFrame, image_path: PathLike) -> Path:
-    """Write ``objects/{stem}_stats.csv``."""
+    """Experimental (incomplete): Write ``objects/{stem}_stats.csv``."""
     sp = stem_paths(image_path)
     sp.objects_dir.mkdir(parents=True, exist_ok=True)
     p = sp.stats_csv
@@ -296,7 +298,7 @@ def save_object_stats(stats: pd.DataFrame, image_path: PathLike) -> Path:
 
 
 def load_object_stats(image_path: PathLike) -> Optional[pd.DataFrame]:
-    """Reload ``objects/{stem}_stats.csv``, or ``None`` if missing."""
+    """Experimental (incomplete): Reload ``objects/{stem}_stats.csv``, or ``None`` if missing."""
     p = stem_paths(image_path).stats_csv
     if not p.exists():
         return None

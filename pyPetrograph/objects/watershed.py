@@ -1,4 +1,6 @@
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 No-training grain outlines: edge map from the channel stack + watershed.
 
 Edge strength at a pixel = weighted sum of Sobel magnitude on every channel
@@ -21,7 +23,7 @@ from pyPetrograph.fuse.stack import ChannelStack
 
 
 def gradient_magnitude(stack: np.ndarray, *, weights: Optional[Sequence[float]] = None) -> np.ndarray:
-    """HxW edge strength: per-channel Sobel magnitude, z-scored, then weighted sum."""
+    """Experimental (incomplete): HxW edge strength: per-channel Sobel magnitude, z-scored, then weighted sum."""
     from scipy.ndimage import sobel
 
     arr = np.asarray(stack, dtype=np.float32)
@@ -51,7 +53,7 @@ def watershed_labels(
     mask: Optional[np.ndarray] = None,
 ) -> np.ndarray:
     """
-    Instance labels from an edge-elevation map.
+    Experimental (incomplete): Instance labels from an edge-elevation map.
 
     Parameters
     ----------
@@ -91,7 +93,7 @@ def run_watershed(
     weights: Optional[Sequence[float]] = None,
 ) -> Tuple[np.ndarray, Dict[str, object]]:
     """
-    Watershed on the channel stack.
+    Experimental (incomplete): Watershed on the channel stack.
 
     Parameters
     ----------
@@ -118,7 +120,7 @@ def run_watershed(
 
 
 def instance_to_three_class(labels: np.ndarray) -> np.ndarray:
-    """Instance mask → HxW uint8 {0 background, 1 grain, 2 outer boundary} (SEG layout)."""
+    """Experimental (incomplete): Instance mask → HxW uint8 {0 background, 1 grain, 2 outer boundary} (SEG layout)."""
     from skimage.segmentation import find_boundaries
 
     lab = np.asarray(labels)
@@ -130,7 +132,7 @@ def instance_to_three_class(labels: np.ndarray) -> np.ndarray:
 
 
 def three_class_to_probs(mask: np.ndarray) -> np.ndarray:
-    """HxW {0,1,2} → HxWx3 float32 one-hot (bg, grain, boundary) for ``label_grains``."""
+    """Experimental (incomplete): HxW {0,1,2} → HxWx3 float32 one-hot (bg, grain, boundary) for ``label_grains``."""
     y = np.asarray(mask)
     oh = np.zeros(y.shape + (3,), dtype=np.float32)
     for k in range(3):

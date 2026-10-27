@@ -1,4 +1,6 @@
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 Inline QC preview of a stage-2 ``ChannelStack``.
 
 One panel per channel in a 3-column grid (colormap by channel kind, 2–98 %
@@ -93,7 +95,7 @@ def run_channel_preview(
     figure_dpi: int = DEFAULT_FIGURE_DPI,
 ) -> None:
     """
-    Show the channel stack inline (``%matplotlib inline``): composite row + one panel per channel.
+    Experimental (incomplete): Show the channel stack inline (``%matplotlib inline``): composite row + one panel per channel.
 
     Parameters
     ----------

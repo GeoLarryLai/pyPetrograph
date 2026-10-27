@@ -1,4 +1,6 @@
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 Stage 4: one table row per grain (and leftover pore/cement/matrix blob).
 
 Each row holds shape (area, axes, roundness) plus mean/std/p10/p90 of every
@@ -71,7 +73,7 @@ def build_object_table(
     min_leftover_px: int = DEFAULT_MIN_LEFTOVER_PX,
 ) -> Tuple[pd.DataFrame, np.ndarray]:
     """
-    Instance grains + leftover blobs → table and a combined id map.
+    Experimental (incomplete): Instance grains + leftover blobs → table and a combined id map.
 
     Parameters
     ----------
@@ -168,7 +170,7 @@ def build_object_table_from_stack(
     px_per_um: Optional[float] = None,
     min_leftover_px: int = DEFAULT_MIN_LEFTOVER_PX,
 ) -> Tuple[pd.DataFrame, np.ndarray]:
-    """``build_object_table`` using a ``ChannelStack``."""
+    """Experimental (incomplete): ``build_object_table`` using a ``ChannelStack``."""
     return build_object_table(
         grain_labels,
         cs.stack,
@@ -184,7 +186,7 @@ def save_object_table(
     objects_mask: np.ndarray,
     image_path: PathLike,
 ) -> Tuple[Path, Path]:
-    """Write ``objects/{stem}_objects.csv`` and ``objects/{stem}_objects_mask.png``."""
+    """Experimental (incomplete): Write ``objects/{stem}_objects.csv`` and ``objects/{stem}_objects_mask.png``."""
     from PIL import Image
 
     sp = stem_paths(image_path)
@@ -201,7 +203,7 @@ def save_object_table(
 
 
 def load_object_table(image_path: PathLike) -> Optional[Tuple[pd.DataFrame, np.ndarray]]:
-    """Reload CSV + mask, or ``None`` if either file is missing."""
+    """Experimental (incomplete): Reload CSV + mask, or ``None`` if either file is missing."""
     from PIL import Image
 
     sp = stem_paths(image_path)

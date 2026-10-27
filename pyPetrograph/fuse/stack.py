@@ -1,4 +1,6 @@
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 Stage 2: build the physics channel stack from an aligned ``Scene``.
 
 Recipe (adapts to the layers present; a missing layer is skipped, never faked):
@@ -55,7 +57,7 @@ KIND_FEATURE = "feature"  # arbitrary float map (texture / embedding)
 
 @dataclass
 class ChannelStack:
-    """Working-grid channel stack with names, value kinds and a coverage mask."""
+    """Experimental (incomplete): Working-grid channel stack with names, value kinds and a coverage mask."""
 
     stack: np.ndarray  # HxWxC float32
     valid: np.ndarray  # HxW bool — True where every used layer covers the pixel
@@ -114,7 +116,7 @@ def build_channel_stack(
     min_xpl_angles: int = MIN_ANGLES,
 ) -> ChannelStack:
     """
-    Build the channel stack on the scene's working grid.
+    Experimental (incomplete): Build the channel stack on the scene's working grid.
 
     Parameters
     ----------
@@ -265,7 +267,7 @@ def build_channel_stack(
 
 
 def channels_paths(image_path: PathLike) -> Tuple[Path, Path]:
-    """``channels/{stem}_channels.npz`` and ``channels/{stem}_channels.json`` beside the image."""
+    """Experimental (incomplete): ``channels/{stem}_channels.npz`` and ``channels/{stem}_channels.json`` beside the image."""
     sp = stem_paths(image_path)
     return sp.channels, sp.channels_meta
 
@@ -289,7 +291,7 @@ def save_channel_stack(cs: ChannelStack, image_path: PathLike) -> Tuple[Path, Pa
 
 
 def load_channel_stack(image_path: PathLike) -> Optional[ChannelStack]:
-    """Reload a saved stack, or ``None`` if the files are missing."""
+    """Experimental (incomplete): Reload a saved stack, or ``None`` if the files are missing."""
     npz, meta_p = channels_paths(image_path)
     if not npz.exists() or not meta_p.exists():
         return None

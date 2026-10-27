@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 Multi-channel grain U-Net worker. Subprocess only (TensorFlow).
 
 Modes:

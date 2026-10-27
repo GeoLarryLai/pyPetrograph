@@ -1,4 +1,6 @@
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 Tiling for whole-slide stacks and Zeiss Axioscan folder helpers.
 
 The Axioscan exports are gigapixel at full size (≈55,000 × 33,000 px). Never load
@@ -24,7 +26,7 @@ DEFAULT_OVERLAP = 128
 def iter_tiles(
     h: int, w: int, *, tile: int = DEFAULT_TILE, overlap: int = DEFAULT_OVERLAP
 ) -> Iterator[Tuple[int, int, int, int]]:
-    """Yield ``(r0, r1, c0, c1)`` windows covering an ``h×w`` grid with overlap."""
+    """Experimental (incomplete): Yield ``(r0, r1, c0, c1)`` windows covering an ``h×w`` grid with overlap."""
     tile = int(tile)
     overlap = int(min(max(0, overlap), tile - 1))
     step = tile - overlap
@@ -70,7 +72,7 @@ def apply_tiled(
     progress: bool = False,
 ) -> np.ndarray:
     """
-    Run ``fn(tile_HxWxC) -> HxWxK`` over overlapping tiles and blend the overlaps.
+    Experimental (incomplete): Run ``fn(tile_HxWxC) -> HxWxK`` over overlapping tiles and blend the overlaps.
 
     Overlaps are averaged with edge-fading weights, so seams do not show. If the
     stack fits one tile, ``fn`` is called once. Output is float32 HxWxK.
@@ -113,7 +115,7 @@ _AXIO_KIND = {"bright": "bright", "ppol": "ppl", "cpol": "cpol", "xpol": "xpl"}
 
 def axioscan_layers(folder: PathLike) -> Dict[str, Tuple[Path, Optional[float]]]:
     """
-    Map Zeiss Axioscan exports in one ``NN scale`` folder to slots.
+    Experimental (incomplete): Map Zeiss Axioscan exports in one ``NN scale`` folder to slots.
 
     Returns ``{slot: (path, angle_deg)}`` with slots ``bright``, ``ppl``, ``cpol``,
     ``xpl_000``, ``xpl_015``, … Files that do not match the naming are ignored.
@@ -135,7 +137,7 @@ def axioscan_layers(folder: PathLike) -> Dict[str, Tuple[Path, Optional[float]]]
 
 def axioscan_scale_folder(sample_dir: PathLike, scale: float) -> Path:
     """
-    Find the ``02 scale`` / ``25scale`` / ``50 scale`` folder for ``scale`` (0.02, 0.25, 0.5).
+    Experimental (incomplete): Find the ``02 scale`` / ``25scale`` / ``50 scale`` folder for ``scale`` (0.02, 0.25, 0.5).
 
     Tolerates the missing space seen in some exports.
     """
@@ -156,7 +158,7 @@ def add_axioscan_layers(
     include: Sequence[str] = ("ppl", "bright", "xpl"),
 ) -> Scene:
     """
-    Add every matching Axioscan export in ``folder`` to ``scene``.
+    Experimental (incomplete): Add every matching Axioscan export in ``folder`` to ``scene``.
 
     ``working`` is the slot used as the pixel grid (falls back to ``bright`` if there
     is no ``ppl``). These exports come from one scanner pass, so they are already on

@@ -1,4 +1,6 @@
-"""Stage 3–6: grain/pore outlines, object table, grouping, classification."""
+"""Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change. (SegmentEveryGrain weight and worker helpers in ``objects.qc`` / ``objects.tf_env`` are shared with the AMICS job and are not experimental.)
+
+Stage 3–6: grain/pore outlines, object table, grouping, classification."""
 
 from pyPetrograph.objects.classify import (
     load_classes,

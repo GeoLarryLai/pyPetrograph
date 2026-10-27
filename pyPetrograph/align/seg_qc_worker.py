@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 PPL GrainPlot QC worker. Subprocess only — never import in the Jupyter kernel.
 
 Blocks pyarrow (TensorFlow SIGSEGV). Opens SEG's GrainPlot; on close writes

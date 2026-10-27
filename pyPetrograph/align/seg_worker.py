@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 SegmentEveryGrain worker. Run in a subprocess, not inside the Jupyter kernel.
 
 Safe to use conda env ``work``'s Python (TensorFlow 2.21 + numpy 2 imports).

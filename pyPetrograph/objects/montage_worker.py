@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 Cluster montage labeler. Subprocess only (Qt). Close the window to save.
 
 Does not import TensorFlow or pyPetrograph.

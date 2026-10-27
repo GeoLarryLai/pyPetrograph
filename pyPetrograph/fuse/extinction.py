@@ -1,4 +1,6 @@
 """
+Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
 Extinction fit across cross-polarized (XPL) angles.
 
 Under crossed polars a grain's brightness repeats every 90° of stage rotation,
@@ -33,13 +35,13 @@ ALL_NAMES = ("mean", "amp", "max", "min", "phi_cos", "phi_sin", "phi_deg", "resi
 
 
 def design_matrix(angles_deg: Sequence[float]) -> np.ndarray:
-    """Rows [1, cos4θ, sin4θ] for each angle (float64, n×3)."""
+    """Experimental (incomplete): Rows [1, cos4θ, sin4θ] for each angle (float64, n×3)."""
     th = np.deg2rad(np.asarray(angles_deg, dtype=np.float64))
     return np.column_stack([np.ones_like(th), np.cos(4.0 * th), np.sin(4.0 * th)])
 
 
 def check_angles(angles_deg: Sequence[float]) -> None:
-    """Raise a plain-language ValueError if the angles cannot support the 3-term fit."""
+    """Experimental (incomplete): Raise a plain-language ValueError if the angles cannot support the 3-term fit."""
     ang = np.asarray(angles_deg, dtype=np.float64)
     if ang.ndim != 1 or ang.size < MIN_ANGLES:
         raise ValueError(
@@ -64,7 +66,7 @@ def fit_extinction(
     amp_eps: float = 1e-3,
 ) -> Dict[str, np.ndarray]:
     """
-    Per-pixel sine fit over a stack of gray XPL photos.
+    Experimental (incomplete): Per-pixel sine fit over a stack of gray XPL photos.
 
     Parameters
     ----------
@@ -123,7 +125,7 @@ def fit_extinction(
 
 
 def phi_deg_from_cos_sin(phi_cos: np.ndarray, phi_sin: np.ndarray) -> np.ndarray:
-    """Recover the max-brightness angle in [0, 90) from the two circle channels."""
+    """Experimental (incomplete): Recover the max-brightness angle in [0, 90) from the two circle channels."""
     return np.mod(
         np.rad2deg(np.arctan2(np.asarray(phi_sin, dtype=np.float64), np.asarray(phi_cos, dtype=np.float64))) / 4.0,
         PERIOD_DEG,

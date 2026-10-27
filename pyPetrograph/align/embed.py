@@ -1,4 +1,6 @@
-"""Embedding field from an aligned Scene. Default C = small autoencoder; B = frozen net."""
+"""Experimental (incomplete): notebook 3 multi-image overlay / segmentation / classifier-training code; functions and results may change.
+
+Embedding field from an aligned Scene. Default C = small autoencoder; B = frozen net."""
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple
@@ -29,7 +31,7 @@ def _ordered_slots(scene: Scene) -> List[str]:
 
 def stack_named_slots(scene: Scene) -> Tuple[np.ndarray, np.ndarray, List[str]]:
     """
-    Working-grid RGB stack and per-slot coverage (legacy RGB-only helper).
+    Experimental (incomplete): Working-grid RGB stack and per-slot coverage (legacy RGB-only helper).
 
     Returns
     -------
@@ -55,7 +57,7 @@ def stack_feature_slots(
     feature_toggles: Optional[Dict[str, bool]] = None,
 ) -> Tuple[np.ndarray, np.ndarray, List[str], List[str]]:
     """
-    Per-slot feature stacks on the working grid (shared with RGB notebook).
+    Experimental (incomplete): Per-slot feature stacks on the working grid (shared with RGB notebook).
 
     For each aligned slot, call ``build_feature_stack`` (Y-norm on RGB, then
     toggled maps). Prefix channel names with ``ppl_``, ``xpl_``, ``bse_``.
@@ -114,7 +116,7 @@ def embed_C(
     feature_toggles: Optional[Dict[str, bool]] = None,
 ) -> Tuple[np.ndarray, Dict[str, object]]:
     """
-    Small autoencoder on per-slot feature stacks (CPU MLP).
+    Experimental (incomplete): Small autoencoder on per-slot feature stacks (CPU MLP).
 
     Inputs come from ``build_feature_stack`` (shared with the RGB notebook).
     Default toggles: r/g/b + std 7/21/63 + grad + LBP r=1/3/5 + Gabor 0/45/90
@@ -178,7 +180,7 @@ def embed_B(
     feature_toggles: Optional[Dict[str, bool]] = None,  # unused; RGB-net path
 ) -> Tuple[np.ndarray, Dict[str, object]]:
     """
-    Frozen pretrained net per available layer; skip missing pixels (no fake BSE).
+    Experimental (incomplete): Frozen pretrained net per available layer; skip missing pixels (no fake BSE).
 
     Requires ``torch``. Each available RGB layer is encoded; votes are summed
     only where that layer is valid, then L2-normalized. Output length is fixed.
@@ -240,7 +242,7 @@ def embed_B(
 
 
 def embedding_to_rgb(field: np.ndarray, *, max_fit: int = 40_000) -> np.ndarray:
-    """False-color view of an embedding field (first 3 PCA axes). Preview only."""
+    """Experimental (incomplete): False-color view of an embedding field (first 3 PCA axes). Preview only."""
     h, w, d = field.shape
     x = np.asarray(field, dtype=np.float32).reshape(-1, d)
     n = int(x.shape[0])
@@ -269,7 +271,7 @@ def embedding_to_rgb(field: np.ndarray, *, max_fit: int = 40_000) -> np.ndarray:
 
 def embed_scene(scene: Scene, method: str = "C", **kwargs) -> Tuple[np.ndarray, np.ndarray, Dict]:
     """
-    Run embedding. ``method`` is ``C`` (default autoencoder) or ``B`` (frozen net).
+    Experimental (incomplete): Run embedding. ``method`` is ``C`` (default autoencoder) or ``B`` (frozen net).
 
     Returns (field, rgb_view, info).
     """

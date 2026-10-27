@@ -4,7 +4,7 @@
 
 v0.3.0
 
-pyPetrograph is a machine-learning toolkit for thin-section petrography. You can hand-label features on an RGB photo and train a LightGBM pixel model to map area % of each class (porosity in the demo). You can count grains on a painted mineral map by matching a color legend. You can stack several image types of the same field (PPL, XPL, or others) and segment grains from that overlay. Or, from an Advanced Mineral Identification and Characterization System (AMICS) set (BSE, mineral map, and legend), you can outline grains on the BSE and name each grain from the map.
+pyPetrograph is a machine-learning toolkit for thin-section petrography. You can hand-label features on an RGB photo and train a LightGBM pixel model to map area % of each class (porosity in the demo). You can count grains on a painted mineral map by matching a color legend. You can stack several image types of the same field (PPL, XPL, or others) and segment grains from that overlay (experimental, incomplete). Or, from an Advanced Mineral Identification and Characterization System (AMICS) set (BSE, mineral map, and legend), you can outline grains on the BSE and name each grain from the map.
 
 > [!WARNING]
 > This tool is under development. Use with caution. Notebooks, APIs, and numbers can still change.
@@ -113,7 +113,7 @@ Lai, L.S.-H. (2026) pyPetrograph. *Zenodo*, [https://doi.org/10.5281/zenodo.2365
 
 - Hand-label features and map their area %: paint a few examples of each class (pores, grains, cement, …); a LightGBM pixel classifier maps the photo and reports area % of each class. The demo treats pore area as porosity.
 - Grain counts on a painted mineral map: match pixels to a color legend, split grains that touch, and count how many grains sit in each class.
-- Segment grains from a multi-image overlay: line up PPL and XPL of the same field, stack them, and outline grains (watershed, optional SegmentEveryGrain, and the shipped N-channel U-Net).
+- Segment grains from a multi-image overlay: line up PPL and XPL of the same field, stack them, and outline grains (watershed, optional SegmentEveryGrain, and the shipped N-channel U-Net). *(Experimental, incomplete.)* Experimental and incomplete: results and functions may change, so use them with caution.
 - AMICS workflow: read a legend, outline grains on the BSE, name each grain from the mineral map, and write counts, a composition figure (grains by mineral and the percent of grains), grain sizes (a, b, D, ECD), size figures, and a knolling sheet (5500 px wide, largest ECD first).
 
 ## Example notebooks
@@ -138,7 +138,10 @@ You already have a color mineral map (one flat color per mineral) and a legend. 
 
 ---
 
-### 3. Segment grains from a multi-image overlay
+### 3. Segment grains from a multi-image overlay (experimental, incomplete)
+
+> [!WARNING]
+> Experimental and incomplete: grain, pore and cement segmentation from multiple overlaid images (PPL + XPL + others), meant for later ML/AI auto-classifier training. Use with caution; results and functions may change.
 
 [`pyPetrograph_3_multimodal_grains.ipynb`](pyPetrograph_3_multimodal_grains.ipynb)
 
