@@ -14,8 +14,8 @@ identifiers:
     value: 10.5281/zenodo.23659316
     description: "Concept DOI (all versions)"
   - type: doi
-    value: 10.5281/zenodo.23676977
-    description: "Version DOI for v0.2.0"
+    value: 10.5281/zenodo.23713992
+    description: "Version DOI for v0.3.0"
 date-released: 2026-10-27
 license: AGPL-3.0-or-later
 repository-code: "https://github.com/GeoLarryLai/pyPetrograph"
