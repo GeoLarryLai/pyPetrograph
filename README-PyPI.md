@@ -24,7 +24,7 @@ pyPetrograph is a machine-learning toolkit for thin-section petrography.
 
 The app (`pypetrograph-app`) runs in your web browser and offers two jobs: **thin-section photos** (porosity %, as notebook 1) and **AMICS grain counting** (as notebook 4), each step by step. Demo videos are on [GitHub](https://github.com/GeoLarryLai/pyPetrograph#the-app).
 
-![The app start page: pick a job](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/images/app_start.jpg)
+[![Demo: measuring porosity in the app](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/videos/pyPetrograph_optical_demo.webp)](https://github.com/GeoLarryLai/pyPetrograph/blob/main/docs/videos/pyPetrograph_optical_demo.mp4)
 
 ## Install
 

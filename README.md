@@ -62,8 +62,6 @@ pypetrograph-app
 python -m pyPetrograph.webapp
 ```
 
-![The app's start page: pick a job](docs/images/app_start.jpg)
-
 The start page offers two jobs. Pick one, then follow the steps on the left. Each step must be done before the next one opens, and you can go back to any finished step.
 
 - **Thin-section photos (PPL / CPL):** measure the porosity % of thin-section photos (notebook 1).
@@ -87,11 +85,6 @@ This job teaches a model what pores and grains look like from a few examples you
 6. *Predict*: map every pixel of every photo, with a confidence map.
 7. *Porosity %*: read the pore share per photo with its mean ± sd, and save the table as a CSV.
 
-| | |
-|---|---|
-| ![Mark examples step](docs/images/app_opt_mark.jpg) | ![Porosity step](docs/images/app_opt_porosity.jpg) |
-| **Mark examples:** pores in yellow, grains in purple. | **Porosity %:** the pore share per photo, with a confidence range. |
-
 ### AMICS grain counting
 
 This job outlines every grain on the BSE image, names each grain from the mineral map, and writes counts, grain sizes and figures. Its exports are byte-identical to notebook 4, and nothing is written until you press an Export button.
@@ -111,13 +104,6 @@ This job outlines every grain on the BSE image, names each grain from the minera
 7. *Minerals*: see which mineral each grain was given: ✓ exact colour, ▲ reassigned, ✗ not found.
 8. *Grain size*: read the size curves and median sizes for each mineral.
 9. *Outputs*: view the knolling diagram and export the CSVs and figures.
-
-| | |
-|---|---|
-| ![Legend step](docs/images/app_web_legend.jpg) | ![Grain segmentation step](docs/images/app_web_segmentation.jpg) |
-| **Legend:** names you can edit, add, delete or recolour. | **Grain segmentation:** every grain outlined on the BSE image. |
-| ![Minerals step](docs/images/app_web_minerals.jpg) | ![Outputs step](docs/images/app_web_outputs.jpg) |
-| **Minerals:** one row per mineral, with its colour match. | **Outputs:** the knolling diagram and the export buttons. |
 
 ## Citation
 
