@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyPetrograph"
-version = "0.2.0"
+version = "0.3.0"
 description = "A toolkit for semi-automated, ML-assisted thin-section petrography: porosity estimation, mineral counting, grain segmentation and micro-texture analysis"
 readme = "README-PyPI.md"
 requires-python = ">=3.10"
