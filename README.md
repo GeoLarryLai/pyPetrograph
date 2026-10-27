@@ -2,7 +2,7 @@
 
 ![PyPI version](https://img.shields.io/pypi/v/pypetrograph.svg) [![pepy downloads](https://static.pepy.tech/badge/pypetrograph)](https://pepy.tech/project/pypetrograph) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23659316.svg)](https://doi.org/10.5281/zenodo.23659316)
 
-v0.2.0
+v0.3.0
 
 pyPetrograph is a machine-learning toolkit for thin-section petrography. You can hand-label features on an RGB photo and train a LightGBM pixel model to map area % of each class (porosity in the demo). You can count grains on a painted mineral map by matching a color legend. You can stack several image types of the same field (PPL, XPL, or others) and segment grains from that overlay. Or, from an AMICS set (BSE, mineral map, and legend), you can outline grains on the BSE and name each grain from the map.
 
@@ -54,7 +54,7 @@ Without it, everything else works: notebooks 1 and 2, the non-segmentation steps
 
 ## The app
 
-`pypetrograph-app` runs the notebook 4 AMICS workflow step by step in your web browser (a local page, nothing is uploaded). You see and fix each result (legend names, non-grain regions, scale, grains, mineral matches) before moving on, and nothing is written to the export folder until you press an Export button. Its exports are byte-identical to notebook 4.
+`pypetrograph-app` opens pyPetrograph in your web browser. It is a local page: your files stay on this computer and nothing is uploaded.
 
 ```bash
 pypetrograph-app
@@ -62,14 +62,62 @@ pypetrograph-app
 python -m pyPetrograph.webapp
 ```
 
-**Files → Legend → BSE & footer → Non-grain regions → Scale (optional) → Grain segmentation → Minerals → Grain size → Outputs**
+![The app's start page: pick a job](docs/images/app_start.jpg)
+
+The start page offers two jobs. Pick one, then follow the steps on the left. Each step must be done before the next one opens, and you can go back to any finished step.
+
+- **Thin-section photos (PPL / CPL):** measure the porosity % of thin-section photos (notebook 1).
+- **AMICS grain counting:** count and size the grains of each mineral from an AMICS set (notebook 4).
+
+### Thin-section photos: porosity %
+
+This job teaches a model what pores and grains look like from a few examples you mark, then measures the pore share of every photo.
+
+[![Demo: measuring porosity on three PPL photos](docs/videos/pyPetrograph_optical_demo.webp)](docs/videos/pyPetrograph_optical_demo.mp4)
+
+*Sped-up demo. Click it to [watch the 1080p video](docs/videos/pyPetrograph_optical_demo.mp4) (about 35 seconds).*
+
+**Photos → Classes → Mark examples → Features → Train → Predict → Porosity %**
+
+1. *Photos*: choose one or more photos and an output folder. Saved labels in that folder load by themselves.
+2. *Classes*: name what you want to find (pores and grains by default).
+3. *Mark examples*: click inside a pore or a grain, and the wand outlines the similar colour around it. Mark grains of every colour (white, pink, yellow, dark), not just the clear ones, or dark grains get counted as pores.
+4. *Features*: choose what the model looks at: colour, plus local texture and edges.
+5. *Train*: train one model for all photos or one per photo, and check its accuracy. Or load a saved model; it only works on photos and labels like the ones it was trained on.
+6. *Predict*: map every pixel of every photo, with a confidence map.
+7. *Porosity %*: read the pore share per photo with its mean ± sd, and save the table as a CSV.
 
 | | |
 |---|---|
-| ![Legend step](docs/images/app_web_legend.jpg) | ![Grain segmentation step](docs/images/app_web_segmentation_running.jpg) |
-| **Legend:** OCR names you can edit, add, delete or recolour. | **Grain segmentation:** SegmentEveryGrain with live progress; click or box to add grains with SAM 2.1. |
+| ![Mark examples step](docs/images/app_opt_mark.jpg) | ![Porosity step](docs/images/app_opt_porosity.jpg) |
+| **Mark examples:** pores in yellow, grains in purple. | **Porosity %:** the pore share per photo, with a confidence range. |
+
+### AMICS grain counting
+
+This job outlines every grain on the BSE image, names each grain from the mineral map, and writes counts, grain sizes and figures. Its exports are byte-identical to notebook 4, and nothing is written until you press an Export button.
+
+[![Demo: counting grains on two AMICS samples](docs/videos/pyPetrograph_amics_demo.webp)](docs/videos/pyPetrograph_amics_demo.mp4)
+
+*Sped-up demo. Click it to [watch the 1080p video](docs/videos/pyPetrograph_amics_demo.mp4) (about 45 seconds).*
+
+**Files → Legend → BSE & footer → Non-grain regions → Scale (optional) → Grain segmentation → Minerals → Grain size → Outputs**
+
+1. *Files*: pick the BSE image. The mineral map and legend with the same name fill in by themselves.
+2. *Legend*: check the mineral names read from the legend image; edit, add, delete or recolour any of them.
+3. *BSE & footer*: crop off the image's info bar so it is not counted.
+4. *Non-grain regions*: mark areas that hold no grains, such as resin or holes.
+5. *Scale (optional)*: set the pixel size if the footer could not be read.
+6. *Grain segmentation*: run SegmentEveryGrain or load saved grains, then fix them by clicking or drawing.
+7. *Minerals*: see which mineral each grain was given: ✓ exact colour, ▲ reassigned, ✗ not found.
+8. *Grain size*: read the size curves and median sizes for each mineral.
+9. *Outputs*: view the knolling diagram and export the CSVs and figures.
+
+| | |
+|---|---|
+| ![Legend step](docs/images/app_web_legend.jpg) | ![Grain segmentation step](docs/images/app_web_segmentation.jpg) |
+| **Legend:** names you can edit, add, delete or recolour. | **Grain segmentation:** every grain outlined on the BSE image. |
 | ![Minerals step](docs/images/app_web_minerals.jpg) | ![Outputs step](docs/images/app_web_outputs.jpg) |
-| **Minerals:** one row per mineral, ✓ exact colour, ▲ reassigned, ✗ not found. | **Outputs:** knolling diagram and the CSV / figure export buttons. |
+| **Minerals:** one row per mineral, with its colour match. | **Outputs:** the knolling diagram and the export buttons. |
 
 ## Citation
 

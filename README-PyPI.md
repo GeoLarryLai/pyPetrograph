@@ -1,6 +1,6 @@
 # pyPetrograph
 
-v0.2.0
+v0.3.0
 
 [![PyPI version](https://img.shields.io/pypi/v/pypetrograph.svg)](https://pypi.org/project/pypetrograph/) [![pepy downloads](https://static.pepy.tech/badge/pypetrograph)](https://pepy.tech/project/pypetrograph) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23659316.svg)](https://doi.org/10.5281/zenodo.23659316)
 
@@ -22,9 +22,9 @@ pyPetrograph is a machine-learning toolkit for thin-section petrography.
 |---|---|---|
 | ![segmentation](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/images/amics_10B_segmentation.jpg) | ![composition](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/images/amics_10B_composition.jpg) | ![knolling](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/images/amics_10B_knolling.jpg) |
 
-The app (`pypetrograph-app`) runs the same workflow step by step in your web browser; nothing is written until you export.
+The app (`pypetrograph-app`) runs in your web browser and offers two jobs: **thin-section photos** (porosity %, as notebook 1) and **AMICS grain counting** (as notebook 4), each step by step. Demo videos are on [GitHub](https://github.com/GeoLarryLai/pyPetrograph#the-app).
 
-![Grain segmentation step of the app](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/images/app_web_segmentation_running.jpg)
+![The app start page: pick a job](https://raw.githubusercontent.com/GeoLarryLai/pyPetrograph/main/docs/images/app_start.jpg)
 
 ## Install
 
