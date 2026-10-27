@@ -69,7 +69,7 @@ from pyPetrograph.image_processing.features import (
     resolve_view_target_mp,
     screen_view_target_mp,
 )
-from pyPetrograph.image_processing.fractions import compute_fractions, compute_fractions_uncertain
+from pyPetrograph.image_processing.fractions import compute_fractions, compute_fractions_uncertain, porosity_summary
 from pyPetrograph.labeling_ml.polygons import magic_wand_to_polygon
 from pyPetrograph.labeling_ml.predict import predict_image, predict_image_proba
 from pyPetrograph.align import (
@@ -207,6 +207,7 @@ __all__ = [
     "predict_image_proba",
     "compute_fractions",
     "compute_fractions_uncertain",
+    "porosity_summary",
     "__version__",
     "DEFAULT_SURE_PROBA",
     "Scene",

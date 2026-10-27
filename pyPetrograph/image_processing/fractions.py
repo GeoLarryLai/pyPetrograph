@@ -107,3 +107,50 @@ def compute_fractions_uncertain(
             "sure_threshold": float(sure_threshold),
         }
     return out
+
+
+def porosity_summary(image_paths, pore_name: str = "pores", verbose: bool = True):
+    """Porosity % per image from the Predict step's ``*_fractions.csv`` files (notebook 1).
+
+    Returns ``(table, stats)``: a DataFrame with ``image, porosity_pct, plus, minus`` and a dict
+    ``{"n", "mean", "sd", "min", "max"}`` (sd uses ddof=1; 0 for one image). ``plus`` / ``minus``
+    are the confidence range written by Predict, not a lab error bar.
+    """
+    from pathlib import Path
+
+    import pandas as pd
+
+    from pyPetrograph.common.paths import stem_paths
+
+    rows = []
+    for path in image_paths:
+        path = Path(path)
+        csv = stem_paths(path).fractions_csv
+        if not csv.exists():
+            if verbose:
+                print("missing", csv.name)
+            continue
+        df = pd.read_csv(csv)
+        pore = df.loc[df["name"].astype(str).str.lower() == pore_name.lower()]
+        if pore.empty:
+            if verbose:
+                print(path.stem, f"no {pore_name} row")
+            continue
+        r = pore.iloc[0]
+        rows.append({
+            "image": path.stem,
+            "porosity_pct": float(r["area_pct"]),
+            "plus": float(r.get("area_pct_plus", 0)),
+            "minus": float(r.get("area_pct_minus", 0)),
+        })
+        if verbose:
+            print(f"{path.stem}: {r['area_pct']:.2f}% +{r.get('area_pct_plus', 0):.2f}%/−{r.get('area_pct_minus', 0):.2f}%")
+    tab = pd.DataFrame(rows, columns=["image", "porosity_pct", "plus", "minus"])
+    stats = {"n": int(len(tab)), "mean": None, "sd": None, "min": None, "max": None}
+    if len(tab):
+        sd = float(tab["porosity_pct"].std(ddof=1)) if len(tab) > 1 else 0.0
+        stats.update(mean=float(tab["porosity_pct"].mean()), sd=sd,
+                     min=float(tab["porosity_pct"].min()), max=float(tab["porosity_pct"].max()))
+        if verbose:
+            print(f"mean ± sd over {len(tab)} image(s): {stats['mean']:.2f}% ± {sd:.2f}%")
+    return tab, stats
