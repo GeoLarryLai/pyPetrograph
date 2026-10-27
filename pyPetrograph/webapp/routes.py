@@ -13,7 +13,7 @@ from typing import Any, Dict, Optional
 import numpy as np
 
 from pyPetrograph.webapp.shell import JobRunner, mount_shell
-from pyPetrograph.webapp.state import MINERAL_FIGURES, ORDER, TITLES, UserError, WebState, short_count
+from pyPetrograph.webapp.state import DOWNSTREAM_KEYS, MINERAL_FIGURES, MISSING_FIG, SETTINGS_FIELDS, ORDER, TITLES, UserError, WebState, short_count
 
 STATIC = Path(__file__).parent / "static"
 NON_GRAIN_RGBA = (26, 102, 255, 140)   # former Qt app / notebook blue tint
@@ -167,6 +167,13 @@ def create_app(state: Optional[WebState] = None, backend=None, testing: bool = F
         if key == "knoll":
             k = S.knoll
             return (None if k is None else (k if k.ndim == 2 else k[..., :3])), False
+        if key == "fig:" + MISSING_FIG:
+            raw = getattr(S, "_raw_map", None)
+            if raw is None or not len(raw[2]):
+                return None, False
+            from pyPetrograph.amics import plot_missing_colors
+
+            return fig_array(plot_missing_colors(raw[2])), False
         if key.startswith("fig:"):
             p = _figure(key[4:])
             return (read_rgb(p) if p else None), False
@@ -514,6 +521,49 @@ def create_app(state: Optional[WebState] = None, backend=None, testing: bool = F
         st.sync_settings(body.get("use_sam2"), body.get("min_px"), body.get("drop"))
         return job("Measuring grains, voting minerals, drawing figures", lambda j: st.use_grain_map(be(), j))
 
+    # -- Advanced settings (notebook 4 Settings cell) -----------------------------------------
+    @app.get("/api/settings")
+    def settings_get():
+        return {"fields": [dict(f, value=_sval(f["key"])) for f in SETTINGS_FIELDS], "computed": "segment" in st.done}
+
+    def _sval(k):
+        v = getattr(S.s, k)
+        return ", ".join(v) if isinstance(v, list) else v
+
+    @app.post("/api/settings")
+    def settings_set(body: dict = Body(...)):
+        changed = []
+        with lock:
+            for f in SETTINGS_FIELDS:
+                k = f["key"]
+                if k not in body:
+                    continue
+                raw = body[k]
+                try:
+                    if f["type"] == "names":
+                        v = [x.strip() for x in str(raw).split(",") if x.strip()]
+                    elif f["type"] == "bool":
+                        v = bool(raw)
+                    elif f["type"] == "int?":
+                        v = None if raw in (None, "") else int(float(raw))
+                    elif f["type"] == "int":
+                        v = int(float(raw))
+                    else:
+                        v = float(raw)
+                except (TypeError, ValueError):
+                    raise HTTPException(400, f"{f['label']}: not a number")
+                if v != getattr(S.s, k):
+                    setattr(S.s, k, v)
+                    changed.append(k)
+        redo = "segment" in st.done and any(k in DOWNSTREAM_KEYS for k in changed)
+
+        def f(j):
+            if redo:
+                st.recount(dict(S.extra_legend), j)
+                imgcache.clear()
+            return {"changed": changed, "recomputed": redo}
+        return job("Applying settings" + (": colours, votes, figures again" if redo else ""), f)
+
     # -- 7 minerals --------------------------------------------------------------------------
     @app.get("/api/minerals")
     def minerals_get():
@@ -525,7 +575,17 @@ def create_app(state: Optional[WebState] = None, backend=None, testing: bool = F
             n = {k: sum(r["status"] == k for r in rows) for k in ("ok", "reassigned", "missing", "unlisted")}
             mapped = len(S.mapped) if S.mapped is not None else 0
             unm = int((S.grains["mineral"] == "Unmapped").sum()) if S.grains is not None and "mineral" in S.grains else 0
-            return {"rows": rows, "figures": [n_ for n_, _ in MINERAL_FIGURES], "version": st.version,
+            raw = getattr(S, "_raw_map", None)
+            figs = [n_ for n_, _ in MINERAL_FIGURES] + ([MISSING_FIG] if raw is not None and len(raw[2]) else [])
+            matches = []
+            cm = getattr(S, "color_matches", None)
+            if cm is not None:
+                for _, m in cm.iterrows():
+                    how = {"free name": "unused legend name", "shared name": "nearest mineral (name also has its exact colour)"}.get(m.status, "left unnamed: counts as Unknown")
+                    matches.append({"rgb": [int(m.map_red), int(m.map_green), int(m.map_blue)], "pixels": int(m.pixels),
+                                    "assigned": str(m.assigned) if m.status in ("free name", "shared name") else "",
+                                    "distance": float(m.distance) if m.distance == m.distance else None, "how": how})
+            return {"rows": rows, "figures": figs, "matches": matches, "auto_match": bool(S.s.auto_match_colors), "version": st.version,
                     "summary": f"{mapped} grains with a mineral, {unm} unmapped (left out). Added colours: {len(S.extra_legend)}.",
                     "state": [f"\u2713 {n['ok']}   \u25B2 {n['reassigned']}   \u2717 {n['missing'] + n['unlisted']}  · computed, not exported yet", "saved"]}
 
@@ -560,7 +620,9 @@ def create_app(state: Optional[WebState] = None, backend=None, testing: bool = F
         figs = list(S.gsd_figures())
         big = int((g["area_px"] >= S.s.min_grain_px).sum())
         unit = "µm" if S.size_unit == "um" else "px"
-        return {"figures": figs, "version": st.version,
+        sel = g.loc[g["area_px"] >= S.s.min_grain_px]
+        med = {n: float(sel[f"{n}_{S.size_unit}"].median()) for n in ("a", "b", "D", "ECD") if f"{n}_{S.size_unit}" in sel and len(sel)}
+        return {"figures": figs, "version": st.version, "medians": med, "unit": unit,
                 "summary": f"{len(g)} grains measured; {big} with area ≥ {S.s.min_grain_px:g} px in the curves "
                            f"(minerals with ≥ {S.s.min_grains_curve} grains get their own curve). "
                            f"Sizes in {unit}" + (f" ({S.um_per_px:.4f} µm/px)." if S.um_per_px else " (no scale)."),

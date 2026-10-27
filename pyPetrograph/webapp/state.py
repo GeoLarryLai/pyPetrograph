@@ -25,7 +25,24 @@ APP_DEFAULTS = dict(min_grain_px=10, dark_drop_frac=0.5)   # same as the former 
 MINERAL_FIGURES = [("Composition", "composition"), ("Overlay", "overlay"),
                    ("Mixed grains", "mixed"), ("Unmapped grains", "unmapped")]
 
-
+MISSING_FIG = "Map colours not in legend"   # view only (notebook 4 cell 25); not exported
+# notebook 4 Settings cell values shown under "Advanced settings": key, label, type, one-line hint
+SETTINGS_FIELDS = [
+    {"key": "color_tol", "label": "Colour tolerance", "type": "int", "group": "Mineral map", "hint": "how far (0–255) a map colour may be from its legend colour"},
+    {"key": "white_tol", "label": "White tolerance", "type": "int", "group": "Mineral map", "hint": "how close to white counts as blank (no data)"},
+    {"key": "auto_match_colors", "label": "Match unnamed colours", "type": "bool", "group": "Mineral map", "hint": "give map colours with no legend swatch the nearest unused legend name"},
+    {"key": "match_max_dist", "label": "Match distance", "type": "float", "group": "Mineral map", "hint": "largest colour difference for that match"},
+    {"key": "thr_radius", "label": "Pick radius (px)", "type": "int", "group": "Non-grain", "hint": "pixels around each non-grain click that set the gray level"},
+    {"key": "thr_pct", "label": "Pick percentile", "type": "float", "group": "Non-grain", "hint": "percentile of those pixels used as the gray level"},
+    {"key": "unmapped_frac", "label": "Unmapped share", "type": "float", "group": "Minerals", "hint": "a grain with more than this share on blank map has no mineral"},
+    {"key": "mixed_frac", "label": "Mixed share", "type": "float", "group": "Minerals", "hint": "a grain whose second mineral covers more than this is marked mixed"},
+    {"key": "overlay_alpha", "label": "Overlay strength", "type": "float", "group": "Figures", "hint": "mineral colours over the BSE (0–1)"},
+    {"key": "min_grains_curve", "label": "Grains per curve", "type": "int", "group": "Figures", "hint": "a mineral needs at least this many grains for its own size curve"},
+    {"key": "knoll_alpha", "label": "Knolling colour strength", "type": "float", "group": "Figures", "hint": "mineral tint on the knolling sheet (0–1)"},
+    {"key": "knoll_width_px", "label": "Knolling width (px)", "type": "int?", "group": "Figures", "hint": "sheet width; blank = 5500 px"},
+]
+DOWNSTREAM_KEYS = {"color_tol", "white_tol", "auto_match_colors", "match_max_dist", "unmapped_frac",
+                   "mixed_frac", "overlay_alpha", "min_grains_curve", "knoll_alpha", "knoll_width_px"}
 
 MERGE_GAP_PX = 4.0  # Merge bridges gaps up to 2x this between selected grains
 

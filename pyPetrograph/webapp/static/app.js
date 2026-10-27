@@ -332,6 +332,7 @@ STEPS.push({title: "Segmentation", lead: "Find the grains, check them, fix mista
     if (k === "a" && !$("sgAdd").disabled) this.addMode(!this.add); else if (k === "z") o("undo"); else if (k === "d" || k === "delete") o("delete"); else if (k === "m") o("merge");
     else if (k === "enter" && this.add) o("accept"); else if (k === "esc") this.add && (this.v.prompts.length || this.v.box) ? o("clear_prompts") : o("deselect"); else return false; return true; }});
 // 7 Minerals
+const MISSING = "Map colours not in legend";
 const ST = {ok: ["✓", "#30a14e", "colour matches the legend"], reassigned: ["▲", "#c98a00", "near colours were given to this mineral"],
   missing: ["✗", "#d70015", "in the legend but not in the map"], unlisted: ["✗", "#d70015", "map colour not in the legend: counts as Unknown"]};
 STEPS.push({title: "Minerals", lead: "How the map colours were matched to legend minerals. Add a map colour the legend misses.",
@@ -342,6 +343,8 @@ STEPS.push({title: "Minerals", lead: "How the map colours were matched to legend
     const v = await api("GET", "/api/minerals"); this.v = v; this.selRow = null; pill(v.state[0], v.state[1]);
     body(`<div class="f"><label>Figure</label><select id="mnFig">${v.figures.map(f => `<option>${f}</option>`).join("")}</select><span></span></div>
       <div class="tbl"><table class="t" id="mnT"></table></div><p class="hintt">${esc(v.summary)}</p>
+      ${v.matches.length ? `<h4>Map colours with no exact legend swatch</h4><p class="hintt">${v.auto_match ? "Matched automatically (Advanced → Match unnamed colours)." : "Automatic matching is off (Advanced)."} Pick “${MISSING}” above to see them.</p>
+      <div class="tbl" style="max-height:170px"><table class="t"><tr><th>Map colour</th><th>Pixels</th><th>Now counts as</th></tr>${v.matches.map(m => `<tr title="${esc(m.how)}"><td class="sw">${m.rgb.join(",")}<i style="background:${hex(m.rgb)}"></i></td><td>${m.pixels.toLocaleString()}</td><td>${m.assigned ? esc(m.assigned) + (m.distance != null ? ` <span class="hintt">(diff ${m.distance.toFixed(0)})</span>` : "") : "<i>Unknown</i>"}</td></tr>`).join("")}</table></div>` : ""}
       <div class="btns"><button id="mnAdd">+ Add map colour not in legend</button></div>
       <div class="btns"><button id="mnRem">Remove added colour</button><button id="mnClear" class="danger">Clear saved…</button></div>`);
     $("mnT").innerHTML = "<tr><th></th><th>Mineral</th><th>Legend</th><th>Map colours</th><th>Pixels</th></tr>" + v.rows.map((r, i) =>
@@ -364,7 +367,7 @@ STEPS.push({title: "Grain size", lead: "Grain size distribution curves: all grai
   async enter() {
     const v = await api("GET", "/api/gsd"); pill(v.state[0], v.state[1]);
     body(`<div class="f"><label>Figure</label><select id="gsFig">${v.figures.map(f => `<option>${esc(f)}</option>`).join("")}</select><span></span></div>
-      <p class="hintt">${esc(v.summary)}</p><div class="btns"><button id="gsRe">Replot grain size curves</button></div>`);
+      <p class="hintt">${esc(v.summary)}</p>${Object.keys(v.medians || {}).length ? `<p class="hintt"><b>Medians (${esc(v.unit)}):</b> ${Object.entries(v.medians).map(([n, m]) => `${n} ${m.toFixed(2)}`).join(" · ")}</p>` : ""}<div class="btns"><button id="gsRe">Replot grain size curves</button></div>`);
     const sh = () => v.figures.length && showImg("fig:" + $("gsFig").value, {fit: true}); $("gsFig").onchange = sh; sh();
     on("gsRe", "onclick", async () => { await runJob("/api/gsd/replot", {}, "Replotting"); await finish(7); });
     mainBtns([{label: "Next: outputs", fn: () => go(8)}]);
@@ -378,15 +381,34 @@ STEPS.push({title: "Outputs", lead: "Nothing is written to the export folder unt
     const v = await api("GET", "/api/outputs"); pill(v.state[0], v.state[1]);
     body(`<p class="hintt">Export folder: <b>${esc(v.folder)}</b><br>Ready: ${v.n_csv} data sheets, ${v.n_png} figures.</p>
       <div class="btns"><button id="otFig">Export all figures</button></div>
+      <div class="btns"><button id="otKz" title="Show the first mineral band at a readable size">Zoom to first band</button><button id="otWhole" title="F">Whole sheet</button></div>
       <div class="btns"><button id="otKn">Replot grain knolling diagram</button><button id="otOpen">Open export folder</button></div>
       <h4>Exported files</h4><div class="files" id="otFiles">${v.files.map(f => `<div data-f="${esc(f)}">${esc(f)}</div>`).join("") || '<span class="hintt">none yet</span>'}</div>`);
     $("otFiles").querySelectorAll("div").forEach(d => d.onclick = () => /\.(png|jpg)$/i.test(d.dataset.f) ? showImg("export:" + d.dataset.f, {fit: true, v: "e" + (++tick)}) : toast(d.dataset.f + " is a data file"));
     on("otFig", "onclick", async () => { await runJob("/api/outputs/export_figures", {}, "Exporting figures"); await finish(8); });
     on("otKn", "onclick", async () => { await runJob("/api/outputs/replot", {}, "Replotting"); await finish(8); });
+    on("otWhole", "onclick", () => Viewer.fit());
     on("otOpen", "onclick", async () => { const r = await api("POST", "/api/outputs/folder"); toast("Opened " + r.opened); });
-    showImg("knoll", {fit: true});
+    this.knollZoom = async () => { const s = await api("GET", "/api/imgsize/knoll").catch(() => null); if (!s) return;
+      const [W, H] = Viewer.size, w = Math.min(s.w, Math.max(900, s.w / 3)); Viewer.zoomTo(0, -w * 0.04, w, w * H / W - w * 0.04); };
+    await showImg("knoll", {fit: true}); this.knollZoom();
+    on("otKz", "onclick", () => this.knollZoom());
     mainBtns([{label: "Export CSV data sheets", fn: async () => { await runJob("/api/outputs/export_data", {}, "Exporting CSV data sheets"); await finish(8); }}]);
   }});
+// ---- Advanced settings (notebook 4 Settings cell) -------------------------------------------
+async function advanced() {
+  const v = await api("GET", "/api/settings"); const groups = [...new Set(v.fields.map(f => f.group))];
+  const inp = f => f.type === "bool" ? `<input type="checkbox" id="as_${f.key}" ${f.value ? "checked" : ""}>`
+    : `<input type="${f.type === "names" ? "text" : "number"}" step="any" id="as_${f.key}" value="${esc(f.value ?? "")}" ${f.type === "int?" ? 'placeholder="auto"' : ""}>`;
+  openDlg(`<h3>Advanced settings</h3><p class="hintt">The values from the notebook's Settings cell. Defaults are the notebook's.${v.computed ? " Changing a mineral or figure value redraws the results." : ""}</p>
+    <div class="tbl" style="max-height:60vh;border:0">${groups.map(g => `<h4>${esc(g)}</h4>` + v.fields.filter(f => f.group === g).map(f =>
+      `<div class="f" title="${esc(f.hint)}"><label>${esc(f.label)}</label>${inp(f)}<span></span></div><div class="hintt" style="margin:-4px 0 6px 98px">${esc(f.hint)}</div>`).join("")).join("")}</div>
+    <div class="btns"><button id="asCancel">Cancel</button><button class="main" id="asOk">Apply</button></div>`);
+  on("asCancel", "onclick", closeDlg);
+  on("asOk", "onclick", async () => { const b = {}; for (const f of v.fields) { const e = $("as_" + f.key); b[f.key] = f.type === "bool" ? e.checked : e.value; }
+    closeDlg(); const r = await runJob("/api/settings", b, "Applying settings"); toast(r.changed.length ? `Changed: ${r.changed.length} setting(s)` + (r.recomputed ? ", results redrawn" : "") : "No change");
+    if (r.recomputed) go(cur); });
+}
 // ---- keys, log, start -----------------------------------------------------------------------
 document.addEventListener("keydown", e => {
   if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName) || dlg.open && dlg.className !== "nonmodal") return;
@@ -396,6 +418,7 @@ document.addEventListener("keydown", e => {
   if (k === "f") { Viewer.fit(); return; }
   if (STEPS[cur].key && STEPS[cur].key(k, e)) e.preventDefault();
 });
+$("advBtn").onclick = advanced;
 $("logBtn").onclick = () => { $("logp").hidden = !$("logp").hidden; };
 Shell.init({steps: [], onStep() {}});
 setInterval(() => { if (!$("logp").hidden) refreshGlobal(); }, 3000);
