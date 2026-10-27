@@ -115,7 +115,9 @@ AMICS_STEPS.push({title: "Files", lead: "Pick the three AMICS images of one samp
       <p class="hintt">The BSE image is shown on the left once it is picked. Wheel = zoom, drag = pan, F or double-click = fit.</p>`);
     const cur_ = () => ({bse: $("f_bse").value, mineral: $("f_mineral").value, legend: $("f_legend").value});
     const after = async k => { const fill = await api("POST", "/api/files/complete", {key: k, cur: cur_()});
-      for (const [kk, v] of Object.entries(fill)) $("f_" + kk).value = v; V.files = {...V.files, ...cur_()}; preview(); };
+      if (k === "bse") $("f_sample").value = "";     // new BSE = new sample: name comes from the file again
+      for (const [kk, v] of Object.entries(fill)) $("f_" + kk).value = v;
+      if (k === "bse" && (!fill.mineral || !fill.legend)) toast("No matching " + [!fill.mineral && "mineral map", !fill.legend && "legend"].filter(Boolean).join(" or ") + " found beside this BSE image: pick it with …"); V.files = {...V.files, ...cur_()}; preview(); };
     const preview = async () => { const r = await api("POST", "/api/files/preview", {bse: $("f_bse").value}); if (r.ok) showImg("bse_gray", {v: "p" + (++tick), fit: true}); };
     for (const k of ["bse", "mineral", "legend"]) {
       on("b_" + k, "onclick", async () => { const p = await browse($("f_" + k).value || $("f_bse").value, false, "Pick the " + k + " image"); if (p) { $("f_" + k).value = p; after(k); } });

@@ -349,3 +349,42 @@ def test_seg_view_passes_status(client, tmp_path):
     v = ok(client.post("/api/segment/op", json={"op": "delete"}))
     assert v["status"].startswith("deleted 1 grain")
     assert ok(client.get("/api/segment"))["status"] == ""      # shown once
+
+
+@need_data
+def test_new_bse_replaces_companions_and_size_mismatch_is_plain(client, tmp_path):
+    """Picking another sample's BSE refills (or clears) the map and legend; a wrong-size map is a plain error."""
+    con = {"bse": str(EX / "Con-1_BSE_Image.tiff"), "mineral": str(EX / "Con-1_Mineral_Image.tiff"),
+           "legend": str(EX / "Con-1_Mineral_Legend.tiff")}
+    fill = ok(client.post("/api/files/complete", json={"key": "bse", "cur": dict(con, bse=str(EX / "10B_BSE_Image.tiff"))}))
+    assert Path(fill["mineral"]).name == "10B_Mineral_Image.tiff" and Path(fill["legend"]).name == "10-Mineral_Legend.tiff"
+    lone = tmp_path / "lone"
+    lone.mkdir()
+    (lone / "X9_BSE_Image.tiff").write_bytes((EX / "10B_BSE_Image.tiff").read_bytes())
+    fill = ok(client.post("/api/files/complete", json={"key": "bse", "cur": dict(con, bse=str(lone / "X9_BSE_Image.tiff"))}))
+    assert fill == {"mineral": "", "legend": ""}          # stale Con-1 paths are cleared, not kept
+    r = client.post("/api/open", json={"bse": str(EX / "10B_BSE_Image.tiff"), "mineral": con["mineral"],
+                                       "legend": con["legend"], "out": str(tmp_path / "o")})
+    assert r.status_code == 400 and "not the same size" in r.json()["detail"] and "different samples" in r.json()["detail"]
+    assert not ok(client.get("/api/state"))["steps"][1]["ready"]
+
+
+def test_use_grain_map_failure_is_plain_error():
+    """A failure inside 'Use this grain map' ends the job with one plain line (no endless wait)."""
+    from pyPetrograph.webapp.shell.jobs import JobRunner
+    from pyPetrograph.webapp.state import UserError, WebState, plain_error
+
+    msg = plain_error(ValueError("mineral map is 1436x1136, BSE is 3313x2552"))
+    assert "not the same size" in msg and "1 · Files" in msg and "ValueError" not in msg
+    st = WebState()
+    st.polys = [object()]
+
+    def boom():
+        raise ValueError("mineral map is 1436x1136, BSE is 3313x2552")
+    st._use_grain_map = lambda *a, **k: boom()
+    runner = JobRunner(error_types=(UserError,))
+    j = runner.submit("use", lambda j: st.use_grain_map(None, j))
+    t0 = time.time()
+    while j.state == "running" and time.time() - t0 < 10:
+        time.sleep(0.02)
+    assert j.state == "error" and "not the same size" in j.error and "different samples" in j.error

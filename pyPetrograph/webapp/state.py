@@ -50,6 +50,38 @@ class UserError(ValueError):
     """Shown to the user as a message, not a traceback."""
 
 
+def _size_problem(bse: str, mineral: str) -> str:
+    """Plain message when the BSE image and the mineral map are not the same size ('' if fine)."""
+    from PIL import Image
+
+    try:
+        with Image.open(bse) as a, Image.open(mineral) as b:
+            (wa, ha), (wb, hb) = a.size, b.size
+    except Exception:
+        return ""      # missing / unreadable files are reported by set_files
+    if (wa, ha) == (wb, hb):
+        return ""
+    return (f"The mineral map ({Path(mineral).name}, {wb}×{hb}) is not the same size as the BSE image "
+            f"({Path(bse).name}, {wa}×{ha}). They are probably from different samples: "
+            "pick the mineral map and legend that belong to this BSE image.")
+
+
+def plain_error(exc: Exception) -> str:
+    """One plain-language line for a failure inside a long step."""
+    import re
+
+    m = re.search(r"mineral map is (\d+)x(\d+), BSE is (\d+)x(\d+)", str(exc))
+    if m:
+        return (f"The mineral map ({m[1]}×{m[2]}) is not the same size as the BSE image ({m[3]}×{m[4]}). "
+                "They are probably from different samples: go back to 1 · Files and pick the matching "
+                "mineral map and legend.")
+    if isinstance(exc, MemoryError):
+        return "Not enough memory for this step. Close other programs and try again."
+    if isinstance(exc, FileNotFoundError):
+        return f"A file is missing: {exc}. Check the files in 1 · Files."
+    return f"This step stopped: {exc}. Check the earlier steps and try again."
+
+
 def short_count(n: int) -> str:
     n = int(n)
     if n < 1000:
@@ -149,6 +181,11 @@ class WebState:
         """Same companion-file guess as the desktop '…' buttons."""
         from pyPetrograph.amics.file_match import complete
 
+        if key == "bse":
+            # A new BSE image means a new sample: its own map and legend replace the old ones,
+            # and a companion that is not found is cleared rather than kept from the last sample.
+            paths, auto = complete(bse=cur.get("bse") or None)
+            return {k: (str(paths[k]) if k in auto and paths.get(k) else "") for k in ("mineral", "legend")}
         args = {k: (v if k == key else (v if v and Path(v).is_file() else None))
                 for k, v in cur.items() if k in ("legend", "bse", "mineral")}
         paths, auto = complete(**args)
@@ -158,6 +195,9 @@ class WebState:
         from pyPetrograph import set_output_dir
 
         set_output_dir(out.strip() or None)
+        size_problem = _size_problem(bse, mineral)
+        if size_problem:
+            raise UserError(size_problem)
         try:
             self.session.set_files(legend, bse, mineral, sample.strip() or None)
         except Exception as exc:
@@ -672,6 +712,14 @@ class WebState:
 
     def use_grain_map(self, backend, job=None) -> None:
         """Desktop 'Use this grain map': save edits, measure, then sections 3 + 4 into the cache."""
+        try:
+            self._use_grain_map(backend, job)
+        except UserError:
+            raise
+        except Exception as exc:     # never leave the step waiting: say what went wrong
+            raise UserError(plain_error(exc)) from exc
+
+    def _use_grain_map(self, backend, job=None) -> None:
         s = self.session
         if not self.polys:
             raise UserError("no grains")

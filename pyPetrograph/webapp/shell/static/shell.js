@@ -16,7 +16,7 @@ const Shell = (() => {
     return j;
   }
   function progress(n, N, msg) {
-    const on = N != null; $("prog").classList.toggle("on", on);
+    const on = N != null; $("prog").classList.toggle("on", on); $("prog").classList.remove("err"); $("progtxt").classList.remove("err");
     if (!on) { $("progtxt").textContent = ""; return; }
     const pct = Math.round(100 * Math.min(n, N) / Math.max(1, N));
     $("prog").firstElementChild.style.width = pct + "%";
@@ -31,9 +31,12 @@ const Shell = (() => {
         progress(j.n, j.N, j.message || label); await new Promise(r => setTimeout(r, wait)); wait = Math.min(250, wait * 2);
         j = await api("GET", "/shell/api/jobs/" + j.id);
       }
-      progress(j.N, j.N, (label || j.title) + (j.state === "done" ? ` · done in ${j.seconds} s` : ""));
+      if (j.state === "error") {        // stays on screen until the next job: the step is not waiting any more
+        const msg = String(j.error || "").replace(/^(UserError|ValueError|RuntimeError): /, "");
+        progress(j.n, j.N, "✗ Stopped: " + msg); $("prog").classList.add("err"); $("progtxt").classList.add("err"); toast(msg, true); throw new Error(msg);
+      }
+      progress(j.N, j.N, (label || j.title) + ` · done in ${j.seconds} s`);
       setTimeout(() => progress(), 2500);
-      if (j.state === "error") { toast(j.error, true); throw new Error(j.error); }
       return j.result;
     } finally { busy(false); }
   }
