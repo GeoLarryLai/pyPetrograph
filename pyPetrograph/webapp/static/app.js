@@ -129,7 +129,7 @@ AMICS_STEPS.push({title: "Files", lead: "Pick the three AMICS images of one samp
     if (last.bse) preview();
     mainBtns([{label: "Open", tip: "Load the sample and read its legend", fn: async () => {
       const b = {...cur_(), out: $("f_out").value, sample: $("f_sample").value}; V.files = {...V.files, ...b};
-      await api("POST", "/api/open", b); await finish(1); }}]);
+      await api("POST", "/api/open", b); V = {files: V.files}; Viewer.clear(); await finish(1); }}]);   // new sample: no view state or image from the last one
   }});
 // 2 Legend
 AMICS_STEPS.push({title: "Legend", lead: "Check the mineral names read from the legend (OCR). Untick what to leave out, fix names and colours.",

@@ -209,6 +209,11 @@ class WebState:
         self.polys, self.base, self.sel, self.ghist, self.edited = [], [], set(), [], False
         self.poly_version += 1
         self.exported = {"data": [], "figures": []}
+        # a new sample: drop every per-sample result of the last one, and new image URLs (no stale browser copies)
+        self.rows, self.legend_hist = [], []
+        self.points, self.thr_typed = [], None
+        self.pts, self.um_text, self.saved_scale = [], "", None
+        self.version += 1
         return self.session.sample
 
     # -- 2 legend ---------------------------------------------------------------------------

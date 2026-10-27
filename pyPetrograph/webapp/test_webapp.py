@@ -388,3 +388,28 @@ def test_use_grain_map_failure_is_plain_error():
     while j.state == "running" and time.time() - t0 < 10:
         time.sleep(0.02)
     assert j.state == "error" and "not the same size" in j.error and "different samples" in j.error
+
+
+@need_data
+def test_switch_sample_in_one_app(client, tmp_path):
+    """Open Con-1, go on, then open 10B in the same app: companions, images and results are 10B's."""
+    import hashlib
+
+    con1 = {"bse": str(EX / "Con-1_BSE_Image.tiff"), "mineral": str(EX / "Con-1_Mineral_Image.tiff"),
+            "legend": str(EX / "Con-1_Mineral_Legend.tiff"), "out": str(tmp_path)}
+    ok(client.post("/api/open", json=con1))
+    job(client, "/api/legend/read")
+    v1 = ok(client.get("/api/state"))["version"]
+    md5 = lambda k, v: hashlib.md5(client.get(f"/api/img/{k}?v={v}&max=400").content).hexdigest()
+    ok(client.post("/api/files/preview", json={"bse": con1["bse"]}))
+    a_leg, a_bse = md5("legend_img", v1), md5("bse_gray", v1)
+    fill = ok(client.post("/api/files/complete", json={"key": "bse", "cur": {**con1, "bse": str(EX / "10B_BSE_Image.tiff")}}))
+    assert fill == {"mineral": str(EX / "10B_Mineral_Image.tiff"), "legend": str(EX / "10-Mineral_Legend.tiff")}
+    ok(client.post("/api/files/preview", json={"bse": str(EX / "10B_BSE_Image.tiff")}))
+    assert ok(client.post("/api/open", json={"bse": str(EX / "10B_BSE_Image.tiff"), **fill, "out": str(tmp_path)}))["sample"] == "10B"
+    g = ok(client.get("/api/state"))
+    assert g["version"] != v1                                              # new image URLs: no stale browser copy
+    assert ok(client.get("/api/legend"))["need_read"]                      # the old legend rows are not kept
+    job(client, "/api/legend/read")
+    assert md5("legend_img", g["version"]) != a_leg and md5("bse_gray", g["version"]) != a_bse
+    assert ok(client.get("/api/legend"))["rows"]
