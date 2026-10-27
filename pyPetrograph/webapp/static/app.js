@@ -321,7 +321,7 @@ STEPS.push({title: "Segmentation", lead: "Find the grains, check them, fix mista
     if (v.poly_version !== this.pv) { const p = await api("GET", "/api/segment/polys?v=" + v.poly_version); this.polys = p.polys; this.pv = p.v; }
     const sel = new Set(v.sel);
     Viewer.setOverlay((c, T) => {
-      Draw.polys(c, T, this.polys.filter((_, i) => !sel.has(i)), "#ffd60a", 1);
+      Draw.polys(c, T, this.polys, "#ffd60a", 1);   // all outlines: one cached path (selected ones are drawn on top)
       if (sel.size) Draw.polys(c, T, v.sel.map(i => this.polys[i]).filter(Boolean), "#ff2d55", 2, "rgba(255,45,85,.3)");
       if (v.preview) Draw.polys(c, T, [v.preview.flat()], "#30d158", 2, "rgba(48,209,88,.3)");
       if (v.box) { c.strokeStyle = "#64d2ff"; c.lineWidth = 1.5; c.strokeRect(T.x(v.box[0]), T.y(v.box[1]), (v.box[2] - v.box[0]) * T.k, (v.box[3] - v.box[1]) * T.k); }
