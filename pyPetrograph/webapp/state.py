@@ -26,6 +26,9 @@ MINERAL_FIGURES = [("Composition", "composition"), ("Overlay", "overlay"),
                    ("Mixed grains", "mixed"), ("Unmapped grains", "unmapped")]
 
 
+
+MERGE_GAP_PX = 4.0  # Merge bridges gaps up to 2x this between selected grains
+
 class UserError(ValueError):
     """Shown to the user as a message, not a traceback."""
 
@@ -579,19 +582,32 @@ class WebState:
             self.sel.clear()
         elif op == "delete" and self.sel:
             self._gpush()
+            n = len(self.sel)
             self.polys = [p for i, p in enumerate(self.polys) if i not in self.sel]
             self.sel.clear()
             self.poly_version += 1
+            self.status = f"deleted {n} grain{'' if n == 1 else 's'} (Undo brings {'it' if n == 1 else 'them'} back)"
         elif op == "merge" and len(self.sel) >= 2:
-            u = shapely.unary_union([self.polys[i] for i in self.sel])
+            parts = [self.polys[i] for i in self.sel]
+            u = shapely.unary_union(parts)
             if u.geom_type != "Polygon":
-                self.status = "selected grains do not touch: not merged"
+                # SEG / SAM outlines of neighbouring grains are separated by a thin gap (a few px),
+                # so an exact union is almost never one polygon. Bridge gaps up to 2*MERGE_GAP_PX.
+                g = MERGE_GAP_PX
+                u = shapely.unary_union([p.buffer(g, join_style="mitre") for p in parts]).buffer(-g, join_style="mitre")
+                if u.geom_type == "MultiPolygon":
+                    u = shapely.unary_union([u] + parts)
+            if u.geom_type != "Polygon":
+                self.status = (f"selected grains are more than {2 * MERGE_GAP_PX:g} px apart: not merged "
+                               "(select neighbouring grains)")
                 self.sel.clear()
                 return
+            n = len(self.sel)
             self._gpush()
             self.polys = [p for i, p in enumerate(self.polys) if i not in self.sel] + [Polygon(u.exterior.coords)]
             self.sel.clear()
             self.poly_version += 1
+            self.status = f"merged {n} grains into one (Undo brings them back)"
         elif op == "undo" and self.ghist:
             self.polys = self.ghist.pop()
             self.sel.clear()

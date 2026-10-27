@@ -261,7 +261,7 @@ STEPS.push({title: "Scale", lead: "Optional: click both ends of the scale bar an
   key(k) { if (k === "z") this.op("undo"); else if (k === "c") this.op("reset"); else if (k === "b") this.zoom(); else if (k === "enter") this.apply(); else return false; return true; }});
 // 6 Segmentation
 STEPS.push({title: "Segmentation", lead: "Find the grains, check them, fix mistakes, then use the grain map.",
-  help: "Click a grain to select it (Shift = add). D delete, M merge, Z undo. With Add grain (A): click points or drag a box, Enter accepts.",
+  help: "Click a grain to select it; each click adds another (click again to unselect). D delete, M merge, Z undo. With Add grain (A): click points or drag a box, Enter accepts.",
   controls: [["Run segmentation", "SegmentEveryGrain (U-Net + SAM); progress shows n / N"], ["SAM 2.1 refine", "optional extra pass over SEG's grains"],
     ["Min grain (px)", "smaller grains are dropped"], ["Non-grain drop fraction", "drop grains mostly inside the blue non-grain area"], ["Load saved grains", "the grains saved for this sample"],
     ["Click / Shift-click", "select grains"], ["Add grain (A)", "SAM: click = point (right-click = negative point), drag = box"], ["Accept grain (Enter)", "keep the SAM preview"], ["Clear prompts (Esc)", ""],
@@ -310,9 +310,12 @@ STEPS.push({title: "Segmentation", lead: "Find the grains, check them, fix mista
   async prompt(x) { await api("POST", "/api/segment/op", x); const r = await api("POST", "/api/segment/prompt");
     if (r.job) { try { await runJob("/api/segment/prompt", undefined, "SAM"); } catch (e) {} } this.draw(await api("GET", "/api/segment")); },
   async draw(v) {
-    this.v = v; pill(v.state[0], v.state[1]);
+    this.v = v; pill(v.state[0], v.state[1]); if (v.status) toast(v.status);
     $("sgInfo").textContent = `${v.n} grains · ${v.sel.length} selected · ${v.edits} edits` + (v.edited ? " (edited)" : "");
     $("sgLoad").disabled = $("sgClear").disabled = !v.has_saved; $("sgUndo").disabled = !v.edits; $("sgDel").disabled = !v.sel.length; $("sgMerge").disabled = v.sel.length < 2;
+    $("sgDel").title = v.sel.length ? "Delete the selected grains (D)" : "Click a grain on the image first";
+    $("sgMerge").title = v.sel.length > 1 ? "Merge the selected grains (M)" : "Click two or more neighbouring grains first";
+    if (v.n && !v.sel.length && !this.add) $("sgInfo").textContent += " · click a grain on the image to select it (click more to add), then Delete or Merge";
     const u = $("sgUse"); if (u) u.disabled = !v.use_ok; const r = $("sgRun"); if (r && !v.avail.seg) r.disabled = true;
     if (v.n && u && !u.disabled) { u.className = "main"; if (r) r.className = ""; }
     if (v.poly_version !== this.pv) { const p = await api("GET", "/api/segment/polys?v=" + v.poly_version); this.polys = p.polys; this.pv = p.v; }

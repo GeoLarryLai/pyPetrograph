@@ -21,3 +21,4 @@
 - Stage A4: equivalence 26/26 SAME
 - Stage A5: wheel 0.2.0 fresh venv 925 MB, app 200, no old codes/tools in dists
 - Stage A6: commit 46a2388; Mac old codes/qt_desktop_app created (12 app files + README + qt_flow + qt_bench), gitignored; review files rebuilt. DONE
+- grain fix: merge gap bridging (MERGE_GAP_PX=4), status toast, tests added; Larry runs OLD Qt 42d4ffb (pip 0.0.7 editable). Steering: buttons greyed -> check selection

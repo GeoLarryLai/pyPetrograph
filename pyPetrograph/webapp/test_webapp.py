@@ -251,22 +251,15 @@ def test_grain_edits_select_delete_merge_undo(client, tmp_path):
     assert v["n"] == n0 - 1 and v["edits"] == 1 and v["edited"]
     v = ok(client.post("/api/segment/op", json={"op": "undo"}))
     assert v["n"] == n0 and v["edits"] == 0 and not v["edited"]
-    # merge two touching grains
-    pair = None
-    for a in cs:
-        for b in cs:
-            if a[0] < b[0] and a[3].buffer(0.6).intersects(b[3]):
-                import shapely
-                if shapely.unary_union([a[3].buffer(0.01), b[3].buffer(0.01)]).geom_type == "Polygon":
-                    pair = (a, b)
-                    break
-        if pair:
-            break
-    if pair:
-        for g in pair:
-            ok(client.post("/api/segment/op", json={"op": "click", "x": g[1], "y": g[2]}))
-        v = ok(client.post("/api/segment/op", json={"op": "merge"}))
-        assert v["n"] in (n0 - 1, n0) and v["sel"] == []
+    # merge two neighbouring grains (SEG leaves a few-px gap between them; Merge must bridge it)
+    from pyPetrograph.webapp.state import MERGE_GAP_PX
+    a, b = min(((a, b) for a in cs for b in cs if a[0] < b[0]), key=lambda ab: ab[0][3].distance(ab[1][3]))
+    assert a[3].distance(b[3]) < 2 * MERGE_GAP_PX
+    for g in (a, b):
+        ok(client.post("/api/segment/op", json={"op": "click", "x": g[1], "y": g[2]}))
+    v = ok(client.post("/api/segment/op", json={"op": "merge"}))
+    assert v["n"] == n0 - 1 and v["sel"] == [] and v["edits"] == 1 and v["status"].startswith("merged 2")
+    ok(client.post("/api/segment/op", json={"op": "undo"}))
     ok(client.post("/api/segment/op", json={"op": "click", "x": x, "y": y}))
     ok(client.post("/api/segment/op", json={"op": "delete"}))
     v = ok(client.post("/api/segment/op", json={"op": "reset"}))
@@ -321,3 +314,38 @@ def test_minerals_add_colour_and_export_gating(tmp_path):
     job(c, "/api/outputs/export_data")
     out = ok(c.get("/api/outputs"))
     assert out["n_csv"] > 0 and "Exported" in out["state"][0]
+
+
+def test_grain_merge_bridges_seg_gap_and_reports():
+    """Regression: SEG leaves a few-px gap between neighbouring grains, so an exact union never
+    merged them (Merge silently did nothing). Merge now bridges small gaps and always reports."""
+    from shapely.geometry import box
+    from pyPetrograph.webapp.state import WebState, MERGE_GAP_PX
+
+    st = WebState()
+    st.got_grains([box(0, 0, 10, 10), box(15, 0, 25, 10), box(100, 0, 110, 10)], "segmented")
+    st.grain_click(5, 5); st.grain_click(20, 5)                # plain clicks add to the selection
+    assert st.sel == {0, 1}
+    st.grain_op("merge")
+    assert len(st.polys) == 2 and st.sel == set() and st.edited and "merged 2" in st.status
+    m = st.polys[-1]
+    assert m.geom_type == "Polygon" and abs(m.area - (100 + 100 + 50)) < 5     # gap filled, shape kept
+    assert m.bounds == (0.0, 0.0, 25.0, 10.0)
+    st.status = ""
+    st.grain_click(105, 5); st.grain_click(5, 5)               # far apart: refused, with a message
+    st.grain_op("merge")
+    assert len(st.polys) == 2 and st.sel == set() and "px apart" in st.status and 2 * MERGE_GAP_PX < 75
+    st.grain_click(105, 5); st.grain_op("delete")
+    assert len(st.polys) == 1 and "deleted 1 grain" in st.status
+    st.grain_op("undo"); st.grain_op("undo")
+    assert len(st.polys) == 3 and not st.edited
+
+
+@need_data
+def test_seg_view_passes_status(client, tmp_path):
+    v = _to_segment(client, tmp_path)
+    x, y = _centroids(client)[0][1:3]
+    ok(client.post("/api/segment/op", json={"op": "click", "x": x, "y": y}))
+    v = ok(client.post("/api/segment/op", json={"op": "delete"}))
+    assert v["status"].startswith("deleted 1 grain")
+    assert ok(client.get("/api/segment"))["status"] == ""      # shown once

@@ -395,7 +395,8 @@ def create_app(state: Optional[WebState] = None, backend=None, testing: bool = F
         av = st.availability()
         msg, kind = st.seg_state()
         s = S.s
-        return {"n": len(st.polys), "sel": sorted(st.sel), "edits": len(st.ghist), "edited": st.edited,
+        note, st.status = st.status, ""
+        return {"status": note, "n": len(st.polys), "sel": sorted(st.sel), "edits": len(st.ghist), "edited": st.edited,
                 "poly_version": st.poly_version, "state": [msg, kind], "avail": av,
                 "settings": {"use_sam2": bool(s.use_sam2) and bool(av.get("sam2")), "min_px": int(s.min_grain_px),
                              "drop": float(s.dark_drop_frac)},
