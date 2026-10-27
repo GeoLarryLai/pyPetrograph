@@ -4,7 +4,7 @@
 
 v0.3.0
 
-pyPetrograph is a machine-learning toolkit for thin-section petrography. You can hand-label features on an RGB photo and train a LightGBM pixel model to map area % of each class (porosity in the demo). You can count grains on a painted mineral map by matching a color legend. You can stack several image types of the same field (PPL, XPL, or others) and segment grains from that overlay. Or, from an AMICS set (BSE, mineral map, and legend), you can outline grains on the BSE and name each grain from the map.
+pyPetrograph is a machine-learning toolkit for thin-section petrography. You can hand-label features on an RGB photo and train a LightGBM pixel model to map area % of each class (porosity in the demo). You can count grains on a painted mineral map by matching a color legend. You can stack several image types of the same field (PPL, XPL, or others) and segment grains from that overlay. Or, from an Advanced Mineral Identification and Characterization System (AMICS) set (BSE, mineral map, and legend), you can outline grains on the BSE and name each grain from the map.
 
 > [!WARNING]
 > This tool is under development. Use with caution. Notebooks, APIs, and numbers can still change.

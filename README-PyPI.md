@@ -16,7 +16,7 @@ pyPetrograph is a machine-learning toolkit for thin-section petrography.
 
 **Segment grains from a multi-image overlay.** Line up several image types of the same field (plane-polarized light, crossed polars, or others) and refine grain outlines with a U-Net, so boundaries are not drawn from one lighting alone.
 
-**AMICS workflow (notebook 4 and the app).** From a BSE image, a mineral map and its legend: read the legend (OCR, editable), outline every grain on the BSE, name each grain from the map, and export counts, per-mineral grain sizes and figures.
+**Advanced Mineral Identification and Characterization System (AMICS) workflow (notebook 4 and the app).** From a BSE image, a mineral map and its legend: read the legend (OCR, editable), outline every grain on the BSE, name each grain from the map, and export counts, per-mineral grain sizes and figures.
 
 | Grain segmentation | Mineral composition | Knolling |
 |---|---|---|
