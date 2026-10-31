@@ -1,8 +1,8 @@
-<p align="center"><img src="image/logo.png" alt="pyPetrograph" width="160"></p>
+<p align="center"><img src="image/logo.png" alt="pyPetrograph" width="240"></p>
 
 # pyPetrograph
 
-![PyPI version](https://img.shields.io/pypi/v/pypetrograph.svg) [![pepy downloads](https://static.pepy.tech/badge/pypetrograph)](https://pepy.tech/project/pypetrograph) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23659316.svg)](https://doi.org/10.5281/zenodo.23659316)
+![PyPI version](https://img.shields.io/pypi/v/pypetrograph.svg) [![pepy downloads](https://static.pepy.tech/badge/pypetrograph)](https://pepy.tech/project/pypetrograph) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23659316.svg)](https://doi.org/10.5281/zenodo.23659316) [![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](./LICENSE)
 
 v0.3.0
 
@@ -211,15 +211,3 @@ Optional extras (not installed by default):
 - everything except tests: `all`
 
 SegmentEveryGrain (TensorFlow, PyTorch, SAM 2) is not a pyPetrograph extra; install it with [its own instructions](https://github.com/zsylvester/segmenteverygrain).
-
-## License
-
-```text
-Program: pyPetrograph
-A toolkit for semi-automated, ML-assisted thin-section petrography:
-porosity estimation, mineral counting, grain segmentation and micro-
-texture analysis
-Copyright (C) 2026  Larry Syu-Heng Lai
-```
-
-pyPetrograph is licensed under the GNU Affero General Public License 3.0 or later. See [LICENSE](LICENSE).
