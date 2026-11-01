@@ -2,7 +2,7 @@
 <p align="center">
 <a href="https://doi.org/10.5281/zenodo.23659316"><img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23659316-blue" alt="DOI"></a> <a href="https://github.com/GeoLarryLai/pyPetrograph/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-lightgrey" alt="License"></a>
 <br>
-<a href="https://pypi.org/project/pypetrograph/"><img src="https://img.shields.io/pypi/pyversions/pypetrograph?color=orange" alt="Python versions"></a> <a href="https://pypi.org/project/pypetrograph/"><img src="https://img.shields.io/pypi/v/pypetrograph?color=orange" alt="PyPI version"></a> <a href="https://pepy.tech/projects/pypetrograph"><img src="https://img.shields.io/pepy/dt/pypetrograph?label=pypi%20downloads&color=orange" alt="PyPI downloads"></a>
+<a href="https://pypi.org/project/pypetrograph/"><img src="https://img.shields.io/pypi/pyversions/pypetrograph?color=lightgrey" alt="Python versions"></a> <a href="https://pypi.org/project/pypetrograph/"><img src="https://img.shields.io/pypi/v/pypetrograph?color=orange" alt="PyPI version"></a> <a href="https://pepy.tech/projects/pypetrograph"><img src="https://img.shields.io/pepy/dt/pypetrograph?label=pypi%20downloads&color=orange" alt="PyPI downloads"></a>
 </p>
 
 # pyPetrograph
