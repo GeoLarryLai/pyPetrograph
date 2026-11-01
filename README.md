@@ -1,8 +1,11 @@
 <p align="center"><img src="image/logo.png" alt="pyPetrograph" width="220"></p>
+<p align="center">
+<a href="https://doi.org/10.5281/zenodo.23659316"><img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23659316-blue" alt="DOI"></a> <a href="https://github.com/GeoLarryLai/pyPetrograph/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-lightgrey" alt="License"></a>
+<br>
+<a href="https://pypi.org/project/pypetrograph/"><img src="https://img.shields.io/pypi/pyversions/pypetrograph?color=orange" alt="Python versions"></a> <a href="https://pypi.org/project/pypetrograph/"><img src="https://img.shields.io/pypi/v/pypetrograph?color=orange" alt="PyPI version"></a> <a href="https://pepy.tech/projects/pypetrograph"><img src="https://img.shields.io/pepy/dt/pypetrograph?label=pypi%20downloads&color=orange" alt="PyPI downloads"></a>
+</p>
 
 # pyPetrograph
-
-![PyPI version](https://img.shields.io/pypi/v/pypetrograph.svg) [![pepy downloads](https://static.pepy.tech/badge/pypetrograph)](https://pepy.tech/project/pypetrograph) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23659316.svg)](https://doi.org/10.5281/zenodo.23659316) [![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](./LICENSE)
 
 pyPetrograph is a machine-learning toolkit for thin-section petrography. You can hand-label features on an RGB photo and train a LightGBM pixel model to map area % of each class (porosity in the demo). You can count grains on a painted mineral map by matching a color legend. You can stack several image types of the same field (PPL, XPL, or others) and segment grains from that overlay (experimental, incomplete). Or, from an Advanced Mineral Identification and Characterization System (AMICS) set (BSE, mineral map, and legend), you can outline grains on the BSE and name each grain from the map.
 
