@@ -10,7 +10,7 @@ pyPetrograph is a machine-learning toolkit for thin-section petrography.
 
 ## What it does
 
-**Hand-label features and map their area %.** Paint a few examples of each class you care about (pores, grains, cement, …) from color, edge sharpness, and microtexture. A LightGBM pixel classifier (random forest or XGBoost optional) maps the rest of the photo and reports area % of each class.
+**Hand-label features and map their area %.** Paint a few examples of each class you care about (pores, grains, cement, …) from color, edge sharpness, and microtexture. A LightGBM pixel classifier (random forest optional) maps the rest of the photo and reports area % of each class.
 
 **Count grains on a painted mineral map.** Match pixels to a color legend, split grains that touch, and count how many grains sit in each class.
 
@@ -40,7 +40,7 @@ cd pyPetrograph
 pip install .
 ```
 
-⚠️ The default install is **~920 MB**, including legend OCR (rapidocr with onnxruntime and OpenCV, plus the bundled PP-OCRv4 models, **~190 MB**) and the app (fastapi + uvicorn, ~11 MB). Optional extras: `xgb`, `test`, `all`.
+⚠️ The default install is **~920 MB**, including legend OCR (rapidocr with onnxruntime and OpenCV, plus the bundled PP-OCRv4 models, **~190 MB**) and the app (fastapi + uvicorn, ~11 MB). Tests (dev only): `pip install pytest httpx`.
 
 ## SegmentEveryGrain (optional, for grain segmentation)
 
@@ -64,7 +64,7 @@ Opens the AMICS workflow in your web browser (local only). The notebook pop-up w
 
 ## Demos
 
-Example notebooks, test images, figures, and optional extras are in the [GitHub repository](https://github.com/GeoLarryLai/pyPetrograph).
+Example notebooks, test images and figures are in the [GitHub repository](https://github.com/GeoLarryLai/pyPetrograph).
 
 ## Credits
 

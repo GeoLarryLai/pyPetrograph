@@ -235,16 +235,14 @@ Auto-align uses structure maps (`local_grad` + `local_std` + LBP), not color. Sa
 
 Declared in [`pyproject.toml`](pyproject.toml) (`environment.yml` mirrors it as a conda dev convenience).
 
-| Extra | Packages | Used by |
+| Install | Packages | Used by |
 |-------|----------|---------|
 | *(core)* | numpy, pillow, matplotlib, scikit-learn, scipy, geopandas, shapely, rasterio, affine, joblib, pandas, lightgbm, scikit-image, rapidocr, onnxruntime, fastapi, uvicorn | notebooks, legend OCR, browser app (`pypetrograph-app`) |
-| `[xgb]` | xgboost | optional RGB classifier |
-| `[test]` | pytest, httpx | test suite |
-| `[all]` | xgb | everything except tests |
+| dev only: `pip install pytest httpx` | pytest, httpx | test suite |
 
-Notebook pop-up windows: `pip install PySide6-Essentials` (not an extra).
+Notebook pop-up windows: `pip install PySide6-Essentials` (optional, not installed by default).
 
-From PyPI: `pip install pypetrograph`. SegmentEveryGrain (TensorFlow, PyTorch, SAM 2; multimodal U-Net / GrainPlot / montage, optional SAM shape refine — **do not** download the ~860 MB SAM weights unless `USE_SAM2 = True`) is not a pyPetrograph extra: install it into the same env with [its own instructions](https://github.com/zsylvester/segmenteverygrain).
+From PyPI: `pip install pypetrograph`. SegmentEveryGrain (TensorFlow, PyTorch, SAM 2; multimodal U-Net / GrainPlot / montage, optional SAM shape refine — **do not** download the ~860 MB SAM weights unless `USE_SAM2 = True`) is not installed with pyPetrograph: install it into the same env with [its own instructions](https://github.com/zsylvester/segmenteverygrain).
 
 ---
 

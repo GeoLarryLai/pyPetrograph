@@ -419,7 +419,7 @@ def check_and_install_packages(
     if failed:
         print("Still missing:", ", ".join(failed))
         print("Fix: conda env create -f environment.yml")
-        print("  or: pip install 'pyPetrograph[all]'  (SegmentEveryGrain: " + SEG_INSTALL_URL + ")")
+        print("  or: pip install pyPetrograph  (SegmentEveryGrain: " + SEG_INSTALL_URL + ")")
     elif not missing:
         print("All required packages are available.")
     else:

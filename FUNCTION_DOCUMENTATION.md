@@ -317,7 +317,7 @@ Names that start with `_` are omitted, except `_run_qt_picker_from_config` and `
 ### `pyPetrograph.labeling_ml.train`
 
 - `format_classification_report_pct` (`pyPetrograph/labeling_ml/train.py`): Classification report with precision / recall / f1 / accuracy as percent (3 dp).
-- `train_classifier` (`pyPetrograph/labeling_ml/train.py`): Train RF / LightGBM / XGBoost on labeled pixels with selected features.
+- `train_classifier` (`pyPetrograph/labeling_ml/train.py`): Train LightGBM / random forest on labeled pixels with selected features.
 - `train_classifier_from_xy` (`pyPetrograph/labeling_ml/train.py`): Train from pre-built float32 X (N,C) and int y (N,). CV then fit-all (see train_classifier).
 
 ## mineral_map

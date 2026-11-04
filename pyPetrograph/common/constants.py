@@ -73,7 +73,7 @@ DEFAULT_ALIGN_SCALE_RANGE = (0.5, 2.0)
 DEFAULT_ALIGN_FADE = 0.45
 UNIVERSAL_MODEL_NAME = "universal_model.joblib"
 
-METHODS = ("lightgbm", "random_forest", "xgboost")
+METHODS = ("lightgbm", "random_forest")
 DEFAULT_METHOD = "lightgbm"
 DEFAULT_CV_FOLDS = 5
 

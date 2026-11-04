@@ -55,35 +55,7 @@ def _make_classifier(method: str, n_jobs: int = DEFAULT_N_JOBS):
             verbose=-1,
         )
 
-    if method == "xgboost":
-        try:
-            from xgboost import XGBClassifier
-        except ImportError as exc:
-            raise ImportError(
-                "xgboost is not installed. `conda install xgboost` or `pip install xgboost`."
-            ) from exc
-        return XGBClassifier(
-            n_estimators=100,
-            random_state=RANDOM_STATE,
-            n_jobs=n_jobs,
-            verbosity=0,
-            objective="multi:softprob",
-            eval_metric="mlogloss",
-        )
-
     raise ValueError(f"Unknown method {method!r}. Choose from {METHODS}.")
-
-
-def _xgboost_label_maps(y: np.ndarray) -> Tuple[Optional[Dict[int, int]], Optional[Dict[int, int]], np.ndarray]:
-    """Map class ids to 0..C-1 for XGBoost when needed. Returns (label_map, inv_map, y_fit)."""
-    y = np.asarray(y, dtype=np.int32)
-    classes = np.unique(y)
-    if np.array_equal(classes, np.arange(len(classes))):
-        return None, None, y
-    label_map = {int(c): i for i, c in enumerate(classes)}
-    inv_map = {i: int(c) for c, i in label_map.items()}
-    y_fit = np.array([label_map[int(v)] for v in y], dtype=np.int32)
-    return label_map, inv_map, y_fit
 
 
 def _class_target_names(
@@ -177,22 +149,15 @@ def _cv_score_then_fit_all(
     """
     y = np.asarray(y, dtype=np.int32)
     method_l = method.lower().strip()
-    label_map = None
+    label_map = None   # kept in the result for saved-model compatibility (classes are fit as-is)
     inv_map = None
-    y_fit = y
-    if method_l == "xgboost":
-        label_map, inv_map, y_fit = _xgboost_label_maps(y)
 
-    _, counts = np.unique(y_fit, return_counts=True)
+    _, counts = np.unique(y, return_counts=True)
     n_splits = int(min(max(int(cv_folds), 2), int(counts.min())))
     if n_splits < 2:
         clf = _make_classifier(method_l, n_jobs=n_jobs)
-        clf.fit(X_df, y_fit)
-        y_hat_m = clf.predict(X_df)
-        if inv_map is not None:
-            y_hat = np.array([inv_map[int(v)] for v in y_hat_m], dtype=np.int32)
-        else:
-            y_hat = y_hat_m
+        clf.fit(X_df, y)
+        y_hat = clf.predict(X_df)
         acc = float(accuracy_score(y, y_hat))
         report = format_classification_report_pct(y, y_hat, class_names=class_names)
         return {
@@ -206,16 +171,12 @@ def _cv_score_then_fit_all(
 
     cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=RANDOM_STATE)
     clf_cv = _make_classifier(method_l, n_jobs=1)
-    y_oof_m = cross_val_predict(clf_cv, X_df, y_fit, cv=cv, n_jobs=n_jobs)
-    if inv_map is not None:
-        y_oof = np.array([inv_map[int(v)] for v in y_oof_m], dtype=np.int32)
-    else:
-        y_oof = y_oof_m
+    y_oof = cross_val_predict(clf_cv, X_df, y, cv=cv, n_jobs=n_jobs)
     acc = float(accuracy_score(y, y_oof))
     report = format_classification_report_pct(y, y_oof, class_names=class_names)
 
     clf = _make_classifier(method_l, n_jobs=n_jobs)
-    clf.fit(X_df, y_fit)
+    clf.fit(X_df, y)
     return {
         "model": clf,
         "accuracy": acc,
@@ -242,7 +203,7 @@ def train_classifier(
     class_names: Optional[Dict[int, str]] = None,
 ) -> Dict[str, Any]:
     """
-    Train RF / LightGBM / XGBoost on labeled pixels with selected features.
+    Train LightGBM / random forest on labeled pixels with selected features.
 
     Scores with stratified k-fold CV (out-of-fold), then fits the saved model on all labels.
     Returns bundle including feature_names and feature_toggles.

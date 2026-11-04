@@ -41,7 +41,7 @@ pip install .
 
 Use `pip install -e .` instead for an editable (development) install.
 
-Optional extras: `xgb`, `test`, `all`, e.g. `pip install "pyPetrograph[xgb]"`.
+Tests (dev only): `pip install pytest httpx`.
 
 ### SegmentEveryGrain (optional, for grain segmentation)
 
@@ -125,7 +125,7 @@ Lai, L.S.-H. (2026) pyPetrograph. *Zenodo*, [https://doi.org/10.5281/zenodo.2365
 
 [`pyPetrograph_1_rgb_porosity.ipynb`](pyPetrograph_1_rgb_porosity.ipynb)
 
-You paint a few examples of each feature you care about (pores, grains, cement, …) using what you see — color, edge sharpness, and microtexture. A LightGBM pixel classifier (random forest or XGBoost optional) learns those examples, maps the rest of the photo, and reports area % of each class with a confidence range. The demo uses pores vs grains and treats pore area as porosity.
+You paint a few examples of each feature you care about (pores, grains, cement, …) using what you see — color, edge sharpness, and microtexture. A LightGBM pixel classifier (random forest optional) learns those examples, maps the rest of the photo, and reports area % of each class with a confidence range. The demo uses pores vs grains and treats pore area as porosity.
 
 ![Wand/polygon label window on a PPL thin section](image/Manual_label_UI.png)
 
@@ -205,10 +205,6 @@ Installed with the package (⚠️ **~920 MB** in total; measured on Linux, Pyth
 
 Notebook pop-up windows (notebook pickers, label/align/GrainPlot windows; not installed by default, the app does not need it): ⚠️ PySide6-Essentials (>=6.6, **~250 MB**), `pip install PySide6-Essentials`. Another Qt binding supported by Matplotlib also works if already installed. On Linux, the pop-up windows' Qt also needs a few system libraries (Debian/Ubuntu; use `libglib2.0-0` on older Ubuntu): `sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libxkbcommon-x11-0 libfontconfig1 libfreetype6 libdbus-1-3 libglib2.0-0t64 libx11-6 libx11-xcb1 libxcb1 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xkb1`. The app needs none of them.
 
-Optional extras (not installed by default):
+Tests (dev only, not installed with the package): `pip install pytest httpx`.
 
-- xgboost (`xgb`: xgboost >=2)
-- tests (`test`: pytest >=7, httpx >=0.24)
-- everything except tests: `all`
-
-SegmentEveryGrain (TensorFlow, PyTorch, SAM 2) is not a pyPetrograph extra; install it with [its own instructions](https://github.com/zsylvester/segmenteverygrain).
+SegmentEveryGrain (TensorFlow, PyTorch, SAM 2) is not installed with pyPetrograph; install it with [its own instructions](https://github.com/zsylvester/segmenteverygrain).

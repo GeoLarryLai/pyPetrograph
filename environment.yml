@@ -2,7 +2,7 @@
 # pyproject.toml is the source of truth; users install with pip (see README).
 # SegmentEveryGrain is optional and installed with its own instructions:
 # https://github.com/zsylvester/segmenteverygrain
-#   conda env create -f environment.yml && conda activate pypetrograph && pip install -e ".[test]"
+#   conda env create -f environment.yml && conda activate pypetrograph && pip install -e .
 
 name: pypetrograph
 channels:
@@ -24,7 +24,6 @@ dependencies:
   - scikit-image>=0.22
   - fastapi>=0.110             # browser app (pypetrograph-app)
   - uvicorn>=0.27
-  - xgboost>=2                 # optional [xgb]
   - pytest>=7                  # tests only
   - httpx>=0.24                # tests only (FastAPI TestClient)
   - jupyterlab

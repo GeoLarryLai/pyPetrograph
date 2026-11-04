@@ -46,17 +46,6 @@ dependencies = [
     "uvicorn>=0.27",
 ]
 
-[project.optional-dependencies]
-# SegmentEveryGrain (grain segmentation, brings TensorFlow, PyTorch and SAM 2) is optional and is
-# installed with its own instructions: https://github.com/zsylvester/segmenteverygrain
-xgb = ["xgboost>=2"]
-# notebook pop-up windows only: pip install PySide6-Essentials (not an extra)
-test = [
-    "pytest>=7",
-    "httpx>=0.24",
-]
-all = ["pyPetrograph[xgb]"]
-
 [project.scripts]
 pypetrograph-app = "pyPetrograph.webapp:main"
 pypetrograph-web = "pyPetrograph.webapp:main"
