@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 (2026-11-03)
 
 ### Changed
 - No pip extras: `xgb`, `test` and `all` are removed. Tests need `pip install pytest httpx`.
