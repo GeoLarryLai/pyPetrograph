@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from pyPetrograph.webapp.routes import create_app
 
 EX = Path(__file__).resolve().parents[1] / "example_data"
-REF = Path("/workspace/ppq/outputs/amics/10B")
+REF = Path(__file__).resolve().parents[1] / "outputs" / "amics" / "10B"
 
 
 def seed(out):
