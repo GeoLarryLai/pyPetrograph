@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- Legend and footer OCR now use rapidocr 3.x on onnxruntime (was rapidocr_onnxruntime), with the PP-OCRv4 mobile det/rec and v2.0 cls models bundled in `pyPetrograph/ocr_models/` (Apache-2.0, see NOTICE); no model download at run time. Works on Python 3.13+. Swatch names and footer pixel sizes are unchanged on the example data.
+
 ## 0.3.0 (2026-10-27)
 
 ### Added

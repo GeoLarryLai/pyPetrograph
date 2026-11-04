@@ -134,7 +134,7 @@ def read_footer_pixelsize(rgba: np.ndarray, footer_row: int) -> Optional[float]:
         h = rgba.shape[0]
         if h - footer_row < 8:
             return None
-        from pyPetrograph.amics.legend_read import _get_engine
+        from pyPetrograph.amics.legend_read import _get_engine, ocr_lines
 
         engine = _get_engine()
         if engine is None:
@@ -143,7 +143,7 @@ def read_footer_pixelsize(rgba: np.ndarray, footer_row: int) -> Optional[float]:
         crop = crop.resize((crop.width * 3, crop.height * 3), Image.LANCZOS)
         canvas = Image.new("RGB", (crop.width + 60, crop.height + 60), (255, 255, 255))
         canvas.paste(crop, (30, 30))
-        result, _ = engine(np.asarray(canvas))
+        result = ocr_lines(engine, np.asarray(canvas))
         if not result:
             return None
 

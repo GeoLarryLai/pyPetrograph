@@ -210,7 +210,8 @@ SAM2_PACKAGES: List[Tuple[str, str]] = [
 
 # AMICS workflow: OCR for legend names and the BSE footer "PixelSize" text.
 AMICS_PACKAGES: List[Tuple[str, str]] = [
-    ("rapidocr_onnxruntime", "rapidocr_onnxruntime>=1.3"),
+    ("rapidocr", "rapidocr>=3,<4"),
+    ("onnxruntime", "onnxruntime"),
 ]
 
 # notebook pop-up windows (``pip install PySide6-Essentials``); checked, never auto-installed by notebooks

@@ -237,7 +237,7 @@ Declared in [`pyproject.toml`](pyproject.toml) (`environment.yml` mirrors it as 
 
 | Extra | Packages | Used by |
 |-------|----------|---------|
-| *(core)* | numpy, pillow, matplotlib, scikit-learn, scipy, geopandas, shapely, rasterio, affine, joblib, pandas, lightgbm, scikit-image, rapidocr_onnxruntime, fastapi, uvicorn | notebooks, legend OCR, browser app (`pypetrograph-app`) |
+| *(core)* | numpy, pillow, matplotlib, scikit-learn, scipy, geopandas, shapely, rasterio, affine, joblib, pandas, lightgbm, scikit-image, rapidocr, onnxruntime, fastapi, uvicorn | notebooks, legend OCR, browser app (`pypetrograph-app`) |
 | `[xgb]` | xgboost | optional RGB classifier |
 | `[test]` | pytest, httpx | test suite |
 | `[all]` | xgb | everything except tests |

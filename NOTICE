@@ -1,0 +1,14 @@
+pyPetrograph
+Copyright (C) 2026 Larry Syu-Heng Lai
+Licensed under the GNU Affero General Public License v3.0 or later (see LICENSE).
+
+This product includes third-party files:
+
+- PaddleOCR text models (bundled, unmodified, in pyPetrograph/ocr_models/): PP-OCRv4 mobile
+  detection (ch_PP-OCRv4_det_infer.onnx), PP-OCRv4 mobile recognition (ch_PP-OCRv4_rec_infer.onnx)
+  and v2.0 mobile direction classifier (ch_ppocr_mobile_v2.0_cls_infer.onnx), ONNX conversions as
+  distributed by RapidOCR. Copyright (c) PaddlePaddle Authors; RapidOCR conversions Copyright (c)
+  RapidAI. Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+  (https://github.com/PaddlePaddle/PaddleOCR, https://github.com/RapidAI/RapidOCR)
+
+The Apache-2.0 models are compatible with AGPLv3 and remain under their own license.

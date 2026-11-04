@@ -9,7 +9,7 @@ description = "A toolkit for semi-automated, ML-assisted thin-section petrograph
 readme = "README-PyPI.md"
 requires-python = ">=3.10"
 license = "AGPL-3.0-or-later"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Larry Syu-Heng Lai" }]
 keywords = ["petrography", "thin-section", "mineralogy", "segmentation", "porosity"]
 classifiers = [
@@ -38,9 +38,9 @@ dependencies = [
     "pandas>=2",
     "lightgbm>=4",
     "scikit-image>=0.22",
-    # legend OCR (notebook 4 and the app); pulls in onnxruntime and OpenCV (~220 MB).
-    # No Python 3.13+ wheels yet; there the legend uses swatch_1..N names.
-    "rapidocr_onnxruntime>=1.3; python_version < '3.13'",
+    # legend OCR (notebook 4 and the app); PP-OCRv4 models bundled in pyPetrograph/ocr_models/
+    "rapidocr>=3,<4",
+    "onnxruntime",
     # browser app (pypetrograph-app), ~11 MB, no Qt
     "fastapi>=0.110",
     "uvicorn>=0.27",
@@ -67,6 +67,7 @@ Repository = "https://github.com/GeoLarryLai/pyPetrograph"
 Changelog = "https://github.com/GeoLarryLai/pyPetrograph/blob/main/CHANGELOG.md"
 
 [tool.setuptools.package-data]
+"pyPetrograph" = ["ocr_models/*.onnx"]
 "pyPetrograph.webapp" = ["static/*"]
 "pyPetrograph.webapp.shell" = ["static/*"]
 

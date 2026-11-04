@@ -402,7 +402,7 @@ def check_and_install_packages(
                 pip_missing, extra_results, import_after=False
             )
         elif pip_missing:
-            print("Pass install=True to pip-install them (rapidocr_onnxruntime is part of pip install pyPetrograph on Python <3.13)")
+            print("Pass install=True to pip-install them (rapidocr and onnxruntime are part of pip install pyPetrograph)")
         if seg_missing:  # never auto-installed: SegmentEveryGrain has its own install method
             print(f"SegmentEveryGrain (grain segmentation, optional; includes SAM 2): install it with its own instructions: {SEG_INSTALL_URL}")
         results.update(extra_results)

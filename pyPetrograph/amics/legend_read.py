@@ -1,12 +1,14 @@
 """
 Read an AMICS legend image: swatch colors by row + mineral names by OCR (rapidocr).
 
-Names that share one color are merged into ``"A / B"``. ``rapidocr_onnxruntime``
-is imported lazily; without it the names fall back to ``swatch_{i}``.
+Names that share one color are merged into ``"A / B"``. ``rapidocr`` (3.x, on ``onnxruntime``) is
+imported lazily and runs the PP-OCRv4 models bundled in ``pyPetrograph/ocr_models/`` (no download);
+without it the names fall back to ``swatch_{i}``.
 """
 from __future__ import annotations
 
 import json
+import os
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -15,6 +17,8 @@ from PIL import Image
 
 from pyPetrograph.common.constants import PathLike
 from pyPetrograph.mineral_map.legend import read_rgba
+
+_MODELS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "ocr_models")
 
 RGB = Tuple[int, int, int]
 Legend = Dict[str, RGB]
@@ -122,13 +126,26 @@ def _get_engine() -> Any:
     if _ENGINE_FAILED:
         return None
     try:
-        from rapidocr_onnxruntime import RapidOCR
+        import onnxruntime  # noqa: F401  (rapidocr 3.x needs an inference backend)
+        from rapidocr import RapidOCR
 
-        _ENGINE = RapidOCR()
+        m = lambda f: os.path.join(_MODELS, f)
+        _ENGINE = RapidOCR(params={"Global.log_level": "warning",
+                                   "Det.model_path": m("ch_PP-OCRv4_det_infer.onnx"),
+                                   "Rec.model_path": m("ch_PP-OCRv4_rec_infer.onnx"),
+                                   "Cls.model_path": m("ch_ppocr_mobile_v2.0_cls_infer.onnx")})
     except Exception:  # ImportError or engine creation failure
         _ENGINE_FAILED = True
         return None
     return _ENGINE
+
+
+def ocr_lines(engine: Any, img: np.ndarray) -> List[Tuple[Any, str, float]]:
+    """Detect + classify + recognise ``img``; returns ``(box, text, score)`` per text line.
+    rapidocr 3.x keeps use_det/use_cls/use_rec from the previous call, so all three are always passed."""
+    r = engine(img, use_det=True, use_cls=True, use_rec=True)
+    boxes = r.boxes if getattr(r, "boxes", None) is not None else []
+    return list(zip(boxes, r.txts or (), r.scores or ()))
 
 
 def _fix_tokens(name: str) -> Tuple[str, bool]:
@@ -162,9 +179,9 @@ def _run_ocr(engine: Any, crop_rgb: np.ndarray, pad: int) -> List[Tuple[float, f
     im = im.resize((im.width * _SCALE, im.height * _SCALE), Image.LANCZOS)
     canvas = Image.new("RGB", (im.width + 2 * pad, im.height + 2 * pad), (255, 255, 255))
     canvas.paste(im, (pad, pad))
-    result, _ = engine(np.asarray(canvas))
+    result = ocr_lines(engine, np.asarray(canvas))
     out: List[Tuple[float, float, float, str]] = []
-    for item in result or []:
+    for item in result:
         box, text = item[0], item[1]
         ys = [p[1] for p in box]
         xs = [p[0] for p in box]
@@ -183,7 +200,7 @@ def ocr_names(path: PathLike, rows: List[Dict[str, Any]]) -> List[str]:
         return []
     engine = _get_engine()
     if engine is None:
-        print("rapidocr_onnxruntime is not installed; using swatch_1..N names")
+        print("rapidocr / onnxruntime is not installed; using swatch_1..N names")
         return [f"swatch_{i}" for i in range(1, n + 1)]
 
     rgb = _load_rgb(path)

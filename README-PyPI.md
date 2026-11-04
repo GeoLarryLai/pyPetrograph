@@ -40,7 +40,7 @@ cd pyPetrograph
 pip install .
 ```
 
-Python 3.10–3.12 recommended (legend OCR has no 3.13+ wheels yet). ⚠️ The default install is **~930 MB**, including legend OCR (rapidocr_onnxruntime with onnxruntime and OpenCV, **~220 MB**) and the app (fastapi + uvicorn, ~11 MB). Optional extras: `xgb`, `test`, `all`.
+⚠️ The default install is **~920 MB**, including legend OCR (rapidocr with onnxruntime and OpenCV, plus the bundled PP-OCRv4 models, **~190 MB**) and the app (fastapi + uvicorn, ~11 MB). Optional extras: `xgb`, `test`, `all`.
 
 ## SegmentEveryGrain (optional, for grain segmentation)
 

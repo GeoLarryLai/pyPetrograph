@@ -21,7 +21,7 @@ Example thin-section images are in `example_data/`. Analyzed results go to `outp
 
 ## Installation
 
-Requires Python 3.10–3.12 (3.13+ installs, but legend OCR has no wheels there yet).
+Requires Python >=3.10.
 
 ### Install from PyPI
 
@@ -198,10 +198,10 @@ docs/images/
 
 Requires Python >=3.10.
 
-Installed with the package (⚠️ **~930 MB** in total; measured on Linux, Python 3.12): numpy (>=1.24), pillow (>=10), matplotlib (>=3.7), scikit-learn (>=1.3), scipy (>=1.10), geopandas (>=0.14), shapely (>=2), rasterio (>=1.3), affine (>=2.4), joblib (>=1.3), pandas (>=2), lightgbm (>=4), scikit-image (>=0.22), rapidocr_onnxruntime (>=1.3; Python <3.13 only), fastapi (>=0.110) and uvicorn (>=0.27) for the app (~11 MB).
+Installed with the package (⚠️ **~920 MB** in total; measured on Linux, Python 3.12): numpy (>=1.24), pillow (>=10), matplotlib (>=3.7), scikit-learn (>=1.3), scipy (>=1.10), geopandas (>=0.14), shapely (>=2), rasterio (>=1.3), affine (>=2.4), joblib (>=1.3), pandas (>=2), lightgbm (>=4), scikit-image (>=0.22), rapidocr (>=3,<4) and onnxruntime, fastapi (>=0.110) and uvicorn (>=0.27) for the app (~11 MB).
 
 > [!NOTE]
-> **rapidocr_onnxruntime** (legend OCR for notebook 4 and the app) is a large part of the default install: it adds **~220 MB** (onnxruntime ~80 MB, OpenCV ~120 MB, RapidOCR ~16 MB) on top of the other dependencies (~700 MB; measured on Linux, Python 3.12).
+> **rapidocr** (legend OCR for notebook 4 and the app) is a large part of the default install: it adds **~190 MB** (onnxruntime ~70 MB, OpenCV ~70 MB, RapidOCR ~33 MB, bundled PP-OCRv4 models ~16 MB, no download at run time) on top of the other dependencies (~700 MB; measured on Linux, Python 3.12).
 
 Notebook pop-up windows (notebook pickers, label/align/GrainPlot windows; not installed by default, the app does not need it): ⚠️ PySide6-Essentials (>=6.6, **~250 MB**), `pip install PySide6-Essentials`. Another Qt binding supported by Matplotlib also works if already installed. On Linux, the pop-up windows' Qt also needs a few system libraries (Debian/Ubuntu; use `libglib2.0-0` on older Ubuntu): `sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libxkbcommon-x11-0 libfontconfig1 libfreetype6 libdbus-1-3 libglib2.0-0t64 libx11-6 libx11-xcb1 libxcb1 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xkb1`. The app needs none of them.
 
