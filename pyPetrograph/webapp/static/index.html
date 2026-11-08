@@ -4,17 +4,17 @@
 <html lang="en"><head><meta charset="utf-8"><title>pyPetrograph</title>
 <link rel="stylesheet" href="/shell/static/shell.css"><link rel="stylesheet" href="/static/app.css"></head>
 <body class="home">
-<header id="top"><span class="brand">pyPetrograph</span><button id="homeBtn" class="ghost" title="Back to the start page">⌂ Start</button><span class="doc" id="doc">Choose a job</span>
+<header id="top"><span class="brand" title="pyPetrograph"><img src="/static/logo.png" alt="pyPetrograph" width="40" height="47"></span><button id="homeBtn" class="ghost" title="Back to the start page">⌂ Start</button><span class="doc" id="doc">Choose a job</span>
   <button id="advBtn" class="ghost" title="Notebook 4 settings: tolerances, shares, figure strengths">Advanced</button>
   <button id="logBtn" class="ghost" title="Show / hide the log">Log</button>
   <button id="quitBtn" class="ghost" title="Stop the app">Quit</button></header>
 <nav id="rail"></nav>
 <main id="main"><canvas id="cv" tabindex="0"></canvas>
   <div id="zoomtools"><button id="fitBtn" title="Fit the whole image (F)">Fit</button><button id="zin" title="Zoom in">+</button><button id="zout" title="Zoom out">−</button><span id="coord"></span></div>
-  <div id="empty"><div><h1>pyPetrograph</h1><p>AMICS thin-section workflow (notebook 4), step by step.<br>Start with <b>1 · Files</b> on the right.</p></div></div>
+  <div id="empty"><div><h1><img class="home-logo" src="/static/logo.png" alt="pyPetrograph" width="130" height="151"></h1><p>AMICS thin-section workflow (notebook 4), step by step.<br>Start with <b>1 · Files</b> on the right.</p></div></div>
   <pre id="logp" hidden></pre>
   <div id="startScreen">
-    <div class="intro"><h1>pyPetrograph</h1><p>Measure thin sections from photos or AMICS maps, step by step, on this computer.<br>Choose what you want to do:</p></div>
+    <div class="intro"><h1><img class="home-logo" src="/static/logo.png" alt="pyPetrograph" width="130" height="151"></h1><p>Measure thin sections from photos or AMICS maps, step by step, on this computer.<br>Choose what you want to do:</p></div>
     <div class="cards">
       <button class="card big" id="goOptical" data-job="optical"><span class="ic"><svg width="96" height="54" viewBox="0 0 96 54" aria-hidden="true">
         <rect x="1" y="1" width="94" height="52" rx="5" fill="#1f2a3a" stroke="#8a93a3" stroke-width="1.5"/>
@@ -34,6 +34,7 @@
   <div id="mainBtns"></div><div class="pill" id="pill"></div></div>
   <div class="body" id="stepBody"></div><div class="controls" id="ctrls"></div></aside>
 <footer id="bar"><span class="help" id="help"></span><span id="progtxt"></span><span class="prog" id="prog"><i></i></span></footer>
+<footer class="app-credits" aria-label="Project credits and license"><span>Project by Larry Syu-Heng Lai, PhD.</span><span>AGPL-3.0 or later license</span></footer>
 <div id="toast"></div>
 <dialog id="dlg"></dialog>
 <script src="/shell/static/shell.js"></script><script src="/static/viewer.js"></script><script src="/static/app.js"></script><script src="/static/optical.js"></script>

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 (2026-11-08)
+
+- Use the existing package logo in the local app header and start and workspace titles.
+- Add separate project/license footer credits without changing workflows.
+- Keep the PyPI description to a simple text overview.
+
 ## 0.4.0 (2026-11-03)
 
 ### Changed

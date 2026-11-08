@@ -413,3 +413,18 @@ def test_switch_sample_in_one_app(client, tmp_path):
     job(client, "/api/legend/read")
     assert md5("legend_img", g["version"]) != a_leg and md5("bse_gray", g["version"]) != a_bse
     assert ok(client.get("/api/legend"))["rows"]
+
+
+def test_package_logo_and_separate_credits(tmp_path):
+    from pyPetrograph.webapp.routes import create_app
+    c = TestClient(create_app(testing=True))
+    html = c.get("/").text
+    assert 'class="brand" title="pyPetrograph"' in html
+    assert html.count('class="home-logo"') == 2
+    assert '<h1>pyPetrograph</h1>' not in html
+    assert '<footer id="bar">' in html
+    assert html.index('<footer id="bar">') < html.index('<footer class="app-credits"')
+    assert 'Project by Larry Syu-Heng Lai, PhD.' in html
+    assert 'AGPL-3.0 or later license' in html
+    logo = c.get("/static/logo.png")
+    assert logo.status_code == 200 and logo.content.startswith(b"\x89PNG\r\n\x1a\n")

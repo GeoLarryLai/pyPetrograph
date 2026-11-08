@@ -32,7 +32,7 @@ dialog::backdrop{background:rgba(0,0,0,.15)} dialog.nonmodal{position:fixed;righ
 a{color:var(--accent)}
 table.t td.sw{white-space:nowrap;font-size:11px} #side{min-width:380px}
 /* start page (pyRockImageLab style) */
-body.home{grid-template:"top" 44px "main" 1fr "bar" 30px/1fr} body.home #rail,body.home #side,body.home #homeBtn,body.home #advBtn{display:none}
+body.home{grid-template:"top" 44px "main" 1fr "bar" 30px "credits" minmax(34px,auto)/1fr} body.home #rail,body.home #side,body.home #homeBtn,body.home #advBtn{display:none}
 body[data-job=optical] #advBtn{display:none}
 #startScreen{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:30px;z-index:6}
 body:not(.home) #startScreen{display:none}
@@ -46,3 +46,13 @@ body:not(.home) #startScreen{display:none}
 .clsbtn{display:flex;gap:6px;flex-wrap:wrap} .clsbtn button{display:flex;align-items:center;gap:6px} .clsbtn button.on{background:#fff7d6;border-color:var(--warn)}
 pre.rep{font:11px ui-monospace,monospace;background:#f6f6f4;border-radius:6px;padding:6px;overflow:auto;white-space:pre}
 .big-num{font-size:22px;font-weight:600}
+
+/* Package identity and credits, outside the workflow and help/progress bar. */
+body{grid-template-areas:"top top top" "rail main side" "bar bar bar" "credits credits credits";grid-template-rows:44px minmax(0,1fr) 30px minmax(34px,auto)}
+#top .brand{position:relative;display:block;overflow:hidden;width:34px;height:34px;flex:0 0 34px}
+#top .brand img{position:absolute;width:40px;height:auto;max-width:none;left:-3px;top:-2px}
+.home-logo{width:130px;max-width:100%;height:auto;display:block;margin:0 auto}
+.app-credits{grid-area:credits;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px 16px;padding:7px 16px;border-top:1px solid var(--line);background:var(--panel);color:var(--mute);font-size:11.5px}
+@media(max-width:600px){.home-logo{width:108px}.app-credits{padding:7px 10px}}
+
+body.home{grid-template-areas:"top" "main" "bar" "credits";grid-template-rows:44px minmax(0,1fr) 30px minmax(34px,auto)}
