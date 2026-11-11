@@ -28,6 +28,10 @@ Requires Python >=3.10.
 ```bash
 pip install pyPetrograph
 ```
+or from `conda-forge` repository with `conda`:
+```bash
+conda install pypetrograph
+```
 
 This installs the library, the notebooks' dependencies and the app (⚠️ **~930 MB** in total, see [Dependencies](#dependencies)). The notebook pop-up windows need one more package ([below](#dependencies)); grain segmentation needs SegmentEveryGrain ([below](#segmenteverygrain-optional-for-grain-segmentation)).
 
