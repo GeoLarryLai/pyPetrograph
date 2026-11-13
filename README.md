@@ -212,3 +212,7 @@ Notebook pop-up windows (notebook pickers, label/align/GrainPlot windows; not in
 Tests (dev only, not installed with the package): `pip install pytest httpx`.
 
 SegmentEveryGrain (TensorFlow, PyTorch, SAM 2) is not installed with pyPetrograph; install it with [its own instructions](https://github.com/zsylvester/segmenteverygrain).
+
+## License
+
+Code: **AGPL-3.0-or-later**. You are free to use, modify, and share it; anyone distributing modified code or running a modified version as a network service must share its source under the same license.

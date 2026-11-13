@@ -10,4 +10,6 @@ A local browser app guides thin-section photo analysis and AMICS grain counting,
 
 Citation: Lai, L. S.-H. (2026). pyPetrograph. [Zenodo](https://doi.org/10.5281/zenodo.23659316).
 
-License: AGPL-3.0-or-later. Third-party credits are recorded in NOTICE.
+License: AGPL-3.0-or-later. You are free to use, modify, and share it; anyone distributing modified code or running a modified version as a network service must share its source under the same license.
+
+Third-party credits are recorded in NOTICE.
